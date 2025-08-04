@@ -1,0 +1,160 @@
+// 变量定义
+$primary-color: #1976d2;
+$white: #fff;
+$black: #000;
+$overlay-bg: rgba(0, 0, 0, 0.3);
+$breakpoint-sm: 599px;
+
+// 顶部工具栏
+.toolbar {
+  background-color: $primary-color;
+  color: $white;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+
+  .menu-button {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: $white;
+    font-size: 24px;
+    display: none;
+    cursor: pointer;
+  }
+
+  .nav-links {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    gap: clamp(8px, 10vw, 24px);
+
+    a {
+      color: $white;
+      text-decoration: none;
+      padding: 4px 8px;
+
+      &:hover {
+        background-color: rgba($white, 0.1);
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .search-field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: rgba($white, 0.7);
+
+    input {
+      background: none;
+      border: none;
+      border-bottom: 1px solid rgba($white, 0.5);
+      color: $white;
+      outline: none;
+
+      &::placeholder {
+        color: rgba($white, 0.7);
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// 侧边栏
+.sidenav-container {
+  position: relative;
+
+  &.open {
+    .sidenav {
+      left: 0;
+    }
+
+    .overlay {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+      bottom: 0;
+      background-color: $overlay-bg;
+      z-index: 9;
+    }
+  }
+
+  .sidenav {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    height: 100%;
+    width: 250px;
+    background-color: $white;
+    box-shadow: 2px 0 8px rgba($black, 0.3);
+    transition: left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    padding-top: 12px;
+    z-index: 10;
+
+    &-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    &-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 16px;
+
+      a {
+        text-decoration: none;
+        color: #333;
+      }
+    }
+
+    &-search {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba($black, 0.6);
+
+      input {
+        background: none;
+        border: none;
+        border-bottom: 1px solid rgba($black, 0.5);
+        color: $black;
+        outline: none;
+
+        &::placeholder {
+          color: rgba(135, 135, 135, 0.7);
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .overlay {
+    display: none;
+  }
+}
+
+// 小屏幕适配
+@media (max-width: $breakpoint-sm) {
+  .toolbar {
+    .menu-button {
+      display: inline-flex;
+    }
+
+    .nav-links,
+    .search-field {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,18 @@
+// @use "tailwindcss";
+@use "./base/variables";
+@use "./base/reset";
+@use "./base/typography";
+
+/* global layout */
+.app-container {
+  min-height: 100svh;
+  max-width: 1000px;
+  min-width: 350px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.children {
+  flex-grow: 1;
+}
