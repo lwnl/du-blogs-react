@@ -9,6 +9,7 @@ if (!MONGODB_URI) {
 export default async function dbConnection(): Promise<void> {
   try {
     await mongoose.connect(MONGODB_URI)
+    console.log("MongoDB connected!")
   } catch (error) {
     console.error('MongoDB connection error:', error)
   }
