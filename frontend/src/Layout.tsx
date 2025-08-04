@@ -1,14 +1,15 @@
-import Footer from "./components/Footer"
-import Header from "./components/Header"
+import { Outlet } from "react-router-dom";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
 
-
-export default function Layout({children}: {children: React.ReactNode}) {
+export default function Layout() {
   return (
     <div className="app-container">
-      <Header></Header>
-      <main className="children">{children}</main>
-      <Footer></Footer>
+      <Header />
+      <main className="children">
+        <Outlet />
+      </main>
+      <Footer />
     </div>
-  )
+  );
 }
-

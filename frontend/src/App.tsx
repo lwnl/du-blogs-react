@@ -4,12 +4,13 @@ import Layout from "./Layout";
 
 export default function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route></Route>
-        <Route></Route>
-      </Routes>
-    </Layout>
-  )
+    // <Routes>
+    //   <Route element={<Layout />}>
+    //     <Route path="/" element={<Home />} />
+    //     <Route path="/login" element={<Login />} />
+    //   </Route>
+    // </Routes>
+    <Layout />
+  );
 }
 

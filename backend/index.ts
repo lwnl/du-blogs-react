@@ -3,8 +3,11 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import dbConnection from './utils/db'
+import userRouter from './routers/userRouter'
 
 dotenv.config()
+
+dbConnection()
 
 const app = express()
 
@@ -17,10 +20,10 @@ app.use(cors({
 
 app.use(cookieParser())
 
-dbConnection()
+app.use('users', userRouter)
 
 const PORT = process.env.PORT || 3300
 
 app.listen(PORT, () => { 
-   console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
  })
