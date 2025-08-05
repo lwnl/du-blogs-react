@@ -7,7 +7,7 @@ const Register = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const HOST = import.meta.env.VITE_HOST;
+  const HOST = (import.meta as any).env.VITE_HOST;
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
