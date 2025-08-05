@@ -20,7 +20,7 @@ app.use(cors({
 
 app.use(cookieParser())
 
-app.use('users', userRouter)
+app.use('/users', userRouter)
 
 const PORT = process.env.PORT || 3300
 
