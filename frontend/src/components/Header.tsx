@@ -20,7 +20,7 @@ export default function Header() {
   return (
     <>
       <header className="toolbar">
-        <span className="date">千寻 / {date}</span>
+        <span className="date">{date}</span>
 
         <button className="menu-button" aria-label="打开菜单" onClick={toggleSidebar}>
           ☰

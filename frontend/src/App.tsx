@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import Layout from "./Layout";
 import MyBlogs from "./pages/MyBlogs";
 import Register from "./pages/Register";
+import Login from "./pages/Login";
 
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<MyBlogs />} />
         <Route path="/users/register" element={<Register />} />
+        <Route path="/users/login" element={<Login />} />
       </Route>
     </Routes>
     // <Layout />

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./Register.scss";
+import "./Register-Login.scss";
 
 const Register = () => {
   const [userName, setUserName] = useState("");
@@ -50,13 +50,23 @@ const Register = () => {
         required
       />
 
+      <input
+        type="password"
+        placeholder="Repeat Password"
+        value={password}
+        onChange={(e) => {
+          setPassword(e.target.value);
+        }}
+        required
+      />
+
       <button type="submit">Register</button>
 
       <button
         type="button"
         className="login-link"
         onClick={() => {
-          navigate("/");
+          navigate("/users/login");
         }}
       >
         Already have an account? Login
