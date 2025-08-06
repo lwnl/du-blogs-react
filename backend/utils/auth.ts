@@ -12,16 +12,20 @@ export interface AuthRequest extends Request {
 export const auth = (req: AuthRequest, res: Response, next: NextFunction) => {
   const token = req.cookies?.token
 
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET)
-      req.user = decoded
-    } catch (error) {
-      req.user = null
-    }
-  } else {
-    req.user = null
+  if (!token) {
+    return res.status(401).json({
+      message: 'Please login!'
+    })
   }
 
-  next()
+  // token verification
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET)
+    req.user = decoded
+    next()
+  } catch (error) {
+    res.status(401).json({
+      message:'Invalid token!'
+    })
+  }
 }

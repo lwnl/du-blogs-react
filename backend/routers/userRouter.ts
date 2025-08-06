@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import type { Request, Response } from 'express'
 import User from '../models/User'
+import { auth } from '../utils/auth'
+import type { AuthRequest } from '../utils/auth'
 
 dotenv.config()
 const userRouter = express.Router()
@@ -55,8 +57,13 @@ userRouter.post('/register', async (req: Request, res: Response) => {
 })
 
 //  User login
-userRouter.post('/login', async (req: Request, res: Response) => {
+userRouter.post('/login', async (req: AuthRequest, res: Response) => {
+
   const { userName, password } = req.body
+
+  if (!userName || !password) {
+    return res.status(401).json({ message: 'Missing credentials' });
+  }
 
   try {
     const user = await User.findOne({ userName })
@@ -94,6 +101,21 @@ userRouter.post('/login', async (req: Request, res: Response) => {
   }
 
   res.status(200).json({ message: 'Login successful' })
+})
+
+// login check
+userRouter.get('/login-check', auth, (req: AuthRequest, res: Response) => {
+  if (req.user) {
+    return res.status(200).json({
+      user: req.user,
+      authenticated: true
+    })
+  } else {
+    return res.status(401).json({
+      authenticated: false,
+      message: 'Not authenticated'
+    });
+  }
 })
 
 

@@ -4,36 +4,52 @@ import axios from "axios";
 import "./Register-Login.scss";
 
 const Login = () => {
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true); 
   const navigate = useNavigate();
   const HOST = (import.meta as any).env.VITE_HOST;
 
-  const handleRegister = async (e: React.FormEvent) => {
-    // e.preventDefault();
-
-    // try {
-    //   const res = await axios.post(
-    //     `${HOST}/users/register`,
-    //     { userName, password },
-    //     { withCredentials: true }
-    //   );
-    // } catch (error) {
-    //   if (error.response) {
-    //     alert(error.response.data.message || "Registration failed!");
-    //   } else {
-    //     alert("Registration error");
-    //     console.error("Registration error", (error as Error).message);
-    //   }
-    // }
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        `${HOST}/users/login`,
+        { userName, password },
+        { withCredentials: true }
+      );
+      navigate("/");
+    } catch (error) {
+      if (error.response) {
+        alert(error.response.data.message || "login failed!");
+      } else {
+        alert("Login error");
+        console.error("Login error", (error as Error).message);
+      }
+    }
   };
 
   useEffect(() => {
-    
-  }, [])
+    const authCheck = async () => {
+      try {
+        const res = await axios.get(`${HOST}/users/login-check`, { withCredentials: true });
+        if (res.data.authenticated) {
+          navigate("/");
+        } else {
+          setIsCheckingAuth(false);
+        }
+      } catch (error) {
+        setIsCheckingAuth(false);
+        console.error("Error authcheck", (error as Error).message);
+      }
+    };
+    authCheck();
+  }, []);
+
+  if (isCheckingAuth) return <div>Checking login status...</div>;
 
   return (
-    <form className="register" onSubmit={handleRegister}>
+    <form className="register" onSubmit={handleLogin}>
       <input
         type="text"
         placeholder="Username"
