@@ -21,9 +21,9 @@ const Login = () => {
         { userName, password },
         { withCredentials: true }
       );
-      await refetchAuth(); // 登录成功后刷新登录状态
-      setMessage(""); // 清空旧的错误信息
-      navigate('/')
+      await refetchAuth(); // Refresh login status after successful login
+      setMessage(""); // Clear old error message
+      navigate("/"); // Redirect to home page
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         setMessage(error.response.data.message || "Login failed!");
@@ -38,7 +38,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await axios.post(`${HOST}/users/logout`, {}, { withCredentials: true });
-      await refetchAuth(); // 登出后刷新状态
+      await refetchAuth(); // Refresh status after logout
     } catch (error) {
       console.error("Logout error", (error as Error).message);
     }
@@ -81,7 +81,7 @@ const Login = () => {
         required
       />
 
-      {/* 登录状态消息提示 */}
+      {/* Login status message prompt  */}
       {message && <p className="error">{message}</p>}
       <button type="submit">Login</button>
     </form>
