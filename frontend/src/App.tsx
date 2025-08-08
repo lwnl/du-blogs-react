@@ -10,6 +10,7 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<MyBlogs />} />
+        <Route path="/my-blogs" element={<MyBlogs />} />
         <Route path="/users/register" element={<Register />} />
         <Route path="/users/login" element={<Login />} />
       </Route>

@@ -4,7 +4,7 @@ import "./Footer.scss";
 export default function Footer() {
   return (
     <footer className="footer">
-      <p>© {new Date().getFullYear()} 千寻新闻站. 保留所有权利。</p>
+      <p>© {new Date().getFullYear()} 我的博客  保留所有权利。</p>
       <p>
         技术支持：<a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>
       </p>

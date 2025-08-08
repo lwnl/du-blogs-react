@@ -118,5 +118,19 @@ userRouter.get('/login-check', auth, (req: AuthRequest, res: Response) => {
   }
 })
 
+// User logout 
+userRouter.post('/logout', (req: Request, res: Response) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  })
+
+  return res.status(200).json({
+    message: 'Logout successful!',
+    authenticated: false
+  })
+})
+
 
 export default userRouter;

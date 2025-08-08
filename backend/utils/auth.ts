@@ -14,7 +14,8 @@ export const auth = (req: AuthRequest, res: Response, next: NextFunction) => {
 
   if (!token) {
     return res.status(401).json({
-      message: 'Please login!'
+      authenticated: false,
+      message: 'No token provided'
     })
   }
 
@@ -24,8 +25,9 @@ export const auth = (req: AuthRequest, res: Response, next: NextFunction) => {
     req.user = decoded
     next()
   } catch (error) {
-    res.status(401).json({
-      message:'Invalid token!'
+    return res.status(401).json({
+      authenticated: false,
+      message: 'Invalid or expired token'
     })
   }
 }

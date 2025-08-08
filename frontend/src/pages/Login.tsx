@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Register-Login.scss";
+import { useAuthCheck } from "../hooks/useAuthCheck";
 
 const Login = () => {
   const [userName, setUserName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
-  const [isLogin, setIsLogin] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+
   const navigate = useNavigate();
-  const HOST = (import.meta as any).env.VITE_HOST;
+
+  const { HOST, authenticated, isLoading, refetchAuth } = useAuthCheck();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,12 +21,14 @@ const Login = () => {
         { userName, password },
         { withCredentials: true }
       );
-      setIsLogin(true);
+      await refetchAuth(); // 登录成功后刷新登录状态
+      setMessage(""); // 清空旧的错误信息
+      navigate('/')
     } catch (error) {
-      if (error.response) {
-        alert(error.response.data.message || "login failed!");
+      if (axios.isAxiosError(error) && error.response) {
+        setMessage(error.response.data.message || "Login failed!");
       } else {
-        alert("Login error");
+        setMessage("Login error");
         console.error("Login error", (error as Error).message);
       }
     }
@@ -32,36 +36,22 @@ const Login = () => {
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLogin(false)
+    try {
+      await axios.post(`${HOST}/users/logout`, {}, { withCredentials: true });
+      await refetchAuth(); // 登出后刷新状态
+    } catch (error) {
+      console.error("Logout error", (error as Error).message);
+    }
   };
 
-  useEffect(() => {
-    const authCheck = async () => {
-      try {
-        const res = await axios.get(`${HOST}/users/login-check`, {
-          withCredentials: true,
-        });
-        if (res.data.authenticated) {
-          setIsLogin(true);
-        } else {
-        }
-      } catch (error) {
-        console.error("Error authcheck", (error as Error).message);
-      } finally {
-        setIsCheckingAuth(false);
-      }
-    };
-    authCheck();
-  }, []);
-
-  if (isCheckingAuth)
+  if (isLoading)
     return (
       <div className="authCheck">
         <p>Checking login status...</p>
       </div>
     );
 
-  if (isLogin)
+  if (authenticated)
     return (
       <form className="login" onSubmit={handleLogout}>
         <p>You are already logged in!</p>
@@ -91,6 +81,8 @@ const Login = () => {
         required
       />
 
+      {/* 登录状态消息提示 */}
+      {message && <p className="error">{message}</p>}
       <button type="submit">Login</button>
     </form>
   );
