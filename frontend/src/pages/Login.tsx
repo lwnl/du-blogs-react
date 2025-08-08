@@ -6,7 +6,8 @@ import "./Register-Login.scss";
 const Login = () => {
   const [userName, setUserName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true); 
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
+  const [isLogin, setIsLogin] = useState<boolean>(false);
   const navigate = useNavigate();
   const HOST = (import.meta as any).env.VITE_HOST;
 
@@ -18,7 +19,7 @@ const Login = () => {
         { userName, password },
         { withCredentials: true }
       );
-      navigate("/");
+      setIsLogin(true);
     } catch (error) {
       if (error.response) {
         alert(error.response.data.message || "login failed!");
@@ -29,27 +30,47 @@ const Login = () => {
     }
   };
 
+  const handleLogout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLogin(false)
+  };
+
   useEffect(() => {
     const authCheck = async () => {
       try {
-        const res = await axios.get(`${HOST}/users/login-check`, { withCredentials: true });
+        const res = await axios.get(`${HOST}/users/login-check`, {
+          withCredentials: true,
+        });
         if (res.data.authenticated) {
-          navigate("/");
+          setIsLogin(true);
         } else {
-          setIsCheckingAuth(false);
         }
       } catch (error) {
-        setIsCheckingAuth(false);
         console.error("Error authcheck", (error as Error).message);
+      } finally {
+        setIsCheckingAuth(false);
       }
     };
     authCheck();
   }, []);
 
-  if (isCheckingAuth) return <div>Checking login status...</div>;
+  if (isCheckingAuth)
+    return (
+      <div className="authCheck">
+        <p>Checking login status...</p>
+      </div>
+    );
+
+  if (isLogin)
+    return (
+      <form className="login" onSubmit={handleLogout}>
+        <p>You are already logged in!</p>
+        <button type="submit">Logout</button>
+      </form>
+    );
 
   return (
-    <form className="register" onSubmit={handleLogin}>
+    <form className="login" onSubmit={handleLogin}>
       <input
         type="text"
         placeholder="Username"
