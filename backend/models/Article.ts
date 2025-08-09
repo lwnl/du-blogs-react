@@ -4,6 +4,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IArticle extends Document {
   title: string;
   content: string;
+  author: string;
   createdAt: Date;
 }
 
@@ -13,6 +14,10 @@ const ArticleSchema: Schema<IArticle> = new Schema({
     required: true
   },
   content: {
+    type: String,
+    required: true
+  },
+  author: {
     type: String,
     required: true
   }

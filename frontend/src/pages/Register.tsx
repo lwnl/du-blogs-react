@@ -60,7 +60,7 @@ const Register = () => {
         required
       />
 
-      <button type="submit">Register</button>
+      <button type="submit">注册</button>
 
       <button
         type="button"
@@ -69,7 +69,7 @@ const Register = () => {
           navigate("/users/login");
         }}
       >
-        Already have an account? Login
+        已注册? 登录
       </button>
     </form>
   );

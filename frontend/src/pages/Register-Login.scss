@@ -17,7 +17,7 @@
   gap: 1rem;
 
   .error {
-    color: red
+    color: red;
   }
 
   p {
@@ -37,22 +37,19 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    background-color: #2a76d2;
+    color: white;
+    
+    &:hover {
+      background-color: #003860;
+    }
 
-    &.login-link {
+    &.login-link, &.register-link {
       background: none;
       color: #2a76d2;
       text-decoration: underline;
       padding: 0;
       font-size: var(--fs-400);
-    }
-
-    &:not(.login-link) {
-      background-color: #2a76d2;
-      color: white;
-
-      &:hover {
-        background-color: #003860;
-      }
     }
   }
 }

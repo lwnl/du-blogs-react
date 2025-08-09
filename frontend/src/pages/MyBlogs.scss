@@ -1,8 +1,22 @@
 .MyBlogs {
   ul {
     margin: 50px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
-  li {
-    text-align: center;
+
+  button {
+    padding: 0.6rem;
+    font-size: var(--fs-400);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #2a76d2;
+    color: white;
+
+    &:hover {
+      background-color: #003860;
+    }
   }
 }

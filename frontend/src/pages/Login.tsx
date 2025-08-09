@@ -83,7 +83,17 @@ const Login = () => {
 
       {/* Login status message prompt  */}
       {message && <p className="error">{message}</p>}
-      <button type="submit">Login</button>
+      <button type="submit">登录</button>
+
+      <button
+        type="button"
+        className="register-link"
+        onClick={() => {
+          navigate("/users/register");
+        }}
+      >
+        还没有账户？注册
+      </button>
     </form>
   );
 };
