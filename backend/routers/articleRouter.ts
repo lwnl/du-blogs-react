@@ -43,12 +43,13 @@ articleRouter.post("/temp-uploads/delete", auth, async (req: AuthRequest, res: R
 
   try {
     const filePath = path.join(tempDir, filename);
+    console.log('fs.existsSync(filePath):', fs.existsSync(filePath))
 
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
       return res.json({ message: "Temp file deleted successfully" });
     }
-    return res.status(404).json({ error: "文件不存在或已被删除" });
+    // return res.status(404).json({ error: "文件不存在或已被删除" });
   } catch (err) {
     console.error("Delete temp file error:", (err as Error).message);
     return res.status(500).json({ error: "Failed to delete temp file" });

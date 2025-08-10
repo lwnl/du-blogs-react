@@ -6,7 +6,12 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBold, faItalic, faLink, faImage } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBold,
+  faItalic,
+  faLink,
+  faImage,
+} from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "@mui/material/Tooltip";
 
 import { CustomImage } from "../f-utils/customImageExtension";
@@ -68,11 +73,15 @@ const NewBlog = () => {
 
         // 1. 插入一个占位图片
         const placeholderId = `temp-${Date.now()}`;
-        editor?.chain().focus().setImage({
-          src: "",
-          "data-placeholder": "上传中...",
-          alt: placeholderId,
-        }).run();
+        editor
+          ?.chain()
+          .focus()
+          .setImage({
+            src: "",
+            "data-placeholder": "上传中...",
+            alt: placeholderId,
+          })
+          .run();
 
         const formData = new FormData();
         formData.append("image", file);
@@ -88,11 +97,15 @@ const NewBlog = () => {
           );
           if (res.data?.tempUrl && res.data?.tempFilename) {
             // 2. 替换占位图片为真实图片
-            editor?.chain().focus().updateAttributes("image", {
-              src: res.data.tempUrl,
-              "data-placeholder": null,
-              alt: file.name,
-            }).run();
+            editor
+              ?.chain()
+              .focus()
+              .updateAttributes("image", {
+                src: res.data.tempUrl,
+                "data-placeholder": null,
+                alt: file.name,
+              })
+              .run();
 
             // 保存临时文件名
             setTempFiles((prev) => [...prev, res.data.tempFilename]);
@@ -147,13 +160,26 @@ const NewBlog = () => {
 
       // 2. 同步 tempFiles 数组（移除被删除的图片）
       setTempFiles((prev) => {
-        const stillUsed = prev.filter(filename => html.includes(`/temp/${filename}`));
-        const removed = prev.filter(filename => !html.includes(`/temp/${filename}`));
+        const stillUsed = prev.filter((filename) =>
+          html.includes(`/temp/${filename}`)
+        );
+        const removed = prev.filter(
+          (filename) => !html.includes(`/temp/${filename}`)
+        );
 
         // 可选：让后端立即删除这些临时文件
-        removed.forEach(filename => {
-          axios.post(`${HOST}/articles/temp-uploads/delete`, { filename }, { withCredentials: true })
-            .catch(err => console.error("删除临时文件失败:", err));
+        console.log('removed.length=', removed.length)
+        removed.forEach((filename) => {
+          axios
+            .post(
+              `${HOST}/articles/temp-uploads/delete`,
+              { filename },
+              { withCredentials: true }
+            )
+            .then((res) => {
+              console.log(res.data.message); // 这里就能看到 "Temp file deleted successfully"
+            })
+            .catch((err) => console.error("删除临时文件失败:", err));
         });
 
         return stillUsed;
