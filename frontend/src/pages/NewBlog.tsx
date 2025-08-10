@@ -5,16 +5,10 @@ import { useAuthCheck } from "../hooks/useAuthCheck";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image"; // 用官方的 Image 扩展
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBold,
-  faItalic,
-  faLink,
-  faImage,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBold, faItalic, faLink, faImage } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "@mui/material/Tooltip";
-
-import { CustomImage } from "../f-utils/customImageExtension";
 
 import "./NewBlog.scss";
 import "prosemirror-view/style/prosemirror.css";
@@ -26,15 +20,13 @@ const NewBlog = () => {
   const [feedback, setFeedback] = useState("");
   const [tempFiles, setTempFiles] = useState<string[]>([]);
 
-  // 导入编辑器内容
   const savedContent = localStorage.getItem("newBlogContent") || "<p></p>";
+
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Link.configure({
-        openOnClick: true,
-      }),
-      CustomImage, // 用自定义的 Image 扩展
+      Link.configure({ openOnClick: true }),
+      Image // 直接用默认 Image
     ],
     content: savedContent,
   });
@@ -52,18 +44,14 @@ const NewBlog = () => {
   };
 
   const addImage = () => {
-    const choice = window.confirm(
-      "点击“确定”输入图片链接，点击“取消”选择本地图片"
-    );
+    const choice = window.confirm("点击“确定”输入图片链接，点击“取消”选择本地图片");
 
     if (choice) {
-      // 通过链接加载图片
       const url = prompt("Enter image URL");
       if (url) {
         editor?.chain().focus().setImage({ src: url }).run();
       }
     } else {
-      // 本地上传图片
       const input = document.createElement("input");
       input.type = "file";
       input.accept = "image/*";
@@ -71,42 +59,18 @@ const NewBlog = () => {
         const file = input.files?.[0];
         if (!file) return;
 
-        // 1. 插入一个占位图片
-        const placeholderId = `temp-${Date.now()}`;
-        editor
-          ?.chain()
-          .focus()
-          .setImage({
-            src: "",
-            "data-placeholder": "上传中...",
-            alt: placeholderId,
-          })
-          .run();
-
         const formData = new FormData();
         formData.append("image", file);
 
         try {
-          const res = await axios.post(
-            `${HOST}/articles/temp-uploads`,
-            formData,
-            {
-              headers: { "Content-Type": "multipart/form-data" },
-              withCredentials: true,
-            }
-          );
-          if (res.data?.tempUrl && res.data?.tempFilename) {
-            // 2. 替换占位图片为真实图片
-            editor
-              ?.chain()
-              .focus()
-              .updateAttributes("image", {
-                src: res.data.tempUrl,
-                "data-placeholder": null,
-                alt: file.name,
-              })
-              .run();
+          const res = await axios.post(`${HOST}/articles/temp-uploads`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            withCredentials: true,
+          });
 
+          if (res.data?.tempUrl && res.data?.tempFilename) {
+            // 直接插入真实图片
+            editor?.chain().focus().setImage({ src: res.data.tempUrl, alt: file.name }).run();
             // 保存临时文件名
             setTempFiles((prev) => [...prev, res.data.tempFilename]);
           } else {
@@ -141,7 +105,6 @@ const NewBlog = () => {
       localStorage.removeItem("newBlogContent");
       setFeedback("✅ Blog posted successfully!");
 
-      // 跳转到主页
       setTimeout(() => navigate("/"), 1500);
     } catch (error) {
       console.error("Blog post error:", error);
@@ -149,43 +112,33 @@ const NewBlog = () => {
     }
   };
 
-  useEffect(() => {
-    if (!editor) return;
+useEffect(() => {
+  if (!editor) return;
 
-    editor.on("update", () => {
-      const html = editor.getHTML();
+  const updateHandler = () => {
+    const html = editor.getHTML();
+    localStorage.setItem("newBlogContent", html);
 
-      // 1. 保存到 localStorage
-      localStorage.setItem("newBlogContent", html);
+    setTempFiles((prev) => {
+      const stillUsed = prev.filter((filename) => html.includes(`/temp/${filename}`));
+      const removed = prev.filter((filename) => !html.includes(`/temp/${filename}`));
 
-      // 2. 同步 tempFiles 数组（移除被删除的图片）
-      setTempFiles((prev) => {
-        const stillUsed = prev.filter((filename) =>
-          html.includes(`/temp/${filename}`)
-        );
-        const removed = prev.filter(
-          (filename) => !html.includes(`/temp/${filename}`)
-        );
-
-        // 可选：让后端立即删除这些临时文件
-        console.log('removed.length=', removed.length)
-        removed.forEach((filename) => {
-          axios
-            .post(
-              `${HOST}/articles/temp-uploads/delete`,
-              { filename },
-              { withCredentials: true }
-            )
-            .then((res) => {
-              console.log(res.data.message); // 这里就能看到 "Temp file deleted successfully"
-            })
-            .catch((err) => console.error("删除临时文件失败:", err));
-        });
-
-        return stillUsed;
+      removed.forEach((filename) => {
+        axios
+          .post(`${HOST}/articles/temp-uploads/delete`, { filename }, { withCredentials: true })
+          .then((res) => console.log(res.data.message))
+          .catch((err) => console.error("删除临时文件失败:", err));
       });
+
+      return stillUsed;
     });
-  }, [editor, HOST]);
+  };
+
+  editor.on("update", updateHandler);
+  return () => {
+    editor.off("update", updateHandler); // 避免重复绑定
+  };
+}, [editor, HOST]);
 
   if (isLoading) return <p>检测权限...</p>;
   if (!authenticated) {
@@ -207,16 +160,10 @@ const NewBlog = () => {
       <div className="editor">
         <div className="editor-toolbar">
           <Tooltip title="粗体">
-            <FontAwesomeIcon
-              icon={faBold}
-              onClick={() => editor?.chain().focus().toggleBold().run()}
-            />
+            <FontAwesomeIcon icon={faBold} onClick={() => editor?.chain().focus().toggleBold().run()} />
           </Tooltip>
           <Tooltip title="斜体">
-            <FontAwesomeIcon
-              icon={faItalic}
-              onClick={() => editor?.chain().focus().toggleItalic().run()}
-            />
+            <FontAwesomeIcon icon={faItalic} onClick={() => editor?.chain().focus().toggleItalic().run()} />
           </Tooltip>
           <Tooltip title="超链接">
             <FontAwesomeIcon icon={faLink} onClick={setLink} />

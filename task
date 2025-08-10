@@ -1,5 +1,11 @@
 login时分配token，再次登录自动识别 ok
 添加logout按钮 ok
+编辑添加博客页面 ok
+给图片添加style
+增加字体设置
+增加图说
+提交时保存至gcs
+
 只加载用户自己的blog
 游客身份发表评论
 富文本编辑器（推荐：Tiptap）
