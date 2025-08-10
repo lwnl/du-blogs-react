@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import dbConnection from './utils/db'
 import userRouter from './routers/userRouter'
+import articleRouter from './routers/articleRouter'
 
 dotenv.config()
 
@@ -21,6 +22,7 @@ app.use(cors({
 app.use(cookieParser())
 
 app.use('/users', userRouter)
+app.use('/articles', articleRouter)
 
 const PORT = process.env.PORT || 3300
 

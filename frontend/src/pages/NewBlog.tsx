@@ -19,7 +19,7 @@ import "./NewBlog.scss";
 import "prosemirror-view/style/prosemirror.css";
 
 const NewBlog = () => {
-  const { authenticated, isLoading } = useAuthCheck();
+  const { authenticated, isLoading, HOST } = useAuthCheck();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -50,9 +50,43 @@ const NewBlog = () => {
   };
 
   const addImage = () => {
-    const url = prompt("Enter image URL");
-    if (url) {
-      editor?.chain().focus().setImage({ src: url }).run();
+    const choice = window.confirm(
+      "点击“确定”输入图片链接，点击“取消”选择本地图片"
+    );
+
+    if (choice) {
+      // 通过链接加载图片
+      const url = prompt("Enter image URL");
+      if (url) {
+        editor?.chain().focus().setImage({ src: url }).run();
+      }
+    } else {
+      // 本地上传图片
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = async () => {
+        const file = input.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+          const res = await axios.post(`${HOST}/articles/uploads`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            withCredentials: true,
+          });
+          if (res.data?.imageUrl) {
+            editor?.chain().focus().setImage({ src: res.data.imageUrl }).run();
+          } else {
+            console.error("No image URL returned from server");
+          }
+        } catch (error) {
+          console.error("upload image error:", (error as Error).message);
+        }
+      };
+      input.click();
     }
   };
 

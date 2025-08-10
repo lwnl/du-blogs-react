@@ -1,6 +1,9 @@
 # dependencies (bun install)
 node_modules
 
+# keys
+gcs-key.json
+
 # output
 out
 dist
