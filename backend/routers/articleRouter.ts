@@ -1,5 +1,5 @@
 import express from 'express'
-import type { Response } from 'express'
+import type { Request, Response } from 'express'
 import { auth } from '../utils/auth'
 import type { AuthRequest } from '../utils/auth'
 import multer from 'multer'
@@ -43,7 +43,7 @@ articleRouter.post("/temp-uploads/delete", auth, async (req: AuthRequest, res: R
 
   try {
     const filePath = path.join(tempDir, filename);
-    
+
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
       return res.json({ message: "Temp file deleted successfully" });
@@ -95,6 +95,44 @@ articleRouter.post('/upload', auth, async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: 'Failed to save blog' });
   }
 });
+
+//获取文章列表
+articleRouter.get('/', async (req: Request, res: Response) => {
+  try {
+    const blogs = await Article.find().sort({
+      createdAt: -1
+    })
+
+    res.status(200).json({
+      blogs
+    })
+  } catch (error) {
+    console.error('error fetching blogs:', (error as Error).message)
+    res.status(500).json({
+      error: '获取文章失败'
+    })
+  }
+})
+
+// 获取具体文章
+articleRouter.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const blog = await Article.findById(req.params.id)
+    if (!blog) {
+      return res.status(404).json({
+        error: '文章不存在'
+      })
+    }
+    res.status(200).json({
+      blog
+    })
+  } catch (error) {
+    console.error('error fetching blog:', (error as Error).message)
+    res.status(500).json({
+      error: '获取文章失败'
+    })
+  }
+})
 
 
 
