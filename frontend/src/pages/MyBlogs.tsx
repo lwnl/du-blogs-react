@@ -49,6 +49,7 @@ const MyBlogs = () => {
             <h5>
               <Link to={`/my-blogs/${blog._id}`}>{blog.title}</Link>
             </h5>
+            <p>{blog.createdAt}</p>
           </li>
         ))}
       </ul>

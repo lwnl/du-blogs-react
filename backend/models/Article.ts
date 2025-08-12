@@ -6,6 +6,7 @@ export interface IArticle extends Document {
   content: string;
   author: string;
   createdAt: Date;
+  updatedAt: Date; 
 }
 
 const ArticleSchema: Schema<IArticle> = new Schema({
@@ -27,6 +28,18 @@ const ArticleSchema: Schema<IArticle> = new Schema({
     updatedAt: true
   }
 })
+
+ArticleSchema.set('toJSON', {
+  transform: function (doc, ret:any) {
+    if (ret.createdAt) {
+      ret.createdAt = new Date(ret.createdAt).toISOString().split('T')[0];
+    }
+    if (ret.updatedAt) {
+      ret.updatedAt = new Date(ret.updatedAt).toISOString().split('T')[0];
+    }
+    return ret;
+  }
+});
 
 const Article: Model<IArticle> = mongoose.models.Article || mongoose.model<IArticle>('Article', ArticleSchema)
 
