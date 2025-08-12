@@ -10,14 +10,13 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<MyBlogs />} />
+        <Route index element={<MyBlogs />} />{/* 默认首页 */}
         <Route path="/my-blogs" element={<MyBlogs />} />
         <Route path="/new-blog" element={<NewBlog />} />
         <Route path="/users/register" element={<Register />} />
         <Route path="/users/login" element={<Login />} />
       </Route>
     </Routes>
-    // <Layout />
   );
 }
 

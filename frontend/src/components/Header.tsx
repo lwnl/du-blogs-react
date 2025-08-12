@@ -1,6 +1,6 @@
 // src/components/Header.tsx
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./Header.scss";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 
@@ -32,11 +32,11 @@ export default function Header() {
       <div className="toolbar">
         {authenticated ? (
           <span className="register-login">
-            <Link to="/users/login">用户：{user?.userName}</Link>
+            <NavLink to="/users/login">用户：{user?.userName}</NavLink>
             </span>
         ) : (
           <span className="register-login">
-            <Link to="/users/login">注册/登录</Link>
+            <NavLink to="/users/login">注册/登录</NavLink>
           </span>
         )}
 
@@ -51,8 +51,8 @@ export default function Header() {
         </button>
 
         <nav className="nav-links">
-          <Link to="/my-blogs">博客园地</Link>
-          <Link to="/downloads">禁书下载</Link>
+          <NavLink to="/my-blogs">博客园地</NavLink>
+          <NavLink to="/downloads">禁书下载</NavLink>
         </nav>
 
         <div className="search-field">
@@ -71,12 +71,12 @@ export default function Header() {
           </div>
 
           <nav className="sidenav-links">
-            <Link to="/news" onClick={toggleSidebar}>
+            <NavLink to="/news" onClick={toggleSidebar}>
               我的博客
-            </Link>
-            <Link to="/downloads" onClick={toggleSidebar}>
+            </NavLink>
+            <NavLink to="/downloads" onClick={toggleSidebar}>
               禁书下载
-            </Link>
+            </NavLink>
           </nav>
 
           <div className="sidenav-search">

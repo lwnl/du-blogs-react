@@ -14,9 +14,18 @@ header {
     display: flex;
     align-items: center;
 
+    .nav-links a {
+      text-decoration: none;
+      color: inherit;
+      padding-bottom: 2px;
+    }
+
+    .nav-links a.active {
+      border-bottom: 2px solid currentColor; /* 下划线 */
+    }
+
     span.register-login {
       margin-right: var(--size-400);
-
 
       a:visited {
         color: rgb(255, 255, 255); /* 访问过的链接颜色 */
