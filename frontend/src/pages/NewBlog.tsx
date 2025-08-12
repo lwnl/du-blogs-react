@@ -15,8 +15,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "@mui/material/Tooltip";
 
-import "./NewBlog.scss";
 import "prosemirror-view/style/prosemirror.css";
+import "./NewBlog.scss";
 
 const NewBlog = () => {
   const { authenticated, isLoading, HOST } = useAuthCheck();
