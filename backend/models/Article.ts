@@ -30,12 +30,18 @@ const ArticleSchema: Schema<IArticle> = new Schema({
 })
 
 ArticleSchema.set('toJSON', {
-  transform: function (doc, ret:any) {
+  transform: function (doc, ret: any) {
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    };
+
     if (ret.createdAt) {
-      ret.createdAt = new Date(ret.createdAt).toISOString().split('T')[0];
+      ret.createdAt = new Date(ret.createdAt).toLocaleDateString('zh-CN', options);
     }
     if (ret.updatedAt) {
-      ret.updatedAt = new Date(ret.updatedAt).toISOString().split('T')[0];
+      ret.updatedAt = new Date(ret.updatedAt).toLocaleDateString('zh-CN', options);
     }
     return ret;
   }
