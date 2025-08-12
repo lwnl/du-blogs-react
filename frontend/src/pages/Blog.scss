@@ -1,9 +1,19 @@
 .Blog {
- 
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-400);
+  text-align: center;
+
+  .author {
+    margin-right: var(--size-400);
+  }
+
+  .article-content {
+    text-align: left;
+  }
 }
 
- .blogError {
-    margin-top: 50px;;
-    text-align: center;
-    color: red;
-  }
+.blogError {
+  text-align: center;
+  color: red;
+}

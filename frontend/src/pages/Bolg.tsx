@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { IArticle } from "./MyBlogs";
 import { useAuthCheck } from "../hooks/useAuthCheck";
-import './Blog.scss'
+import "./Blog.scss";
 
 const Blog = () => {
   const { id } = useParams<{ id: string }>();
@@ -44,16 +44,27 @@ const Blog = () => {
   if (error) return <div className="blogError">错误: {error}</div>;
   if (!blog) return <div>文章不存在</div>;
 
-  return <div className="Blog">
-    <h5>{blog.title}</h5>
-    <p><strong>作者：</strong> {blog.author}</p>
-    <p><strong>更新时间：</strong> {blog.updatedAt}</p>
-    {/* 将 blog.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
-    <article dangerouslySetInnerHTML={{__html: blog.content}}></article>
-    <p>
-      <Link to='/my-blogs'>返回博客园地</Link>
-    </p>
-  </div>;
+  return (
+    <div className="Blog">
+      <div>
+        <h3>{blog.title}</h3>
+        <div>
+          <span className="author">
+            <strong>作者：</strong> {blog.author}
+          </span>
+          <span>
+            <strong>更新时间：</strong> {blog.updatedAt}
+          </span>
+        </div>
+      </div>
+
+      {/* 将 blog.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
+      <article className="article-content" dangerouslySetInnerHTML={{ __html: blog.content }}></article>
+      <p>
+        <Link to="/my-blogs">返回博客园地</Link>
+      </p>
+    </div>
+  );
 };
 
 export default Blog;

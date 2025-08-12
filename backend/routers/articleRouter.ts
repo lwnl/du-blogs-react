@@ -89,7 +89,7 @@ articleRouter.post('/upload', auth, async (req: AuthRequest, res: Response) => {
     await Article.create({
       title,
       content: finalContent,
-      author: req.user?.useName || 'unknown', // 假设 auth 中挂载了 req.user
+      author: req.user?.userName || 'unknown', // 假设 auth 中挂载了 req.user
     })
 
     res.status(201).json({ message: 'Blog created successfully' });
