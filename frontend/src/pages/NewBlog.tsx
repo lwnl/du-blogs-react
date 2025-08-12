@@ -16,6 +16,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "@mui/material/Tooltip";
 import Paragraph from "@tiptap/extension-paragraph";
+import { TextSelection } from 'prosemirror-state'
+
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
 
@@ -30,25 +32,55 @@ const NewBlog = () => {
 
   const savedContent = localStorage.getItem("newBlogContent") || "<p></p>";
 
-  const CustomParagraph = Paragraph.extend({
-    addAttributes() {
-      return {
-        class: {
-          default: null,
+const CustomParagraph = Paragraph.extend({
+  addAttributes() {
+    return {
+      ...(Paragraph.config as any).addAttributes?.(),
+      class: {
+        default: null,
+        parseHTML: (element: HTMLElement) => element.getAttribute("class"),
+        renderHTML: (attributes) => {
+          if (!attributes.class) {
+            return {};
+          }
+          return { class: attributes.class };
         },
-      };
-    },
-  });
+      },
+    };
+  },
+});
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({ paragraph: false }), // 禁用默认段落
-      CustomParagraph, // 使用带 class 属性的段落扩展
-      Link.configure({ openOnClick: true }),
-      Image,
-    ],
-    content: savedContent,
-  });
+const editor = useEditor({
+  extensions: [
+    StarterKit.configure({ paragraph: false }),
+    CustomParagraph,
+    Link.configure({ openOnClick: true }),
+    Image,
+  ],
+  content: savedContent,
+  editorProps: {
+    handleKeyDown(view, event) {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        const { state, dispatch } = view
+        const { schema, selection } = state
+        const position = selection.$to.pos
+
+        // 插入默认无样式段落节点
+        const paragraph = schema.nodes.paragraph.create()
+        const tr = state.tr.insert(position, paragraph)
+
+        // 选中插入的空段落开头
+        const selectionNew = TextSelection.near(tr.doc.resolve(position + 1))
+        tr.setSelection(selectionNew)
+        dispatch(tr)
+
+        return true // 阻止默认回车行为
+      }
+      return false
+    }
+  }
+})
 
   const setLink = () => {
     const url = prompt("Enter URL");
@@ -94,13 +126,11 @@ const NewBlog = () => {
           );
 
           if (res.data?.tempUrl && res.data?.tempFilename) {
-            // 直接插入真实图片
             editor
               ?.chain()
               .focus()
               .setImage({ src: res.data.tempUrl, alt: file.name })
               .run();
-            // 保存临时文件名
             setTempFiles((prev) => [...prev, res.data.tempFilename]);
           } else {
             console.error("No image URL returned from server");
@@ -127,7 +157,6 @@ const NewBlog = () => {
         { withCredentials: true }
       );
 
-      // 清空
       editor?.commands.setContent("");
       setTitle("");
       setTempFiles([]);
@@ -173,7 +202,7 @@ const NewBlog = () => {
 
     editor.on("update", updateHandler);
     return () => {
-      editor.off("update", updateHandler); // 避免重复绑定
+      editor.off("update", updateHandler);
     };
   }, [editor, HOST]);
 
@@ -188,72 +217,60 @@ const NewBlog = () => {
   }
 
   return (
-    <form className="NewBlog" onSubmit={handleSubmit}>
-      <h4>创建新博客</h4>
-      <input
-        type="text"
-        placeholder="标题"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
-      />
+    <>
+      <form className="NewBlog" onSubmit={handleSubmit}>
+        <h4>创建新博客</h4>
+        <input
+          type="text"
+          placeholder="标题"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
 
-      <div className="editor">
-        <div className="editor-toolbar">
-          <Tooltip title="粗体">
-            <FontAwesomeIcon
-              icon={faBold}
-              onClick={() => editor?.chain().focus().toggleBold().run()}
-            />
-          </Tooltip>
+        <div className="editor">
+          <div className="editor-toolbar">
+            <Tooltip title="粗体">
+              <FontAwesomeIcon
+                icon={faBold}
+                onClick={() => editor?.chain().focus().toggleBold().run()}
+              />
+            </Tooltip>
 
-          <Tooltip title="斜体">
-            <FontAwesomeIcon
-              icon={faItalic}
-              onClick={() => editor?.chain().focus().toggleItalic().run()}
-            />
-          </Tooltip>
-          <Tooltip title="超链接">
-            <FontAwesomeIcon icon={faLink} onClick={setLink} />
-          </Tooltip>
+            <Tooltip title="斜体">
+              <FontAwesomeIcon
+                icon={faItalic}
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
+              />
+            </Tooltip>
+            <Tooltip title="超链接">
+              <FontAwesomeIcon icon={faLink} onClick={setLink} />
+            </Tooltip>
 
-          <Tooltip title="图片">
-            <FontAwesomeIcon icon={faImage} onClick={addImage} />
-          </Tooltip>
+            <Tooltip title="图片">
+              <FontAwesomeIcon icon={faImage} onClick={addImage} />
+            </Tooltip>
 
-          <Tooltip title="图说">
-            <FontAwesomeIcon
-              icon={faCommentDots}
-              onClick={() => {
-                const caption = window.prompt("请输入图片说明");
-                if (
-                  caption !== null &&
-                  caption !== undefined &&
-                  caption !== ""
-                ) {
-                  // Escape HTML special characters in caption
-                  const escapeHtml = (unsafe: string) =>
-                    unsafe
-                      .replace(/&/g, "&amp;")
-                      .replace(/</g, "&lt;")
-                      .replace(/>/g, "&gt;")
-                      .replace(/"/g, "&quot;")
-                      .replace(/'/g, "&#039;");
-                  const safeCaption = escapeHtml(caption);
-                  // Use single quotes and possibly inline style to test retention
-                  const html = `<p class='image-caption'>${safeCaption}</p>`;
-                  editor?.chain().focus().insertContent(html).run();
-                }
-              }}
-            />
-          </Tooltip>
+            <Tooltip title="图说">
+              <FontAwesomeIcon
+                icon={faCommentDots}
+                onClick={() => {
+                  editor
+                    ?.chain()
+                    .focus()
+                    .setNode("paragraph", { class: "image-caption" }) // 给当前段落设置类名
+                    .run();
+                }}
+              />
+            </Tooltip>
+          </div>
+          <EditorContent className="content-container" editor={editor} />
         </div>
-        <EditorContent className="content-container" editor={editor} />
-      </div>
 
-      {feedback && <p className="feedback">{feedback}</p>}
-      <button type="submit">提交</button>
-    </form>
+        {feedback && <p className="feedback">{feedback}</p>}
+        <button type="submit">提交</button>
+      </form>
+    </>
   );
 };
 
