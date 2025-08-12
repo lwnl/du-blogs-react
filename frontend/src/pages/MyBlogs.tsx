@@ -9,7 +9,7 @@ export interface IArticle extends Document {
   title: string;
   content: string;
   author: string;
-  createdAt: Date;
+  createdAt: string;
 }
 
 const MyBlogs = () => {
