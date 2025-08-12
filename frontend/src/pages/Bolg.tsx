@@ -41,7 +41,7 @@ const Blog = () => {
   }, [id]);
 
   if (loading) return <div>加载中...</div>;
-  if (error) return <div className="error">错误: {error}</div>;
+  if (error) return <div className="blogError">错误: {error}</div>;
   if (!blog) return <div>文章不存在</div>;
 
   return <div className="Blog">
