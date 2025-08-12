@@ -2,9 +2,19 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Header.scss";
+import { useAuthCheck } from "../hooks/useAuthCheck";
 
 export default function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const {
+    HOST,
+    user,
+    authenticated,
+    message,
+    isLoading,
+    isError,
+    refetchAuth,
+  } = useAuthCheck();
 
   const date = new Date().toLocaleDateString("zh-CN", {
     year: "numeric",
@@ -20,9 +30,21 @@ export default function Header() {
   return (
     <header>
       <div className="toolbar">
+        {authenticated ? (
+          <span className="register-login">用户：{user?.userName}</span>
+        ) : (
+          <span className="register-login">
+            <Link to="/users/login">注册/登录</Link>
+          </span>
+        )}
+
         <span className="date">{date}</span>
 
-        <button className="menu-button" aria-label="打开菜单" onClick={toggleSidebar}>
+        <button
+          className="menu-button"
+          aria-label="打开菜单"
+          onClick={toggleSidebar}
+        >
           ☰
         </button>
 
