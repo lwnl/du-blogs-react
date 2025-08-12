@@ -12,9 +12,10 @@ import {
   faItalic,
   faLink,
   faImage,
+  faCommentDots,
 } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "@mui/material/Tooltip";
-
+import Paragraph from "@tiptap/extension-paragraph";
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
 
@@ -29,11 +30,22 @@ const NewBlog = () => {
 
   const savedContent = localStorage.getItem("newBlogContent") || "<p></p>";
 
+  const CustomParagraph = Paragraph.extend({
+    addAttributes() {
+      return {
+        class: {
+          default: null,
+        },
+      };
+    },
+  });
+
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ paragraph: false }), // 禁用默认段落
+      CustomParagraph, // 使用带 class 属性的段落扩展
       Link.configure({ openOnClick: true }),
-      Image, // 直接用默认 Image
+      Image,
     ],
     content: savedContent,
   });
@@ -194,6 +206,7 @@ const NewBlog = () => {
               onClick={() => editor?.chain().focus().toggleBold().run()}
             />
           </Tooltip>
+
           <Tooltip title="斜体">
             <FontAwesomeIcon
               icon={faItalic}
@@ -203,8 +216,36 @@ const NewBlog = () => {
           <Tooltip title="超链接">
             <FontAwesomeIcon icon={faLink} onClick={setLink} />
           </Tooltip>
+
           <Tooltip title="图片">
             <FontAwesomeIcon icon={faImage} onClick={addImage} />
+          </Tooltip>
+
+          <Tooltip title="图说">
+            <FontAwesomeIcon
+              icon={faCommentDots}
+              onClick={() => {
+                const caption = window.prompt("请输入图片说明");
+                if (
+                  caption !== null &&
+                  caption !== undefined &&
+                  caption !== ""
+                ) {
+                  // Escape HTML special characters in caption
+                  const escapeHtml = (unsafe: string) =>
+                    unsafe
+                      .replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+                  const safeCaption = escapeHtml(caption);
+                  // Use single quotes and possibly inline style to test retention
+                  const html = `<p class='image-caption'>${safeCaption}</p>`;
+                  editor?.chain().focus().insertContent(html).run();
+                }
+              }}
+            />
           </Tooltip>
         </div>
         <EditorContent className="content-container" editor={editor} />
