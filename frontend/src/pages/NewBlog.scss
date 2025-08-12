@@ -40,6 +40,13 @@
       }
     }
 
+    .content-container {
+      img {
+        width: 50%;
+        margin: 0 auto;
+      }
+    }
+
     .ProseMirror {
       min-height: 350px;
       padding: var(--size-200);

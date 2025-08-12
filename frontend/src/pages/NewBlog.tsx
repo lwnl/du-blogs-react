@@ -207,7 +207,7 @@ const NewBlog = () => {
             <FontAwesomeIcon icon={faImage} onClick={addImage} />
           </Tooltip>
         </div>
-        <EditorContent editor={editor} />
+        <EditorContent className="content-container" editor={editor} />
       </div>
 
       {feedback && <p className="feedback">{feedback}</p>}

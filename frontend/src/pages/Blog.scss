@@ -4,12 +4,27 @@
   gap: var(--size-400);
   text-align: center;
 
+  .title {
+    font-weight: bold;
+  }
+
   .author {
     margin-right: var(--size-400);
   }
 
   .article-content {
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap:var(--size-200);
+    strong {
+      font-weight: bold;
+    }
+
+    img{
+      width: 50%;
+      margin: 0 auto;
+    }
   }
 }
 
