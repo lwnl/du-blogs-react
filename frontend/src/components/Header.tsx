@@ -18,8 +18,8 @@ export default function Header() {
   };
 
   return (
-    <>
-      <header className="toolbar">
+    <header>
+      <div className="toolbar">
         <span className="date">{date}</span>
 
         <button className="menu-button" aria-label="打开菜单" onClick={toggleSidebar}>
@@ -27,14 +27,14 @@ export default function Header() {
         </button>
 
         <nav className="nav-links">
-          <Link to="/my-blogs">我的博客</Link>
+          <Link to="/my-blogs">博客园地</Link>
           <Link to="/downloads">禁书下载</Link>
         </nav>
 
         <div className="search-field">
           🔍 <input type="search" placeholder="搜索..." />
         </div>
-      </header>
+      </div>
 
       {/* 侧边栏（小屏显示） */}
       <div className={`sidenav-container ${isSidebarOpen ? "open" : ""}`}>
@@ -63,6 +63,6 @@ export default function Header() {
         {/* 遮罩层 */}
         <div className="overlay" onClick={toggleSidebar}></div>
       </div>
-    </>
+    </header>
   );
 }

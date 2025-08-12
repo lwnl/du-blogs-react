@@ -12,6 +12,7 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 const PORT = process.env.PORT
+const HOST = `http://localhost:${PORT}`
 
 const articleRouter = express.Router()
 
@@ -77,7 +78,7 @@ articleRouter.post('/upload', auth, async (req: AuthRequest, res: Response) => {
         } as any);
 
         // 替换 HTML 中的临时 URL
-        finalContent = finalContent.replace(new RegExp(`/temp/${filename}`, 'g'), gcsUrl);
+        finalContent = finalContent.replace(`${HOST}/temp/${filename}`, gcsUrl);
 
         // 删除临时文件
         fs.unlinkSync(filePath);
@@ -90,6 +91,8 @@ articleRouter.post('/upload', auth, async (req: AuthRequest, res: Response) => {
       content: finalContent,
       author: req.user?.useName || 'unknown', // 假设 auth 中挂载了 req.user
     })
+
+    res.status(201).json({ message: 'Blog created successfully' });
   } catch (err) {
     console.error('Finalize blog error:', (err as Error).message);
     res.status(500).json({ error: 'Failed to save blog' });
