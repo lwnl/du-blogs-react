@@ -10,6 +10,7 @@ export interface IArticle extends Document {
   content: string;
   author: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 const MyBlogs = () => {
@@ -49,7 +50,7 @@ const MyBlogs = () => {
             <h5>
               <Link to={`/my-blogs/${blog._id}`}>{blog.title}</Link>
             </h5>
-            <p>{blog.createdAt}</p>
+            <p>{blog.updatedAt}</p>
           </li>
         ))}
       </ul>

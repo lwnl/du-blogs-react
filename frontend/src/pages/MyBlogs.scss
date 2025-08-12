@@ -2,11 +2,17 @@
   a {
     text-decoration: none;
   }
-  ul {
+
+  ul.blogs {
     margin: 50px auto;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+    }
   }
 
   button {
