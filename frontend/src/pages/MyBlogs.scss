@@ -3,18 +3,6 @@
     text-decoration: none;
   }
 
-  ul.blogs {
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    li {
-      display: flex;
-      justify-content: space-between;
-    }
-  }
-
   button {
     padding: 0.6rem;
     font-size: var(--fs-400);
@@ -27,5 +15,21 @@
     &:hover {
       background-color: #003860;
     }
+  }
+
+  ul.blogs {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  div.add-blog {
+    margin-top: var(--size-400);
   }
 }
