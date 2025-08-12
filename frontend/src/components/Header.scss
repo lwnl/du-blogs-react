@@ -16,6 +16,11 @@ header {
 
     span.register-login {
       margin-right: var(--size-400);
+
+
+      a:visited {
+        color: rgb(255, 255, 255); /* 访问过的链接颜色 */
+      }
     }
 
     .menu-button {

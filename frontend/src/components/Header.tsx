@@ -31,7 +31,9 @@ export default function Header() {
     <header>
       <div className="toolbar">
         {authenticated ? (
-          <span className="register-login">用户：{user?.userName}</span>
+          <span className="register-login">
+            <Link to="/users/login">用户：{user?.userName}</Link>
+            </span>
         ) : (
           <span className="register-login">
             <Link to="/users/login">注册/登录</Link>
