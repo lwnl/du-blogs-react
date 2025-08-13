@@ -149,13 +149,12 @@ const editor = useEditor({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !editor?.getHTML().trim()) {
-      setFeedback("Please fill in all fields.");
+    if (!title.trim() && !editor?.getHTML().trim()) {
+      setFeedback("没有更新的内容");
       return;
     }
 
     try {
-      const id = ''
       await axios.post(
         // 待获取id
         `${HOST}/articles/update/${id}`,

@@ -125,32 +125,49 @@ articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => 
 
 // 更新具体文章
 articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response) => {
-  const updates: Partial<{ title: string; content: string }> = {};
-  if (req.body.title) updates.title = req.body.title;
-  if (req.body.content) updates.content = req.body.content;
+  const { title, content, tempFiles } = req.body; // tempFiles 是前端传来的文件名数组
+
+  let finalContent = content;
 
   try {
-    const updatedBlog = await Article.findOneAndUpdate(
-      { _id: req.params.id, author: req.user.userName }, // filter
-      updates, // update
-      { new: true } // options
-    );
+    // 上传临时文件到 GCS，并替换 URL
+    for (const filename of tempFiles || []) {
+      const filePath = path.join(tempDir, filename);
 
-    if (!updatedBlog) {
-      return res.status(404).json({
-        error: '文章不存在或无权更改'
-      });
+      if (fs.existsSync(filePath)) {
+        const fileBuffer = fs.readFileSync(filePath);
+        const mimeType = 'image/' + path.extname(filename).slice(1);
+
+        const gcsUrl = await uploadFileToGCS({
+          buffer: fileBuffer,
+          originalname: filename,
+          mimetype: mimeType,
+        } as any);
+
+        // 替换 HTML 中的临时 URL
+        finalContent = finalContent.replace(`${HOST}/temp/${filename}`, gcsUrl);
+
+        // 删除临时文件
+        fs.unlinkSync(filePath);
+      }
     }
 
-    res.status(200).json({
-      message: '更新成功！',
-      blog: updatedBlog
-    });
-  } catch (error) {
-    console.error('更新文章失败:', (error as Error).message);
-    res.status(500).json({
-      error: '更新文章失败'
-    });
+    // 保存到 MongoDB
+    const updatedBlog = await Article.findOneAndUpdate(
+      { _id: req.params.id, author: req.user.userName }, //只能更新自己的文章
+      {
+        title,
+        content: finalContent,
+      },
+      { new: true }// 返回更新后的文档
+    )
+    if (!updatedBlog) {
+      return res.status(404).json({ error: '文章不存在或无权限更新' });
+    }
+    res.status(200).json({ message: '文章更新成功！', blog: updatedBlog });
+  } catch (err) {
+    console.error('Finalize blog error:', (err as Error).message);
+    res.status(500).json({ error: 'Failed to save blog' });
   }
 });
 
