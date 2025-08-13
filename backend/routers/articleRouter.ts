@@ -9,6 +9,7 @@ import { tempDir } from '../utils/tempDir';
 import path from 'path'
 import fs from 'fs'
 import dotenv from 'dotenv'
+import { authOptional } from '../utils/authOptional'
 
 dotenv.config()
 const PORT = process.env.PORT
@@ -100,15 +101,19 @@ articleRouter.post('/upload', auth, async (req: AuthRequest, res: Response) => {
   }
 });
 
-//获取文章列表
-articleRouter.get('/', async (req: Request, res: Response) => {
+//获取所有文章列表
+articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => {
+  console.log('user:', req.user)
+  
   try {
-    const blogs = await Article.find().sort({
+    const filter = req.user ? {author: req.user.userName} : {}
+    const blogs = await Article.find(filter).sort({
       createdAt: -1
     })
 
     res.status(200).json({
-      blogs
+      blogs,
+      user: req.user
     })
   } catch (error) {
     console.error('error fetching blogs:', (error as Error).message)
