@@ -14,7 +14,7 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<MyBlogs />} />{/* 默认首页 */}
+        <Route index element={<AllBlogs />} />{/* 默认首页 */}
         <Route path="/users/register" element={<Register />} />
         <Route path="/users/login" element={<Login />} />
         <Route path="/all-blogs" element={<AllBlogs />} />
