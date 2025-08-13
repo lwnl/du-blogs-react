@@ -1,0 +1,62 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBold,
+  faItalic,
+  faLink,
+  faImage,
+  faCommentDots,
+} from "@fortawesome/free-solid-svg-icons";
+import Tooltip from "@mui/material/Tooltip";
+
+interface EditorToolbarProps {
+  editor: any;
+  setLink: () => void;
+  addImage: () => void;
+}
+
+const EditorToolbar: React.FC<EditorToolbarProps> = ({
+  editor,
+  setLink,
+  addImage,
+}) => {
+  return (
+    <div className="editor-toolbar">
+      <Tooltip title="粗体">
+        <FontAwesomeIcon
+          icon={faBold}
+          onClick={() => editor?.chain().focus().toggleBold().run()}
+        />
+      </Tooltip>
+
+      <Tooltip title="斜体">
+        <FontAwesomeIcon
+          icon={faItalic}
+          onClick={() => editor?.chain().focus().toggleItalic().run()}
+        />
+      </Tooltip>
+
+      <Tooltip title="超链接">
+        <FontAwesomeIcon icon={faLink} onClick={setLink} />
+      </Tooltip>
+
+      <Tooltip title="图片">
+        <FontAwesomeIcon icon={faImage} onClick={addImage} />
+      </Tooltip>
+
+      <Tooltip title="图说">
+        <FontAwesomeIcon
+          icon={faCommentDots}
+          onClick={() => {
+            editor
+              ?.chain()
+              .focus()
+              .setNode("paragraph", { class: "image-caption" })
+              .run();
+          }}
+        />
+      </Tooltip>
+    </div>
+  );
+};
+
+export default EditorToolbar;

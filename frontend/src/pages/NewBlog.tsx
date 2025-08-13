@@ -6,20 +6,12 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image"; // 用官方的 Image 扩展
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBold,
-  faItalic,
-  faLink,
-  faImage,
-  faCommentDots,
-} from "@fortawesome/free-solid-svg-icons";
-import Tooltip from "@mui/material/Tooltip";
 import Paragraph from "@tiptap/extension-paragraph";
 import { TextSelection } from "prosemirror-state";
 
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
+import EditorToolbar from "../components/EditorToolbar";
 
 const NewBlog = () => {
   const { authenticated, isLoading, HOST } = useAuthCheck();
@@ -148,18 +140,19 @@ const NewBlog = () => {
         { title, content: editor.getHTML() },
         { withCredentials: true }
       );
-
-      editor?.commands.setContent("");
-      setTitle("");
+      //一定要先清理localstorage，再重置编辑器和title，这样存储在gcs上的数据才不会消失
       localStorage.removeItem("newBlogContent");
       localStorage.removeItem("newBlogTitle");
+      localStorage.removeItem("blogImages");
+      editor?.commands.setContent("");
+      setTitle("");
       setFeedback("✅ Blog posted successfully!");
 
       setTimeout(() => navigate("/"), 1500);
     } catch (error) {
       console.error("Blog post error:", error);
       setFeedback("❌ Failed to post blog.");
-    }
+    } 
   };
 
   useEffect(() => {
@@ -220,41 +213,11 @@ const NewBlog = () => {
         />
 
         <div className="editor">
-          <div className="editor-toolbar">
-            <Tooltip title="粗体">
-              <FontAwesomeIcon
-                icon={faBold}
-                onClick={() => editor?.chain().focus().toggleBold().run()}
-              />
-            </Tooltip>
-
-            <Tooltip title="斜体">
-              <FontAwesomeIcon
-                icon={faItalic}
-                onClick={() => editor?.chain().focus().toggleItalic().run()}
-              />
-            </Tooltip>
-            <Tooltip title="超链接">
-              <FontAwesomeIcon icon={faLink} onClick={setLink} />
-            </Tooltip>
-
-            <Tooltip title="图片">
-              <FontAwesomeIcon icon={faImage} onClick={addImage} />
-            </Tooltip>
-
-            <Tooltip title="图说">
-              <FontAwesomeIcon
-                icon={faCommentDots}
-                onClick={() => {
-                  editor
-                    ?.chain()
-                    .focus()
-                    .setNode("paragraph", { class: "image-caption" }) // 给当前段落设置类名
-                    .run();
-                }}
-              />
-            </Tooltip>
-          </div>
+          <EditorToolbar
+            editor={editor}
+            setLink={setLink}
+            addImage={addImage}
+          />
           <EditorContent className="content-container" editor={editor} />
         </div>
 
