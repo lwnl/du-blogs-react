@@ -16,7 +16,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "@mui/material/Tooltip";
 import Paragraph from "@tiptap/extension-paragraph";
-import { TextSelection } from 'prosemirror-state'
+import { TextSelection } from "prosemirror-state";
 
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
@@ -26,65 +26,62 @@ const UpdateBlog = () => {
   const navigate = useNavigate();
   const [feedback, setFeedback] = useState("");
 
-  //待更改
   const [tempFiles, setTempFiles] = useState<string[]>([]);
 
-  //待更改
   const savedTitle = localStorage.getItem("newBlogTitle") || "";
-  const [title, setTitle] = useState<string>('');
+  const [title, setTitle] = useState<string>(savedTitle);
 
-  //待更改
   const savedContent = localStorage.getItem("updateContent") || "<p></p>";
 
-const CustomParagraph = Paragraph.extend({
-  addAttributes() {
-    return {
-      ...(Paragraph.config as any).addAttributes?.(),
-      class: {
-        default: null,
-        parseHTML: (element: HTMLElement) => element.getAttribute("class"),
-        renderHTML: (attributes) => {
-          if (!attributes.class) {
-            return {};
-          }
-          return { class: attributes.class };
+  const CustomParagraph = Paragraph.extend({
+    addAttributes() {
+      return {
+        ...(Paragraph.config as any).addAttributes?.(),
+        class: {
+          default: null,
+          parseHTML: (element: HTMLElement) => element.getAttribute("class"),
+          renderHTML: (attributes) => {
+            if (!attributes.class) {
+              return {};
+            }
+            return { class: attributes.class };
+          },
         },
+      };
+    },
+  });
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({ paragraph: false }),
+      CustomParagraph,
+      Link.configure({ openOnClick: true }),
+      Image,
+    ],
+    content: savedContent,
+    editorProps: {
+      handleKeyDown(view, event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const { state, dispatch } = view;
+          const { schema, selection } = state;
+          const position = selection.$to.pos;
+
+          // 插入默认无样式段落节点
+          const paragraph = schema.nodes.paragraph.create();
+          const tr = state.tr.insert(position, paragraph);
+
+          // 选中插入的空段落开头
+          const selectionNew = TextSelection.near(tr.doc.resolve(position + 1));
+          tr.setSelection(selectionNew);
+          dispatch(tr);
+
+          return true; // 阻止默认回车行为
+        }
+        return false;
       },
-    };
-  },
-});
-
-const editor = useEditor({
-  extensions: [
-    StarterKit.configure({ paragraph: false }),
-    CustomParagraph,
-    Link.configure({ openOnClick: true }),
-    Image,
-  ],
-  content: savedContent,
-  editorProps: {
-    handleKeyDown(view, event) {
-      if (event.key === 'Enter') {
-        event.preventDefault()
-        const { state, dispatch } = view
-        const { schema, selection } = state
-        const position = selection.$to.pos
-
-        // 插入默认无样式段落节点
-        const paragraph = schema.nodes.paragraph.create()
-        const tr = state.tr.insert(position, paragraph)
-
-        // 选中插入的空段落开头
-        const selectionNew = TextSelection.near(tr.doc.resolve(position + 1))
-        tr.setSelection(selectionNew)
-        dispatch(tr)
-
-        return true // 阻止默认回车行为
-      }
-      return false
-    }
-  }
-})
+    },
+  });
 
   const setLink = () => {
     const url = prompt("Enter URL");
@@ -176,6 +173,15 @@ const editor = useEditor({
   };
 
   useEffect(() => {
+    //通过id向后台获取文章
+    //获取文章后将图片保存在后台
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("newBlogTitle", title);
+  }, [title]);
+
+  useEffect(() => {
     if (!editor) return;
 
     const updateHandler = () => {
@@ -209,11 +215,7 @@ const editor = useEditor({
     return () => {
       editor.off("update", updateHandler);
     };
-  }, [editor, HOST]);
-
-  useEffect(() => {
-    localStorage.setItem("newBlogTitle", title);
-  }, [title]);
+  }, [editor]);
 
   if (isLoading) return <p>检测权限...</p>;
   if (!authenticated) {
@@ -224,7 +226,7 @@ const editor = useEditor({
   return (
     <>
       <form className="NewBlog" onSubmit={handleSubmit}>
-        <h4>创建新博客</h4>
+        <h4>更新博客</h4>
         <input
           type="text"
           placeholder="标题"

@@ -8,7 +8,7 @@ const storage = new Storage({
 });
 
 const bucketName = 'daniel-jansen7879-bucket-1';
-const bucket = storage.bucket(bucketName);
+export const bucket = storage.bucket(bucketName);
 
 export const uploadFileToGCS = async (file: Express.Multer.File) => {
   return new Promise(async (resolve, reject) => {

@@ -3,7 +3,7 @@ import type { Request, Response } from 'express'
 import { auth } from '../utils/auth'
 import type { AuthRequest } from '../utils/auth'
 import multer from 'multer'
-import { uploadFileToGCS } from '../utils/uploadFileToGCS'
+import { bucket, uploadFileToGCS } from '../utils/uploadFileToGCS'
 import Article from '../models/Article'
 import { tempDir } from '../utils/tempDir';
 import path from 'path'
@@ -17,83 +17,50 @@ const HOST = `http://localhost:${PORT}`
 
 const articleRouter = express.Router()
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => cb(null, tempDir),
-    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
-  }),
-});
+const upload = multer({ storage: multer.memoryStorage() });
 
-//临时保存上传文件
-articleRouter.post("/temp-uploads", auth, upload.single("image"), async (req: AuthRequest, res: Response) => {
+//保存上传文件
+articleRouter.post("/image/upload", auth, upload.single("image"), async (req: AuthRequest, res: Response) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
 
-  // 临时 URL（直接暴露静态目录给前端访问）
-  const tempUrl = `${req.protocol}://${req.get('host')}/temp/${req.file.filename}`;
-  res.json({ tempUrl, tempFilename: req.file.filename });
+  //将文件上传至gcs 将图片url返回给前端
+  try {
+    const url = await uploadFileToGCS(req.file);
+    res.status(200).json({ url });
+  } catch (err) {
+    console.error("Upload to GCS error:", (err as Error).message);
+    res.status(500).json({ error: "Upload failed" });
+  }
 });
 
 // 删除临时文件
-articleRouter.post("/temp-uploads/delete", auth, async (req: AuthRequest, res: Response) => {
-  const { filename } = req.body;
-
-
-  if (!filename) {
-    return res.status(400).json({ error: "缺少文件名参数" });
-  }
+articleRouter.post("/image/delete", auth, async (req: AuthRequest, res: Response) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: "Missing image URL" });
 
   try {
-    const filePath = path.join(tempDir, filename);
-
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      return res.json({ message: "Temp file deleted successfully" });
-    }
-    return res.status(404).json({ error: "文件不存在或已被删除" });
+    const fileName = decodeURIComponent(new URL(url).pathname.split("/").pop() || "");
+    await bucket.file(fileName).delete();
+    res.status(200).json({ message: "Image deleted" });
   } catch (err) {
-    console.error("Delete temp file error:", (err as Error).message);
-    return res.status(500).json({ error: "Failed to delete temp file" });
+    console.error("Delete GCS error:", (err as Error).message);
+    res.status(500).json({ error: "Delete failed" });
   }
 });
 
 // 提交时上传到 GCS
-articleRouter.post('/upload', auth, async (req: AuthRequest, res: Response) => {
-  const { title, content, tempFiles } = req.body; // tempFiles 是前端传来的文件名数组
-
-  let finalContent = content;
+articleRouter.post('/upload-blog', auth, async (req: AuthRequest, res: Response) => {
+  const { title, content } = req.body;
 
   try {
-    // 上传临时文件到 GCS，并替换 URL
-    for (const filename of tempFiles || []) {
-      const filePath = path.join(tempDir, filename);
-
-      if (fs.existsSync(filePath)) {
-        const fileBuffer = fs.readFileSync(filePath);
-        const mimeType = 'image/' + path.extname(filename).slice(1);
-
-        const gcsUrl = await uploadFileToGCS({
-          buffer: fileBuffer,
-          originalname: filename,
-          mimetype: mimeType,
-        } as any);
-
-        // 替换 HTML 中的临时 URL
-        finalContent = finalContent.replace(`${HOST}/temp/${filename}`, gcsUrl);
-
-        // 删除临时文件
-        fs.unlinkSync(filePath);
-      }
-    }
-
     // 保存到 MongoDB
     await Article.create({
       title,
-      content: finalContent,
+      content,
       author: req.user?.userName || 'unknown', // 假设 auth 中挂载了 req.user
     })
-
     res.status(201).json({ message: 'Blog created successfully' });
   } catch (err) {
     console.error('Finalize blog error:', (err as Error).message);
@@ -117,6 +84,26 @@ articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => 
     })
   } catch (error) {
     console.error('error fetching blogs:', (error as Error).message)
+    res.status(500).json({
+      error: '获取文章失败'
+    })
+  }
+})
+
+// 获取具体文章
+articleRouter.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const blog = await Article.findById(req.params.id)
+    if (!blog) {
+      return res.status(404).json({
+        error: '文章不存在'
+      })
+    }
+    res.status(200).json({
+      blog
+    })
+  } catch (error) {
+    console.error('error fetching blog:', (error as Error).message)
     res.status(500).json({
       error: '获取文章失败'
     })
@@ -170,27 +157,6 @@ articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
     res.status(500).json({ error: 'Failed to save blog' });
   }
 });
-
-// 获取具体文章
-articleRouter.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const blog = await Article.findById(req.params.id)
-    if (!blog) {
-      return res.status(404).json({
-        error: '文章不存在'
-      })
-    }
-    res.status(200).json({
-      blog
-    })
-  } catch (error) {
-    console.error('error fetching blog:', (error as Error).message)
-    res.status(500).json({
-      error: '获取文章失败'
-    })
-  }
-})
-
 
 
 export default articleRouter;

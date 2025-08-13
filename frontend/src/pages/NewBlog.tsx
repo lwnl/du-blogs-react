@@ -16,7 +16,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "@mui/material/Tooltip";
 import Paragraph from "@tiptap/extension-paragraph";
-import { TextSelection } from 'prosemirror-state'
+import { TextSelection } from "prosemirror-state";
 
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
@@ -25,62 +25,61 @@ const NewBlog = () => {
   const { authenticated, isLoading, HOST } = useAuthCheck();
   const navigate = useNavigate();
   const [feedback, setFeedback] = useState("");
-  const [tempFiles, setTempFiles] = useState<string[]>([]);
 
   const savedTitle = localStorage.getItem("newBlogTitle") || "";
   const [title, setTitle] = useState(savedTitle);
 
   const savedContent = localStorage.getItem("newBlogContent") || "<p></p>";
 
-const CustomParagraph = Paragraph.extend({
-  addAttributes() {
-    return {
-      ...(Paragraph.config as any).addAttributes?.(),
-      class: {
-        default: null,
-        parseHTML: (element: HTMLElement) => element.getAttribute("class"),
-        renderHTML: (attributes) => {
-          if (!attributes.class) {
-            return {};
-          }
-          return { class: attributes.class };
+  const CustomParagraph = Paragraph.extend({
+    addAttributes() {
+      return {
+        ...(Paragraph.config as any).addAttributes?.(),
+        class: {
+          default: null,
+          parseHTML: (element: HTMLElement) => element.getAttribute("class"),
+          renderHTML: (attributes) => {
+            if (!attributes.class) {
+              return {};
+            }
+            return { class: attributes.class };
+          },
         },
+      };
+    },
+  });
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({ paragraph: false }),
+      CustomParagraph,
+      Link.configure({ openOnClick: true }),
+      Image,
+    ],
+    content: savedContent,
+    editorProps: {
+      handleKeyDown(view, event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const { state, dispatch } = view;
+          const { schema, selection } = state;
+          const position = selection.$to.pos;
+
+          // 插入默认无样式段落节点
+          const paragraph = schema.nodes.paragraph.create();
+          const tr = state.tr.insert(position, paragraph);
+
+          // 选中插入的空段落开头
+          const selectionNew = TextSelection.near(tr.doc.resolve(position + 1));
+          tr.setSelection(selectionNew);
+          dispatch(tr);
+
+          return true; // 阻止默认回车行为
+        }
+        return false;
       },
-    };
-  },
-});
-
-const editor = useEditor({
-  extensions: [
-    StarterKit.configure({ paragraph: false }),
-    CustomParagraph,
-    Link.configure({ openOnClick: true }),
-    Image,
-  ],
-  content: savedContent,
-  editorProps: {
-    handleKeyDown(view, event) {
-      if (event.key === 'Enter') {
-        event.preventDefault()
-        const { state, dispatch } = view
-        const { schema, selection } = state
-        const position = selection.$to.pos
-
-        // 插入默认无样式段落节点
-        const paragraph = schema.nodes.paragraph.create()
-        const tr = state.tr.insert(position, paragraph)
-
-        // 选中插入的空段落开头
-        const selectionNew = TextSelection.near(tr.doc.resolve(position + 1))
-        tr.setSelection(selectionNew)
-        dispatch(tr)
-
-        return true // 阻止默认回车行为
-      }
-      return false
-    }
-  }
-})
+    },
+  });
 
   const setLink = () => {
     const url = prompt("Enter URL");
@@ -117,23 +116,16 @@ const editor = useEditor({
 
         try {
           const res = await axios.post(
-            `${HOST}/articles/temp-uploads`,
+            `${HOST}/articles/image/upload`,
             formData,
             {
               headers: { "Content-Type": "multipart/form-data" },
               withCredentials: true,
             }
           );
-
-          if (res.data?.tempUrl && res.data?.tempFilename) {
-            editor
-              ?.chain()
-              .focus()
-              .setImage({ src: res.data.tempUrl, alt: file.name })
-              .run();
-            setTempFiles((prev) => [...prev, res.data.tempFilename]);
-          } else {
-            console.error("No image URL returned from server");
+          // 将图片src设置为保存在gcs的链接地址
+          if (res.data?.url) {
+            editor?.chain().focus().setImage({ src: res.data.url }).run();
           }
         } catch (error) {
           console.error("upload image error:", (error as Error).message);
@@ -152,15 +144,15 @@ const editor = useEditor({
 
     try {
       await axios.post(
-        `${HOST}/articles/upload`,
-        { title, content: editor.getHTML(), tempFiles },
+        `${HOST}/articles/upload-blog`,
+        { title, content: editor.getHTML() },
         { withCredentials: true }
       );
 
       editor?.commands.setContent("");
       setTitle("");
-      setTempFiles([]);
       localStorage.removeItem("newBlogContent");
+      localStorage.removeItem("newBlogTitle");
       setFeedback("✅ Blog posted successfully!");
 
       setTimeout(() => navigate("/"), 1500);
@@ -173,42 +165,41 @@ const editor = useEditor({
   useEffect(() => {
     if (!editor) return;
 
-    const updateHandler = () => {
+    const handler = async () => {
       const html = editor.getHTML();
       localStorage.setItem("newBlogContent", html);
+      localStorage.setItem("newBlogTitle", title);
+      // 找出 HTML 中的图片 URL
+      const imgUrls = Array.from(html.matchAll(/<img[^>]+src="([^">]+)"/g)).map(
+        (m) => m[1]
+      );
 
-      setTempFiles((prev) => {
-        const stillUsed = prev.filter((filename) =>
-          html.includes(`/temp/${filename}`)
+      // 获取 localStorage 已存的图片列表
+      const storedImages = JSON.parse(
+        localStorage.getItem("blogImages") || "[]"
+      );
+
+      // 删除已不在编辑器中的图片
+      const removedUrl = storedImages.filter(
+        (url: string) => !imgUrls.includes(url)
+      );
+      for (const url of removedUrl) {
+        await axios.post(
+          `${HOST}/articles/image/delete`,
+          { url },
+          { withCredentials: true }
         );
-        const removed = prev.filter(
-          (filename) => !html.includes(`/temp/${filename}`)
-        );
+      }
 
-        removed.forEach((filename) => {
-          axios
-            .post(
-              `${HOST}/articles/temp-uploads/delete`,
-              { filename },
-              { withCredentials: true }
-            )
-            .then((res) => console.log(res.data.message))
-            .catch((err) => console.error("删除临时文件失败:", err));
-        });
-
-        return stillUsed;
-      });
+      // 更新保存图片列表
+      localStorage.setItem("blogImages", JSON.stringify(imgUrls));
     };
 
-    editor.on("update", updateHandler);
+    editor.on("update", handler);
     return () => {
-      editor.off("update", updateHandler);
+      editor.off("update", handler);
     };
-  }, [editor, HOST]);
-
-  useEffect(() => {
-    localStorage.setItem("newBlogTitle", title);
-  }, [title]);
+  }, [editor, title]);
 
   if (isLoading) return <p>检测权限...</p>;
   if (!authenticated) {
