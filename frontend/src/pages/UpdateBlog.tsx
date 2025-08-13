@@ -155,9 +155,10 @@ const editor = useEditor({
     }
 
     try {
+      const id = ''
       await axios.post(
         // 待获取id
-        `${HOST}/articles/update:${id}`,
+        `${HOST}/articles/update/${id}`,
         { title, content: editor.getHTML(), tempFiles },
         { withCredentials: true }
       );
