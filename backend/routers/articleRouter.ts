@@ -104,9 +104,9 @@ articleRouter.post('/upload', auth, async (req: AuthRequest, res: Response) => {
 //获取所有文章列表
 articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => {
   console.log('user:', req.user)
-  
+
   try {
-    const filter = req.user ? {author: req.user.userName} : {}
+    const filter = req.user ? { author: req.user.userName } : {}
     const blogs = await Article.find(filter).sort({
       createdAt: -1
     })
@@ -122,6 +122,37 @@ articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => 
     })
   }
 })
+
+// 更新具体文章
+articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response) => {
+  const updates: Partial<{ title: string; content: string }> = {};
+  if (req.body.title) updates.title = req.body.title;
+  if (req.body.content) updates.content = req.body.content;
+
+  try {
+    const updatedBlog = await Article.findOneAndUpdate(
+      { _id: req.params.id, author: req.user.userName }, // filter
+      updates, // update
+      { new: true } // options
+    );
+
+    if (!updatedBlog) {
+      return res.status(404).json({
+        error: '文章不存在或无权更改'
+      });
+    }
+
+    res.status(200).json({
+      message: '更新成功！',
+      blog: updatedBlog
+    });
+  } catch (error) {
+    console.error('更新文章失败:', (error as Error).message);
+    res.status(500).json({
+      error: '更新文章失败'
+    });
+  }
+});
 
 // 获取具体文章
 articleRouter.get('/:id', async (req: Request, res: Response) => {
