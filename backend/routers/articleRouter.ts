@@ -5,9 +5,6 @@ import type { AuthRequest } from '../utils/auth'
 import multer from 'multer'
 import { bucket, uploadFileToGCS } from '../utils/uploadFileToGCS'
 import Article from '../models/Article'
-import { tempDir } from '../utils/tempDir';
-import path from 'path'
-import fs from 'fs'
 import dotenv from 'dotenv'
 import { authOptional } from '../utils/authOptional'
 
@@ -19,7 +16,7 @@ const articleRouter = express.Router()
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-//保存上传文件
+//上传图片至GCS
 articleRouter.post("/image/upload", auth, upload.single("image"), async (req: AuthRequest, res: Response) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
@@ -41,6 +38,7 @@ articleRouter.post("/image/delete", auth, async (req: AuthRequest, res: Response
   if (!url) return res.status(400).json({ error: "Missing image URL" });
 
   try {
+    // 获取GCS上保存的文件名
     const fileName = decodeURIComponent(new URL(url).pathname.split("/").pop() || "");
     await bucket.file(fileName).delete();
     res.status(200).json({ message: "Image deleted" });
@@ -50,7 +48,6 @@ articleRouter.post("/image/delete", auth, async (req: AuthRequest, res: Response
   }
 });
 
-// 提交时上传到 GCS
 articleRouter.post('/upload-blog', auth, async (req: AuthRequest, res: Response) => {
   const { title, content } = req.body;
 
@@ -112,39 +109,15 @@ articleRouter.get('/:id', async (req: Request, res: Response) => {
 
 // 更新具体文章
 articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response) => {
-  const { title, content, tempFiles } = req.body; // tempFiles 是前端传来的文件名数组
-
-  let finalContent = content;
+  const { title, content } = req.body; // tempFiles 是前端传来的文件名数组
 
   try {
-    // 上传临时文件到 GCS，并替换 URL
-    for (const filename of tempFiles || []) {
-      const filePath = path.join(tempDir, filename);
-
-      if (fs.existsSync(filePath)) {
-        const fileBuffer = fs.readFileSync(filePath);
-        const mimeType = 'image/' + path.extname(filename).slice(1);
-
-        const gcsUrl = await uploadFileToGCS({
-          buffer: fileBuffer,
-          originalname: filename,
-          mimetype: mimeType,
-        } as any);
-
-        // 替换 HTML 中的临时 URL
-        finalContent = finalContent.replace(`${HOST}/temp/${filename}`, gcsUrl);
-
-        // 删除临时文件
-        fs.unlinkSync(filePath);
-      }
-    }
-
     // 保存到 MongoDB
     const updatedBlog = await Article.findOneAndUpdate(
       { _id: req.params.id, author: req.user.userName }, //只能更新自己的文章
       {
         title,
-        content: finalContent,
+        content,
       },
       { new: true }// 返回更新后的文档
     )

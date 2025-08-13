@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser'
 import dbConnection from './utils/db'
 import userRouter from './routers/userRouter'
 import articleRouter from './routers/articleRouter'
-import { tempDir } from './utils/tempDir';
 
 dotenv.config()
 
@@ -26,7 +25,6 @@ app.use('/users', userRouter)
 app.use('/articles', articleRouter)
 
 // 允许浏览器通过 /temp/... 访问临时文件
-app.use('/temp', express.static(tempDir)); 
 
 const PORT = process.env.PORT || 3300
 
