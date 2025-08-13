@@ -51,7 +51,8 @@ export default function Header() {
         </button>
 
         <nav className="nav-links">
-          <NavLink to="/my-blogs">博客园地</NavLink>
+          <NavLink to="/my-blogs">我的博客</NavLink>
+          <NavLink to="/all-blogs">博客园地</NavLink>
           <NavLink to="/downloads">禁书下载</NavLink>
         </nav>
 

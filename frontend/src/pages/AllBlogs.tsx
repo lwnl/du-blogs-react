@@ -13,7 +13,7 @@ export interface IArticle extends Document {
   updatedAt: string;
 }
 
-const MyBlogs = () => {
+const AllBlogs = () => {
   const {
     HOST,
     user,
@@ -68,4 +68,4 @@ const MyBlogs = () => {
   );
 };
 
-export default MyBlogs;
+export default AllBlogs;

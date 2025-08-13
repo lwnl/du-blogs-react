@@ -23,6 +23,7 @@ const upload = multer({
   }),
 });
 
+//临时保存上传文件
 articleRouter.post("/temp-uploads", auth, upload.single("image"), async (req: AuthRequest, res: Response) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
@@ -56,7 +57,7 @@ articleRouter.post("/temp-uploads/delete", auth, async (req: AuthRequest, res: R
   }
 });
 
-// 提交时批量上传到 GCS
+// 提交时上传到 GCS
 articleRouter.post('/upload', auth, async (req: AuthRequest, res: Response) => {
   const { title, content, tempFiles } = req.body; // tempFiles 是前端传来的文件名数组
 

@@ -61,7 +61,7 @@ const Blog = () => {
       {/* 将 blog.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
       <article className="article-content" dangerouslySetInnerHTML={{ __html: blog.content }}></article>
       <p>
-        <Link to="/my-blogs">返回博客园地</Link>
+        <Link to="/my-blogs">返回我的博客</Link>
       </p>
     </div>
   );
