@@ -5,7 +5,8 @@ import { useAuthCheck } from "../hooks/useAuthCheck";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image"; // 用官方的 Image 扩展
+import Image from "@tiptap/extension-image";
+import Heading from "@tiptap/extension-heading";
 import Paragraph from "@tiptap/extension-paragraph";
 import { TextSelection } from "prosemirror-state";
 
@@ -47,6 +48,9 @@ const NewBlog = () => {
       CustomParagraph,
       Link.configure({ openOnClick: true }),
       Image,
+      Heading.configure({
+        levels: [3, 4, 5], // 支持的标题级别
+      }),
     ],
     content: savedContent,
     editorProps: {
@@ -152,7 +156,7 @@ const NewBlog = () => {
     } catch (error) {
       console.error("Blog post error:", error);
       setFeedback("❌ Failed to post blog.");
-    } 
+    }
   };
 
   useEffect(() => {

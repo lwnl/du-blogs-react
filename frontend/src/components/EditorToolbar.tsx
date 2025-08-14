@@ -5,6 +5,7 @@ import {
   faLink,
   faImage,
   faCommentDots,
+  faHeading,
 } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "@mui/material/Tooltip";
 
@@ -32,6 +33,15 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
         <FontAwesomeIcon
           icon={faItalic}
           onClick={() => editor?.chain().focus().toggleItalic().run()}
+        />
+      </Tooltip>
+
+      <Tooltip title="小标题">
+        <FontAwesomeIcon
+          icon={faHeading}
+          onClick={() =>
+            editor?.chain().focus().toggleHeading({ level: 5 }).run()
+          }
         />
       </Tooltip>
 

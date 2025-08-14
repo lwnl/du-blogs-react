@@ -67,8 +67,6 @@ articleRouter.post('/upload-blog', auth, async (req: AuthRequest, res: Response)
 
 //获取所有文章列表
 articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => {
-  console.log('user:', req.user)
-
   try {
     const filter = req.user ? { author: req.user.userName } : {}
     const blogs = await Article.find(filter).sort({
