@@ -1,37 +1,34 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image"; // 用官方的 Image 扩展
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBold,
-  faItalic,
-  faLink,
-  faImage,
-  faCommentDots,
-} from "@fortawesome/free-solid-svg-icons";
-import Tooltip from "@mui/material/Tooltip";
+import Image from "@tiptap/extension-image";
+import Heading from "@tiptap/extension-heading";
 import Paragraph from "@tiptap/extension-paragraph";
 import { TextSelection } from "prosemirror-state";
 
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
+import EditorToolbar from "../components/EditorToolbar";
 
 const UpdateBlog = () => {
+  const { id } = useParams<{ id: string }>();
   const { authenticated, isLoading, HOST } = useAuthCheck();
   const navigate = useNavigate();
   const [feedback, setFeedback] = useState("");
 
-  const [tempFiles, setTempFiles] = useState<string[]>([]);
+  // 使用特定于博客ID的localStorage键
+  const titleKey = `draft_${id}_title`;
+  const contentKey = `draft_${id}_content`;
+  const imagesKey = `blogImages_${id}`;
 
-  const savedTitle = localStorage.getItem("newBlogTitle") || "";
-  const [title, setTitle] = useState<string>(savedTitle);
-
-  const savedContent = localStorage.getItem("updateContent") || "<p></p>";
+  // 初始化时优先尝试从localStorage加载草稿
+  const [title, setTitle] = useState<string>(
+    localStorage.getItem(titleKey) || ""
+  );
 
   const CustomParagraph = Paragraph.extend({
     addAttributes() {
@@ -57,8 +54,12 @@ const UpdateBlog = () => {
       CustomParagraph,
       Link.configure({ openOnClick: true }),
       Image,
+      Heading.configure({
+        levels: [3, 4, 5], // 支持的标题级别
+      }),
     ],
-    content: savedContent,
+    // 初始化时优先使用localStorage草稿，否则为空
+    content: localStorage.getItem(contentKey) || "<p></p>",
     editorProps: {
       handleKeyDown(view, event) {
         if (event.key === "Enter") {
@@ -118,23 +119,16 @@ const UpdateBlog = () => {
 
         try {
           const res = await axios.post(
-            `${HOST}/articles/temp-uploads`,
+            `${HOST}/articles/image/upload`,
             formData,
             {
               headers: { "Content-Type": "multipart/form-data" },
               withCredentials: true,
             }
           );
-
-          if (res.data?.tempUrl && res.data?.tempFilename) {
-            editor
-              ?.chain()
-              .focus()
-              .setImage({ src: res.data.tempUrl, alt: file.name })
-              .run();
-            setTempFiles((prev) => [...prev, res.data.tempFilename]);
-          } else {
-            console.error("No image URL returned from server");
+          // 将图片src设置为保存在gcs的链接地址
+          if (res.data?.url) {
+            editor?.chain().focus().setImage({ src: res.data.url }).run();
           }
         } catch (error) {
           console.error("upload image error:", (error as Error).message);
@@ -146,76 +140,111 @@ const UpdateBlog = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() && !editor?.getHTML().trim()) {
-      setFeedback("没有更新的内容");
+    if (!title.trim() || !editor?.getHTML().trim()) {
+      setFeedback("Please fill in all fields.");
       return;
     }
 
     try {
-      await axios.post(
-        // 待获取id
+      // 先提交更新
+      await axios.patch(
         `${HOST}/articles/update/${id}`,
-        { title, content: editor.getHTML(), tempFiles },
+        { title, content: editor.getHTML() },
         { withCredentials: true }
       );
 
+      // 清理未使用的图片
+      const currentImages = Array.from(
+        editor?.getHTML().matchAll(/<img[^>]+src="([^">]+)"/g) || []
+      ).map((m) => m[1]);
+
+      const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
+      const removedImages = storedImages.filter(
+        (url: string) => !currentImages.includes(url)
+      );
+
+      // 异步删除图片，不阻塞主流程
+      if (removedImages.length > 0) {
+        Promise.all(
+          removedImages.map((url: string) =>
+            axios
+              .post(
+                `${HOST}/articles/image/delete`,
+                { url },
+                { withCredentials: true }
+              )
+              .catch((err) => {
+                console.error("图片删除失败:", url, err);
+              })
+          )
+        );
+      }
+      // 移除监听
+      editor?.off("update");
+      // 清除本地存储
+      [titleKey, contentKey, imagesKey].forEach((key) =>
+        localStorage.removeItem(key)
+      );
       editor?.commands.setContent("");
       setTitle("");
-      setTempFiles([]);
-      localStorage.removeItem("updateContent");
-      setFeedback("✅ Blog posted successfully!");
-
-      setTimeout(() => navigate("/"), 1500);
+      setFeedback("✅ 更新成功!");
+      setTimeout(() => navigate("/blogs/mine"), 1500);
     } catch (error) {
       console.error("Blog post error:", error);
-      setFeedback("❌ Failed to post blog.");
+      setFeedback("❌ Failed to update blog.");
     }
   };
 
+  // 初始化标题内容和图片列表
   useEffect(() => {
-    //通过id向后台获取文章
-    //获取文章后将图片保存在后台
-  }, []);
+    if (id && editor) {
+      const hasLocalDraft =
+        localStorage.getItem(titleKey) || localStorage.getItem(contentKey);
+      if (!hasLocalDraft) {
+        axios
+          .get(`${HOST}/articles/${id}`)
+          .then((res) => {
+            const { blog } = res.data;
+            setTitle(blog.title);
+            editor?.commands.setContent(blog.content);
+            // 使用带ID的key保存初始内容
+            localStorage.setItem(titleKey, blog.title);
+            localStorage.setItem(contentKey, blog.content);
 
-  useEffect(() => {
-    localStorage.setItem("newBlogTitle", title);
-  }, [title]);
+            // 提取并保存初始图片
+            const imgUrls = Array.from(
+              blog.content.matchAll(/<img[^>]+src="([^">]+)"/g)
+            ).map((m: any) => m[1]);
+            localStorage.setItem(imagesKey, JSON.stringify(imgUrls));
+          })
+          .catch((error) => {
+            console.error("Failed to fetch blog", (error as Error).message);
+          });
+      }
+    }
+  }, [id, editor, HOST, titleKey, contentKey, imagesKey]);
 
+  // 实时保存标题
   useEffect(() => {
-    if (!editor) return;
+    if (title && id) {
+      localStorage.setItem(titleKey, title);
+    }
+  }, [title, id, titleKey]);
+
+  // 实时保存内容
+  useEffect(() => {
+    if (!editor || !id) return;
 
     const updateHandler = () => {
       const html = editor.getHTML();
-      localStorage.setItem("updateContent", html);
-
-      setTempFiles((prev) => {
-        const stillUsed = prev.filter((filename) =>
-          html.includes(`/temp/${filename}`)
-        );
-        const removed = prev.filter(
-          (filename) => !html.includes(`/temp/${filename}`)
-        );
-
-        removed.forEach((filename) => {
-          axios
-            .post(
-              `${HOST}/articles/temp-uploads/delete`,
-              { filename },
-              { withCredentials: true }
-            )
-            .then((res) => console.log(res.data.message))
-            .catch((err) => console.error("删除临时文件失败:", err));
-        });
-
-        return stillUsed;
-      });
+      localStorage.setItem(contentKey, html);
     };
 
     editor.on("update", updateHandler);
     return () => {
       editor.off("update", updateHandler);
     };
-  }, [editor]);
+  }, [editor, id, contentKey]);
 
   if (isLoading) return <p>检测权限...</p>;
   if (!authenticated) {
@@ -236,41 +265,11 @@ const UpdateBlog = () => {
         />
 
         <div className="editor">
-          <div className="editor-toolbar">
-            <Tooltip title="粗体">
-              <FontAwesomeIcon
-                icon={faBold}
-                onClick={() => editor?.chain().focus().toggleBold().run()}
-              />
-            </Tooltip>
-
-            <Tooltip title="斜体">
-              <FontAwesomeIcon
-                icon={faItalic}
-                onClick={() => editor?.chain().focus().toggleItalic().run()}
-              />
-            </Tooltip>
-            <Tooltip title="超链接">
-              <FontAwesomeIcon icon={faLink} onClick={setLink} />
-            </Tooltip>
-
-            <Tooltip title="图片">
-              <FontAwesomeIcon icon={faImage} onClick={addImage} />
-            </Tooltip>
-
-            <Tooltip title="图说">
-              <FontAwesomeIcon
-                icon={faCommentDots}
-                onClick={() => {
-                  editor
-                    ?.chain()
-                    .focus()
-                    .setNode("paragraph", { class: "image-caption" }) // 给当前段落设置类名
-                    .run();
-                }}
-              />
-            </Tooltip>
-          </div>
+          <EditorToolbar
+            editor={editor}
+            setLink={setLink}
+            addImage={addImage}
+          />
           <EditorContent className="content-container" editor={editor} />
         </div>
 

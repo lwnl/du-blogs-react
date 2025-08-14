@@ -48,6 +48,7 @@ articleRouter.post("/image/delete", auth, async (req: AuthRequest, res: Response
   }
 });
 
+// 上传博客文章
 articleRouter.post('/upload-blog', auth, async (req: AuthRequest, res: Response) => {
   const { title, content } = req.body;
 
@@ -108,7 +109,8 @@ articleRouter.get('/:id', async (req: Request, res: Response) => {
 // 更新具体文章
 articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response) => {
   const { title, content } = req.body; // tempFiles 是前端传来的文件名数组
-
+  console.log('article id is', req.params.id)
+  console.log('username is', req.user.userName)
   try {
     // 保存到 MongoDB
     const updatedBlog = await Article.findOneAndUpdate(
