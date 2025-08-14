@@ -25,7 +25,12 @@
 
     li {
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+    }
+
+    .update-date {
+      margin-left: auto;
+      margin-right: var(--size-400)
     }
   }
 

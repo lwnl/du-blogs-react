@@ -48,17 +48,18 @@ const MyBlogs = () => {
         {blogs.map((blog) => (
           <li key={blog._id}>
             <h5>
-              <Link to={`/all-blogs/${blog._id}`}>{blog.title}</Link>
+              <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
             </h5>
-            <p>{blog.updatedAt}</p>
+            <p className="update-date">{blog.updatedAt}</p>
+            <Link to={`/blogs/update/${blog._id}`}>编辑</Link>
           </li>
         ))}
       </ul>
 
       {authenticated ? (
         <div className="add-blog">
-          <Link to="/new-blog">
-            <button>添加一条博客</button>
+          <Link to="/blogs/new">
+            <button>新建博客</button>
           </Link>
         </div>
       ) : (
