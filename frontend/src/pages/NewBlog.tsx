@@ -83,7 +83,7 @@ const NewBlog = () => {
   });
 
   const setLink = () => {
-    const url = prompt("Enter URL");
+    const url = prompt("输入链接地址");
     if (url) {
       editor
         ?.chain()
