@@ -25,6 +25,21 @@ const MyBlogs = () => {
   } = useAuthCheck();
   const [blogs, setBlogs] = useState<IArticle[]>([]);
 
+  const handleDelete = (id: string) => {
+    axios
+      .delete(`${HOST}/articles/delete/${id}`, { withCredentials: true })
+      .then(() => {
+        console.log("文章删除成功");
+        setBlogs((prev) => prev.filter((blog) => blog._id !== id));
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.error("服务器错误", error.response.data.error);
+        }
+        console.error("请求失败", (error as Error).message);
+      });
+  };
+
   useEffect(() => {
     axios
       .get(`${HOST}/articles`, { withCredentials: true })
@@ -52,6 +67,13 @@ const MyBlogs = () => {
             </h5>
             <p className="update-date">{blog.updatedAt}</p>
             <Link to={`/blogs/update/${blog._id}`}>编辑</Link>
+            <button
+              onClick={() => {
+                handleDelete(blog._id);
+              }}
+            >
+              删除
+            </button>
           </li>
         ))}
       </ul>

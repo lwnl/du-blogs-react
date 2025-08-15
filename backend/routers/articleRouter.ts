@@ -110,8 +110,6 @@ articleRouter.get('/:id', async (req: Request, res: Response) => {
 // 更新具体文章
 articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response) => {
   const { title, content } = req.body; // tempFiles 是前端传来的文件名数组
-  console.log('article id is', req.params.id)
-  console.log('username is', req.user.userName)
   try {
     // 保存到 MongoDB
     const updatedBlog = await Article.findOneAndUpdate(
@@ -131,6 +129,31 @@ articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
     res.status(500).json({ error: 'Failed to save blog' });
   }
 });
+
+// 删除文章
+articleRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response) => {
+  const id = req.params.id
+  if (!id) {
+    return res.status(400).json({
+      error: '文章编号缺失'
+    })
+  }
+
+  try {
+    const deletedBlog = await Article.findOneAndDelete({ _id: id, author: req.user.userName }) //只有作者本人可以删除自己的文章
+    if (!deletedBlog) {
+      return res.status(404).json({ error: '文章不存在或无权限删除' });
+    }
+    res.status(200).json({
+      message: '文章删除成功'
+    })
+  } catch (error) {
+    console.error('删除文章失败', (error as Error).message)
+    res.status(500).json({
+      error: '删除文章失败'
+    })
+  }
+})
 
 
 export default articleRouter;
