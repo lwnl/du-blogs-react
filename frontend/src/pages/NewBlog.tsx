@@ -9,10 +9,11 @@ import Image from "@tiptap/extension-image";
 import Heading from "@tiptap/extension-heading";
 import Paragraph from "@tiptap/extension-paragraph";
 import { TextSelection } from "prosemirror-state";
+import Swal from "sweetalert2";
 
+import EditorToolbar from "../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
-import EditorToolbar from "../components/EditorToolbar";
 
 const NewBlog = () => {
   const { authenticated, isLoading, HOST } = useAuthCheck();
@@ -82,8 +83,17 @@ const NewBlog = () => {
     },
   });
 
-  const setLink = () => {
-    const url = prompt("输入链接地址");
+ const setLink = async () => {
+    const { value: url } = await Swal.fire({
+      title: "插入链接",
+      input: "url",
+      inputLabel: "请输入链接地址",
+      inputPlaceholder: "https://example.com",
+      showCancelButton: true,
+      confirmButtonText: "插入",
+      cancelButtonText: "取消",
+    });
+
     if (url) {
       editor
         ?.chain()
@@ -94,53 +104,64 @@ const NewBlog = () => {
     }
   };
 
-  const addImage = () => {
-    const choice = window.confirm(
-      "点击“确定”输入图片链接，点击“取消”选择本地图片"
-    );
+  const addImage = async () => {
+    const {
+      value: imageUrl,
+      isConfirmed,
+      isDenied,
+      isDismissed,
+    } = await Swal.fire({
+      title: "添加图片",
+      input: "url",
+      inputLabel: "请输入图片链接",
+      inputPlaceholder: "https://example.com/image.png",
+      showCancelButton: true, // 取消按钮
+      showDenyButton: true, // 第三个按钮
+      confirmButtonText: "插入链接图片",
+      denyButtonText: "上传本地文件",
+      cancelButtonText: "取消",
+    });
 
-    if (choice) {
-      const url = prompt("Enter image URL");
-      if (url) {
-        editor?.chain().focus().setImage({ src: url }).run();
-      }
-    } else {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/*";
-      input.onchange = async () => {
-        const file = input.files?.[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append("image", file);
-
-        try {
-          const res = await axios.post(
-            `${HOST}/articles/image/upload`,
-            formData,
-            {
-              headers: { "Content-Type": "multipart/form-data" },
-              withCredentials: true,
-            }
-          );
-          // 将图片src设置为保存在gcs的链接地址
-          if (res.data?.url) {
-            editor?.chain().focus().setImage({ src: res.data.url }).run();
-
-            // 将图片链接地址保存在localStorage里
-            const storedUrl = JSON.parse(
-              localStorage.getItem(imagesKey) || "[]"
-            );
-            storedUrl.push(res.data.url);
-            localStorage.setItem(imagesKey, JSON.stringify(storedUrl));
-          }
-        } catch (error) {
-          console.error("upload image error:", (error as Error).message);
-        }
-      };
-      input.click();
+    if (imageUrl) {
+      editor?.chain().focus().setImage({ src: imageUrl }).run();
+      return;
+    } else if (isDismissed) {
+      return;
     }
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const res = await axios.post(
+          `${HOST}/articles/image/upload`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+            withCredentials: true,
+          }
+        );
+        // 将图片src设置为保存在gcs的链接地址
+        if (res.data?.url) {
+          editor?.chain().focus().setImage({ src: res.data.url }).run();
+
+          // 将图片链接地址保存在localStorage里
+          const storedUrl = JSON.parse(localStorage.getItem(imagesKey) || "[]");
+          storedUrl.push(res.data.url);
+          localStorage.setItem(imagesKey, JSON.stringify(storedUrl));
+        }
+      } catch (error) {
+        console.error("upload image error:", (error as Error).message);
+      }
+    };
+    input.click();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
