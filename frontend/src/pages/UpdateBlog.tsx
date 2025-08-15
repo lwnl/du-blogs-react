@@ -129,6 +129,13 @@ const UpdateBlog = () => {
           // 将图片src设置为保存在gcs的链接地址
           if (res.data?.url) {
             editor?.chain().focus().setImage({ src: res.data.url }).run();
+
+            // 将图片链接地址保存在localStorage里
+            const storedUrl = JSON.parse(
+              localStorage.getItem(imagesKey) || "[]"
+            );
+            storedUrl.push(res.data.url);
+            localStorage.setItem(imagesKey, JSON.stringify(storedUrl));
           }
         } catch (error) {
           console.error("upload image error:", (error as Error).message);

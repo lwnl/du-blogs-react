@@ -38,9 +38,10 @@ articleRouter.post("/image/delete", auth, async (req: AuthRequest, res: Response
   if (!url) return res.status(400).json({ error: "Missing image URL" });
 
   try {
-    // 获取GCS上保存的文件名
-    const fileName = decodeURIComponent(new URL(url).pathname.split("/").pop() || "");
-    await bucket.file(fileName).delete();
+    // 获取GCS上保存的文件路径
+    const objectPath = decodeURIComponent(new URL(url).pathname.replace(/^\/[^/]+\//, ''));
+    // 删除该文件
+    await bucket.file(objectPath).delete();
     res.status(200).json({ message: "Image deleted" });
   } catch (err) {
     console.error("Delete GCS error:", (err as Error).message);

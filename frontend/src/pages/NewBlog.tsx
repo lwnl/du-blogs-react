@@ -127,6 +127,8 @@ const NewBlog = () => {
           // 将图片src设置为保存在gcs的链接地址
           if (res.data?.url) {
             editor?.chain().focus().setImage({ src: res.data.url }).run();
+
+            // 将图片链接地址保存在localStorage里
             const storedUrl = JSON.parse(
               localStorage.getItem(imagesKey) || "[]"
             );
