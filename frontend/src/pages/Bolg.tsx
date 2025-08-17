@@ -50,14 +50,16 @@ const Blog = () => {
       <div>
         <h3 className="title">{blog.title}</h3>
         <div>
-          <span className="author">
-            <strong>作者：</strong> {blog.author}
-          </span>
-          <span>
-            <strong>更新时间：</strong> {blog.updatedAt}
-          </span>
+          <span className="author">作者： {blog.author}</span>
+          <span>更新时间： {blog.updatedAt}</span>
         </div>
       </div>
+
+      <form className="comments-form">
+        <p className="title">评论</p>
+        <textarea></textarea>
+        <button>发表留言</button>
+      </form>
 
       {/* 将 blog.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
       <article
