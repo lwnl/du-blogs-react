@@ -4,7 +4,8 @@ export const HOST = (import.meta as any).env.VITE_HOST
 
 type User = {
   id: string,
-  userName: string
+  userName: string,
+  role: string
 }
 
 export type LoginCheckResponse = {

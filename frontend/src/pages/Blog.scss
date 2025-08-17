@@ -4,6 +4,10 @@
   gap: var(--size-400);
   text-align: center;
 
+  a {
+    text-decoration: none;
+  }
+
   .title {
     font-weight: bold;
   }
@@ -42,6 +46,12 @@
       color: #666;
       font-style: italic;
     }
+  }
+
+  .back-to {
+    display: flex;
+    justify-content: center;
+    gap: 100px;
   }
 }
 

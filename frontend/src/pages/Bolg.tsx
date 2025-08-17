@@ -26,6 +26,7 @@ const Blog = () => {
     if (!id) return;
 
     setLoading(true);
+
     axios
       .get(`${HOST}/articles/${id}`)
       .then((res) => {
@@ -63,9 +64,16 @@ const Blog = () => {
         className="article-content"
         dangerouslySetInnerHTML={{ __html: blog.content }}
       ></article>
-      <p>
-        <Link to="/blogs/mine">返回我的博客</Link>
-      </p>
+      <div className="back-to">
+        {user?.role === "Registered User" && (
+          <p>
+            <Link to="/blogs/mine">返回我的博客</Link>
+          </p>
+        )}
+        <p>
+          <Link to="/blogs">返回博客园地</Link>
+        </p>
+      </div>
     </div>
   );
 };

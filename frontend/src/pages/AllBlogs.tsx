@@ -50,7 +50,10 @@ const AllBlogs = () => {
             <h5>
               <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
             </h5>
-            <p className="update-date">{blog.updatedAt}</p>
+            <div className="blog-info">
+              <span>作者：{blog.author}</span>
+              <span>更新时间： {blog.updatedAt}</span>
+            </div>
           </li>
         ))}
       </ul>

@@ -44,8 +44,14 @@
       margin-left: var(--size-400);
     }
 
-    .update-date {
+    .update-date, .blog-info {
       margin-left: auto;
+    }
+
+    .blog-info {
+      span {
+        margin-left: var(--size-600)
+      }
     }
   }
 

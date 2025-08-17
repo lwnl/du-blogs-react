@@ -31,11 +31,11 @@ userRouter.post('/registered-user', async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10)
 
     // Create a new user
-    const newUser = await User.create({ userName, password: hashedPassword, role: UserRole.RegisteredUser})
+    const newUser = await User.create({ userName, password: hashedPassword, role: UserRole.RegisteredUser })
 
     // generate JWT token
     const token = jwt.sign(
-      { id: newUser._id, userName: newUser.userName },
+      { id: newUser._id, userName: newUser.userName, role: newUser.role },
       JWT_SECRET,
       { expiresIn: '24h' }
     )
@@ -81,7 +81,7 @@ userRouter.post('/login', async (req: AuthRequest, res: Response) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user._id, userName: user.userName },
+      { id: user._id, userName: user.userName, role: user.role },
       JWT_SECRET,
       { expiresIn: '1d' }
     )
