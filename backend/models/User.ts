@@ -1,8 +1,15 @@
 import mongoose, { Schema, Document, Model } from 'mongoose'
 
+export enum UserRole {
+  Guest = "Guest",
+  RegisteredUser = "Registered User",
+  Admin = "Administrator"
+}
+
 export interface IUser extends Document {
   userName: string
   password: string
+  role: UserRole
 }
 
 const UserSchema: Schema<IUser> = new Schema({
@@ -11,11 +18,21 @@ const UserSchema: Schema<IUser> = new Schema({
     required: true,
     unique: true
   },
+
   password: {
     type: String,
     required: true
-  }
-}, {
+  },
+
+
+  role: {
+    type: String,
+    enum: Object.values(UserRole),
+    default: UserRole.Guest,
+  }, 
+}, 
+
+{
   timestamps: {
     createdAt: true,
     updatedAt: true

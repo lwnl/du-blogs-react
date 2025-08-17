@@ -6,6 +6,7 @@ import "./Register-Login.scss";
 const Register = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState(""); // 单独的重复密码状态
   const navigate = useNavigate();
   const HOST = (import.meta as any).env.VITE_HOST;
 
@@ -14,10 +15,16 @@ const Register = () => {
 
     try {
       const res = await axios.post(
-        `${HOST}/users/register`,
+        `${HOST}/users/registered-user`,
         { userName, password },
         { withCredentials: true }
       );
+
+      setPassword("");
+      setRepeatPassword("");
+      setUserName("");
+      alert("注册成功！");
+      navigate("/users/login");
     } catch (error) {
       if (error.response) {
         alert(error.response.data.message || "Registration failed!");
@@ -53,9 +60,9 @@ const Register = () => {
       <input
         type="password"
         placeholder="Repeat Password"
-        value={password}
+        value={repeatPassword}
         onChange={(e) => {
-          setPassword(e.target.value);
+          setRepeatPassword(e.target.value);
         }}
         required
       />

@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import type { Request, Response } from 'express'
-import User from '../models/User'
+import User, { UserRole } from '../models/User'
 import { auth } from '../utils/auth'
 import type { AuthRequest } from '../utils/auth'
 
@@ -12,7 +12,7 @@ const userRouter = express.Router()
 const JWT_SECRET = process.env.JWT_SECRET || 'your_default_dev_secret'
 
 // User registration
-userRouter.post('/register', async (req: Request, res: Response) => {
+userRouter.post('/registered-user', async (req: Request, res: Response) => {
   const { userName, password } = req.body
 
   if (!userName || !password) {
@@ -31,7 +31,7 @@ userRouter.post('/register', async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10)
 
     // Create a new user
-    const newUser = await User.create({ userName, password: hashedPassword })
+    const newUser = await User.create({ userName, password: hashedPassword, role: UserRole.RegisteredUser})
 
     // generate JWT token
     const token = jwt.sign(
