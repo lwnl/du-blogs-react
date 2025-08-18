@@ -1,12 +1,14 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import { jsonDateTransform } from '../utils/formatDate';
 
 
 export interface IArticle extends Document {
   title: string;
   content: string;
   author: string;
+  comments: string[];
   createdAt: Date;
-  updatedAt: Date; 
+  updatedAt: Date;
 }
 
 const ArticleSchema: Schema<IArticle> = new Schema({
@@ -21,6 +23,9 @@ const ArticleSchema: Schema<IArticle> = new Schema({
   author: {
     type: String,
     required: true
+  },
+  comments: {
+    type: [String]
   }
 }, {
   timestamps: {
@@ -30,21 +35,7 @@ const ArticleSchema: Schema<IArticle> = new Schema({
 })
 
 ArticleSchema.set('toJSON', {
-  transform: function (doc, ret: any) {
-    const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    };
-
-    if (ret.createdAt) {
-      ret.createdAt = new Date(ret.createdAt).toLocaleDateString('zh-CN', options);
-    }
-    if (ret.updatedAt) {
-      ret.updatedAt = new Date(ret.updatedAt).toLocaleDateString('zh-CN', options);
-    }
-    return ret;
-  }
+  transform: jsonDateTransform
 });
 
 const Article: Model<IArticle> = mongoose.models.Article || mongoose.model<IArticle>('Article', ArticleSchema)

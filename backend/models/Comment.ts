@@ -1,10 +1,12 @@
 import mongoose, { Schema, Document, Model } from 'mongoose'
+import { jsonDateTransform } from '../utils/formatDate';
 
 export interface IComment extends Document {
   subjectId: string,
   content: string,
   author: string,
   createdAt: Date;
+  updatedAt: Date;
 }
 
 const CommentSchema: Schema<IComment> = new Schema({
@@ -25,22 +27,12 @@ const CommentSchema: Schema<IComment> = new Schema({
 }, {
   timestamps: {
     createdAt: true,
+    updatedAt: true
   }
 })
 
 CommentSchema.set('toJSON', {
-  transform: function (doc, ret: any) {
-    const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    };
-
-    if (ret.createdAt) {
-      ret.createdAt = new Date(ret.createdAt).toLocaleDateString('zh-CN', options);
-    }
-    return ret;
-  }
+  transform: jsonDateTransform
 });
 
 const Comment: Model<IComment> = mongoose.models.Comment || mongoose.model<IComment>('Comment', CommentSchema)

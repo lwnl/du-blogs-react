@@ -5,12 +5,25 @@ import axios from "axios";
 import { IArticle } from "./MyBlogs";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import "./Blog.scss";
+import Swal from "sweetalert2";
+
+export interface IComment {
+  _id: string;
+  subjectId: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const Blog = () => {
   const { id } = useParams<{ id: string }>();
   const [blog, setBlog] = useState<IArticle | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [newComment, setNewComment] = useState<string>("");
+  const [feedback, setFeedback] = useState<string>("");
+  const [comments, setComments] = useState<IComment[] | null>(null);
 
   const {
     HOST,
@@ -21,6 +34,93 @@ const Blog = () => {
     isError,
     refetchAuth,
   } = useAuthCheck();
+
+  const submitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newComment.trim()) {
+      setFeedback("评论内容不能为空");
+    }
+
+    // 判断用户是否登录
+    // 若未登录，使用Swal弹出对话框询问用户是否以游客身份发表评论？
+    if (!authenticated || user?.role === "Guest") {
+      const result = await Swal.fire({
+        title: "您未登录",
+        text: "是否以游客身份发表评论？",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+      });
+
+      if (result.isConfirmed) {
+        // 创建游客用户 或者 使用当前游客身份
+
+        // 检查是否具备游客身份
+        if (user?.role === "Guest") {
+          //用游客身份发表评论
+          await postComment();
+        } else {
+          // 若还没有游客身份，创建游客身份
+          try {
+            await axios.post(
+              `${HOST}/users/guests/new`,
+              {},
+              {
+                withCredentials: true,
+              }
+            );
+            //用游客身份发表评论
+            await postComment();
+          } catch (error) {
+            console.error("创建游客失败", (error as Error).message);
+            Swal.fire("错误", "创建游客失败", "error");
+          }
+        }
+      } else {
+        // 用户选择取消，不发表评论
+        Swal.fire("已取消", "你取消了游客评论", "info");
+      }
+    }
+  };
+
+  // 发表评论子程序
+  const postComment = async () => {
+    if (!blog?._id || !newComment.trim()) return;
+
+    try {
+      const res = await axios.post(
+        `${HOST}/comments/new`,
+        {
+          subjectId: blog._id,
+          content: newComment,
+        },
+        { withCredentials: true }
+      );
+
+      // 将新评论的id追加到文章中
+      const newCommentId = res.data.newComment._id;
+      try {
+        const res = await axios.patch(
+          `${HOST}/articles/update-comments/${blog._id}`,
+          { newCommentId }
+        );
+        Swal.fire("成功", "发表评论成功！", "success");
+        setNewComment("");
+      } catch (error) {
+        console.error("追加评论失败", (error as Error).message);
+        Swal.fire("错误", "追加评论失败", "error");
+      }
+
+      // 更新评论列表
+      const { newComment: createdComment } = res.data;
+      setComments((prev) => [...(prev || []), createdComment]);
+    } catch (error) {
+      console.error("发表评论失败", (error as Error).message);
+      Swal.fire("错误", "发表评论失败", "error");
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -55,17 +155,22 @@ const Blog = () => {
         </div>
       </div>
 
-    
       {/* 将 blog.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
       <article
         className="article-content"
         dangerouslySetInnerHTML={{ __html: blog.content }}
       ></article>
 
-        {/* 评论区 */}
-      <form className="comments-form">
+      {/* 评论区 */}
+      <form className="comments-form" onSubmit={submitComment}>
         <p className="title">评论</p>
-        <textarea></textarea>
+        <textarea
+          placeholder="撰写评论"
+          value={newComment}
+          onChange={(e) => {
+            setNewComment(e.target.value);
+          }}
+        />
         <button>发表留言</button>
       </form>
 

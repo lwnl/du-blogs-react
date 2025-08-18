@@ -56,6 +56,44 @@ userRouter.post('/registered-user', async (req: Request, res: Response) => {
   }
 })
 
+// 创建游客id
+userRouter.post('/guests/new', async (req: Request, res: Response) => {
+  try {
+    const guests = await User.find({ role: "Guest" })
+    // guestNumber 三位以下自动补“0”
+    const guestNumber = guests.length.toString().padStart(3, '0')
+    const userName = '游客' + guestNumber
+    const newguest = await User.create({
+      userName
+    })
+
+    // 设置guestToken
+    const guestToken = jwt.sign(
+      { id: newguest._id, userName, role: newguest.role },
+      JWT_SECRET,
+    )
+
+    // Set token in HTTP-only cookie
+    res.cookie('guestToken', guestToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // only under https
+      sameSite: 'lax',
+      maxAge: 100 * 365 * 24 * 60 * 60 * 1000 // 100 年
+    })
+
+    res.status(201).json({
+      message: '游客ID创建成功',
+      userName,
+      role: newguest.role
+    })
+  } catch (error) {
+    console.error('创建游客失败!', (error as Error).message)
+    res.status(500).json({
+      error: '创建游客失败!'
+    })
+  }
+})
+
 //  User login
 userRouter.post('/login', async (req: AuthRequest, res: Response) => {
 

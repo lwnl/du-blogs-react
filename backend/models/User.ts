@@ -21,7 +21,6 @@ const UserSchema: Schema<IUser> = new Schema({
 
   password: {
     type: String,
-    required: true
   },
 
 

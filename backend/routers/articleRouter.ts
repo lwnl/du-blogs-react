@@ -5,12 +5,7 @@ import type { AuthRequest } from '../utils/auth'
 import multer from 'multer'
 import { bucket, uploadFileToGCS } from '../utils/uploadFileToGCS'
 import Article from '../models/Article'
-import dotenv from 'dotenv'
 import { authOptional } from '../utils/authOptional'
-
-dotenv.config()
-const PORT = process.env.PORT
-const HOST = `http://localhost:${PORT}`
 
 const articleRouter = express.Router()
 
@@ -107,7 +102,7 @@ articleRouter.get('/:id', async (req: Request, res: Response) => {
   }
 })
 
-// 更新具体文章
+// 作者本人更新文章
 articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response) => {
   const { title, content } = req.body; // tempFiles 是前端传来的文件名数组
   try {
@@ -129,6 +124,25 @@ articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
     res.status(500).json({ error: 'Failed to save blog' });
   }
 });
+
+// 追加评论
+articleRouter.patch('update-comments/:id', auth, async (req: AuthRequest, res: Response) => {
+  const id = req.params.id
+  const { newCommentId } = req.body
+
+  const updatedBlog = await Article.findByIdAndUpdate(
+    id,
+    { $push: { comments: newCommentId }, },
+    { new: true }// 返回更新后的文档
+  )
+
+  if (!updatedBlog) {
+    return res.status(404).json({
+      message: '文章不存在'
+    })
+  }
+  res.status(200).json({ message: '评论追加成功', blog: updatedBlog });
+})
 
 // 删除文章
 articleRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response) => {

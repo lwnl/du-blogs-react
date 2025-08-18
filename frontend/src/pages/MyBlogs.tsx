@@ -4,7 +4,7 @@ import { useAuthCheck } from "../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export interface IArticle extends Document {
+export interface IArticle {
   _id: string;
   title: string;
   content: string;
