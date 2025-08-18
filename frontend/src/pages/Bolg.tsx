@@ -55,17 +55,20 @@ const Blog = () => {
         </div>
       </div>
 
+    
+      {/* 将 blog.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
+      <article
+        className="article-content"
+        dangerouslySetInnerHTML={{ __html: blog.content }}
+      ></article>
+
+        {/* 评论区 */}
       <form className="comments-form">
         <p className="title">评论</p>
         <textarea></textarea>
         <button>发表留言</button>
       </form>
 
-      {/* 将 blog.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
-      <article
-        className="article-content"
-        dangerouslySetInnerHTML={{ __html: blog.content }}
-      ></article>
       <div className="back-to">
         {user?.role === "Registered User" && (
           <p>

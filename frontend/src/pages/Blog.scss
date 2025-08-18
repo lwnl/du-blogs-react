@@ -1,7 +1,7 @@
 .Blog {
   display: flex;
   flex-direction: column;
-  gap: var(--size-400);
+  gap: 50px;
   text-align: center;
 
   a {
@@ -10,6 +10,7 @@
 
   .title {
     font-weight: bold;
+    margin-bottom: var(--size-200);
   }
 
   .author {
@@ -45,6 +46,30 @@
       font-size: 0.9rem;
       color: #666;
       font-style: italic;
+    }
+  }
+
+  .comments-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-400);
+    text-align: left;
+
+    .title {
+      background-color: #F5F5F5;
+      padding: var(--size-300)
+    }
+
+    textarea {
+      padding: var(--size-200);
+      width: 100%;
+      min-height: 150px;
+    }
+
+    button {
+      padding: 2px 5px;
+      margin-left: auto;
+      width: fit-content;
     }
   }
 
