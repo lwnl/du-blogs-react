@@ -10,7 +10,7 @@ const commentRouter = express.Router()
 commentRouter.post('/new', auth, async (req: AuthRequest, res: Response) => {
   try {
     const { subjectId, content } = req.body;
-    const author = req.user;
+    const author = req.user.userName;
 
     // 1. 创建评论
     const newComment = await Comment.create({
@@ -33,3 +33,5 @@ commentRouter.post('/new', auth, async (req: AuthRequest, res: Response) => {
     })
   }
 })
+
+export default commentRouter

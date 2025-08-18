@@ -10,10 +10,9 @@ export interface AuthRequest extends Request {
 }
 
 export const auth = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const token = req.cookies?.token
-  const guestToken = req.cookies?.guestToken
+  const token = req.cookies.token || req.cookies.guestToken; 
 
-  if (!token && !guestToken) {
+  if (!token) {
     return res.status(401).json({
       authenticated: false,
       message: 'No token provided'
