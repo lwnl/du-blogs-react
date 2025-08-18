@@ -40,6 +40,7 @@ const Blog = () => {
 
     if (!newComment.trim()) {
       setFeedback("评论内容不能为空");
+      return;
     }
 
     // 判断用户是否登录
@@ -99,19 +100,13 @@ const Blog = () => {
         { withCredentials: true }
       );
 
-      // 将新评论的id追加到文章中
-      const newCommentId = res.data.newComment._id;
-      try {
-        const res = await axios.patch(
-          `${HOST}/articles/update-comments/${blog._id}`,
-          { newCommentId }
-        );
-        Swal.fire("成功", "发表评论成功！", "success");
-        setNewComment("");
-      } catch (error) {
-        console.error("追加评论失败", (error as Error).message);
-        Swal.fire("错误", "追加评论失败", "error");
-      }
+      Swal.fire({
+        icon: "success",
+        title: "发表评论成功！",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      setNewComment("");
 
       // 更新评论列表
       const { newComment: createdComment } = res.data;
