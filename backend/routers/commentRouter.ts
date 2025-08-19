@@ -41,14 +41,14 @@ commentRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
   const userName = req.user.userName
   const { content } = req.body
 
-  const updatedComment = await Comment.findById(id)
-  if (!updatedComment) {
+  const commentToUpdate = await Comment.findById(id)
+  if (!commentToUpdate) {
     return res.status(404).json({
       message: '该评论不存在！'
     })
   }
 
-  if (userName !== updatedComment.author) {
+  if (userName !== commentToUpdate.author) {
     return res.status(403).json({
       message: '只有评论者本人才能修改该评论！'
     })
@@ -56,7 +56,7 @@ commentRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
 
   // 更新评论
   try {
-    await Comment.findByIdAndUpdate(id, {
+    const updatedComment = await Comment.findByIdAndUpdate(id, {
       content
     }, {
       new: true

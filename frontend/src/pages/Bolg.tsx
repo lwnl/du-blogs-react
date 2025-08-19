@@ -26,7 +26,6 @@ const Blog = () => {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
   const [comments, setComments] = useState<IComment[] | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const {
     HOST,
@@ -140,18 +139,19 @@ const Blog = () => {
         { withCredentials: true }
       );
 
-      // 使用服务器返回的数据更新状态
-      setComments(
-        (prev) =>
-          prev?.map((c) => (c._id === commentId ? data.updatedComment : c)) ||
-          null
-      );
+      const updatedComment = data.updatedComment;
 
+      setComments((prev) => {
+        if (!prev) return [];
+        const updated = prev.map((c) =>
+          c._id.toString() === commentId.toString() ? updatedComment : c
+        );
+        return updated;
+      });
+
+      // 重置编辑状态
       setEditingContent("");
       setEditingCommentId(null);
-
-      // 强制重新渲染
-      setRefreshKey((prev) => prev + 1);
 
       Swal.fire({
         icon: "success",
@@ -160,7 +160,7 @@ const Blog = () => {
         showConfirmButton: false,
       });
     } catch (err) {
-      console.error(err);
+      console.error("更新评论失败:", err);
       Swal.fire("", "更新评论失败", "error");
     }
   };
@@ -246,7 +246,7 @@ const Blog = () => {
       </form>
 
       {/* 展示评论 */}
-      <div className="show-comments" key={refreshKey}>
+      <div className="show-comments">
         {comments?.map((comment) => (
           <div key={comment._id} className="comment-item">
             <p className="comment-author">{comment.author}留言：</p>
