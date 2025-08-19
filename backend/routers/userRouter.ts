@@ -158,7 +158,14 @@ userRouter.get('/login-check', auth, (req: AuthRequest, res: Response) => {
 
 // User logout 
 userRouter.post('/logout', (req: Request, res: Response) => {
+  // 移除注册用户token
   res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  })
+  //移除游客token
+  res.clearCookie('guestToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax'

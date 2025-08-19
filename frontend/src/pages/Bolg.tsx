@@ -22,6 +22,9 @@ const Blog = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
+  const [commentToEdit, setCommentToEdit] = useState<string>("");
+  const [isMyComment, setIsMyComment] = useState<boolean>(false);
+  const [isEdittingComment, setIsEdittingComment] = useState<boolean>(false);
   const [comments, setComments] = useState<IComment[] | null>(null);
 
   const {
@@ -81,7 +84,11 @@ const Blog = () => {
         // 用户选择取消，不发表评论
         Swal.fire("已取消", "", "info");
       }
+      return
     }
+
+    //注册用户发表留言
+    await postComment();
   };
 
   // 发表评论子程序
@@ -115,6 +122,8 @@ const Blog = () => {
     }
   };
 
+  const updateComment = async (e: React.FormEvent) => {};
+
   useEffect(() => {
     if (!id) return;
 
@@ -124,6 +133,9 @@ const Blog = () => {
       .get(`${HOST}/articles/${id}`)
       .then((res) => {
         setBlog(res.data.blog);
+        setComments(res.data.comments);
+        console.log('res.data: ', res.data)
+        console.log('comments: ', comments)
         setError(null);
       })
       .catch((err) => {
@@ -154,7 +166,7 @@ const Blog = () => {
         dangerouslySetInnerHTML={{ __html: blog.content }}
       ></article>
 
-      {/* 评论区 */}
+      {/* 评论留言 */}
       <form className="comments-form" onSubmit={submitComment}>
         <p className="title">评论</p>
         <textarea
@@ -166,6 +178,44 @@ const Blog = () => {
         />
         <button>发表留言</button>
       </form>
+
+      {/* 展示评论 */}
+      {/* <form className="show-commnents">
+        {comments?.map((comment) => (
+          <div key={comment._id}>
+            <p className="comment-author">{comment.author}</p>
+
+            {isEdittingComment ? (
+              <textarea
+                value={comment.content}
+                onChange={(e) => {
+                  setCommentToEdit(e.target.value);
+                }}
+              />
+            ) : (
+              <textarea value={comment.content} readOnly />
+            )}
+
+            {user?.userName === comment.author && (
+              <div className="edit-comment">
+                {isEdittingComment ? (
+                  <button onClick={() => {}}>更新</button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEdittingComment(true);
+                    }}
+                  >
+                    编辑
+                  </button>
+                )}
+                <button>删除</button>
+              </div>
+            )}
+          </div>
+        ))}
+      </form> */}
 
       <div className="back-to">
         {user?.role === "Registered User" && (

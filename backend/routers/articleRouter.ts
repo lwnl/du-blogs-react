@@ -6,6 +6,7 @@ import multer from 'multer'
 import { bucket, uploadFileToGCS } from '../utils/uploadFileToGCS'
 import Article from '../models/Article'
 import { authOptional } from '../utils/authOptional'
+import Comment from '../models/Comment'
 
 const articleRouter = express.Router()
 
@@ -82,7 +83,7 @@ articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => 
   }
 })
 
-// 获取具体文章
+// 获取具体文章及其所有评论内容
 articleRouter.get('/:id', async (req: Request, res: Response) => {
   try {
     const blog = await Article.findById(req.params.id)
@@ -91,8 +92,12 @@ articleRouter.get('/:id', async (req: Request, res: Response) => {
         error: '文章不存在'
       })
     }
+    const comments = await Promise.all(
+      blog.comments.map((commentId) => Comment.findById(commentId))
+    )
     res.status(200).json({
-      blog
+      blog,
+      comments
     })
   } catch (error) {
     console.error('error fetching blog:', (error as Error).message)
