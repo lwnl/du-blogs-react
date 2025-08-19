@@ -22,7 +22,6 @@ const Blog = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
-  const [feedback, setFeedback] = useState<string>("");
   const [comments, setComments] = useState<IComment[] | null>(null);
 
   const {
@@ -39,7 +38,7 @@ const Blog = () => {
     e.preventDefault();
 
     if (!newComment.trim()) {
-      setFeedback("评论内容不能为空");
+      Swal.fire("", "评论内容不能为空！", "error");
       return;
     }
 
@@ -47,9 +46,8 @@ const Blog = () => {
     // 若未登录，使用Swal弹出对话框询问用户是否以游客身份发表评论？
     if (!authenticated || user?.role === "Guest") {
       const result = await Swal.fire({
-        title: "您未登录",
+        title: "您尚未登录",
         text: "是否以游客身份发表评论？",
-        icon: "question",
         showCancelButton: true,
         confirmButtonText: "是",
         cancelButtonText: "否",
@@ -76,12 +74,12 @@ const Blog = () => {
             await postComment();
           } catch (error) {
             console.error("创建游客失败", (error as Error).message);
-            Swal.fire("错误", "创建游客失败", "error");
+            Swal.fire("", "创建游客失败", "error");
           }
         }
       } else {
         // 用户选择取消，不发表评论
-        Swal.fire("已取消", "你取消了游客评论", "info");
+        Swal.fire("已取消", "", "info");
       }
     }
   };
@@ -113,7 +111,7 @@ const Blog = () => {
       setComments((prev) => [...(prev || []), createdComment]);
     } catch (error) {
       console.error("发表评论失败", (error as Error).message);
-      Swal.fire("错误", "发表评论失败", "error");
+      Swal.fire("", "发表评论失败", "error");
     }
   };
 

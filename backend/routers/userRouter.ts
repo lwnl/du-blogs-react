@@ -61,7 +61,7 @@ userRouter.post('/guests/new', async (req: Request, res: Response) => {
   try {
     const guests = await User.find({ role: "Guest" })
     // guestNumber 三位以下自动补“0”
-    const guestNumber = guests.length.toString().padStart(3, '0')
+    const guestNumber = (guests.length + 1).toString().padStart(3, '0')
     const userName = '游客' + guestNumber
     const newguest = await User.create({
       userName
