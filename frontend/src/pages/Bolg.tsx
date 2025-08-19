@@ -26,6 +26,7 @@ const Blog = () => {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
   const [comments, setComments] = useState<IComment[] | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const {
     HOST,
@@ -123,24 +124,14 @@ const Blog = () => {
   };
 
   // 更新评论内容
-  const saveEditedComment = async (commentId: string, updatedContent: string) => {
+  const saveEditedComment = async (
+    commentId: string,
+    updatedContent: string
+  ) => {
     if (!updatedContent.trim()) {
       Swal.fire("", "评论内容不能为空！", "error");
       return;
     }
-
-    // 保存原始内容用于错误恢复
-    const originalContent = comments?.find(c => c._id === commentId)?.content || '';
-
-    // 先更新本地状态，提供即时反馈
-    setComments(
-      (prev) =>
-        prev?.map((comment) =>
-          comment._id === commentId
-            ? { ...comment, content: updatedContent }  // 使用参数updatedContent而不是editingContent
-            : comment
-        ) || null
-    );
 
     try {
       const { data } = await axios.patch(
@@ -149,14 +140,19 @@ const Blog = () => {
         { withCredentials: true }
       );
 
-      // 使用服务器返回的数据再次更新，确保数据一致性
+      // 使用服务器返回的数据更新状态
       setComments(
         (prev) =>
           prev?.map((c) => (c._id === commentId ? data.updatedComment : c)) ||
           null
       );
+
       setEditingContent("");
       setEditingCommentId(null);
+
+      // 强制重新渲染
+      setRefreshKey((prev) => prev + 1);
+
       Swal.fire({
         icon: "success",
         title: "评论已更新",
@@ -164,16 +160,6 @@ const Blog = () => {
         showConfirmButton: false,
       });
     } catch (err) {
-      // 如果更新失败，恢复原始内容
-      setComments(
-        (prev) =>
-          prev?.map((comment) =>
-            comment._id === commentId
-              ? { ...comment, content: originalContent }
-              : comment
-          ) || null
-      );
-      
       console.error(err);
       Swal.fire("", "更新评论失败", "error");
     }
@@ -260,11 +246,13 @@ const Blog = () => {
       </form>
 
       {/* 展示评论 */}
-      <div className="show-comments">
+      <div className="show-comments" key={refreshKey}>
         {comments?.map((comment) => (
           <div key={comment._id} className="comment-item">
             <p className="comment-author">{comment.author}留言：</p>
+
             {editingCommentId === comment._id ? (
+              // 编辑模式
               <>
                 <TextareaAutosize
                   value={editingContent}
@@ -292,6 +280,7 @@ const Blog = () => {
                 </div>
               </>
             ) : (
+              // 查看模式 - 直接显示内容
               <>
                 <div className="comment-content">{comment.content}</div>
                 {user?.userName === comment.author && (

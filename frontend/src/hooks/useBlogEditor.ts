@@ -142,7 +142,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
             withCredentials: true,
           }
         );
-        
+
         if (res.data?.url) {
           editor?.chain().focus().setImage({ src: res.data.url }).run();
 
@@ -166,6 +166,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       const removedImages = storedImages.filter(
         (url: string) => !currentImages.includes(url)
       );
+      console.log("将被删除的图片:", removedImages);
 
       if (removedImages.length > 0) {
         await Promise.all(
@@ -195,23 +196,31 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   }, [contentKey, imagesKey, titleKey, editor]);
 
   // 提取当前编辑器中的图片
-  const getCurrentImages = useCallback((): string[] => {
-    const html = editor?.getHTML() || "";
-    const imageRegex = /<img[^>]+src="([^">]+)"/g;
-    const images: string[] = [];
-    let match;
+ const getCurrentImages = useCallback((): string[] => {
+  const html = editor?.getHTML() || "";
+  const imageRegex = /<img[^>]+src="([^">]+)"/g;
+  const images: string[] = [];
+  let match;
 
-    while ((match = imageRegex.exec(html)) !== null) {
-      images.push(match[1]);
-    }
+  while ((match = imageRegex.exec(html)) !== null) {
+    // decode HTML 实体
+    const url = match[1].replace(/&amp;/g, "&");
+    images.push(url);
+  }
 
-    return images;
-  }, [editor]);
+  return images;
+}, [editor]);
 
   // 处理表单提交
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    const currentImages = getCurrentImages();
+    console.log("=== 调试信息 ===");
+    console.log("编辑器中图片:", currentImages);
+
+    const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
+    console.log("localStorage中存储的图片:", storedImages);
+
     if (!title.trim() || !editor?.getHTML().trim()) {
       setFeedback("请填写所有字段");
       return;
@@ -238,13 +247,13 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       // 清理未使用的图片
       const currentImages = getCurrentImages();
       await removeUnusedImages(currentImages);
-      
+
       // 清除草稿
       clearDraft();
-      
+
       // 设置成功反馈
       setFeedback(type === "update" ? "✅ 更新成功!" : "✅ 创建成功!");
-      
+
       // 1.5秒后导航到我的博客页面
       setTimeout(() => navigate("/blogs/mine"), 1500);
     } catch (error) {
@@ -252,14 +261,14 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       setFeedback(type === "update" ? "❌ 更新失败" : "❌ 创建失败");
     }
   }, [
-    title, 
-    editor, 
-    type, 
-    id, 
-    HOST, 
-    getCurrentImages, 
-    removeUnusedImages, 
-    clearDraft, 
+    title,
+    editor,
+    type,
+    id,
+    HOST,
+    getCurrentImages,
+    removeUnusedImages,
+    clearDraft,
     navigate
   ]);
 
@@ -288,7 +297,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     if (type === "update" && id && editor) {
       const hasLocalDraft =
         localStorage.getItem(titleKey) || localStorage.getItem(contentKey);
-        
+
       if (!hasLocalDraft) {
         axios
           .get(`${HOST}/articles/${id}`)
