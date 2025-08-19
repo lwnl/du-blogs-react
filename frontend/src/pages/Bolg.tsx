@@ -180,7 +180,7 @@ const Blog = () => {
       </form>
 
       {/* 展示评论 */}
-      {/* <form className="show-commnents">
+      <form className="show-commnents">
         {comments?.map((comment) => (
           <div key={comment._id}>
             <p className="comment-author">{comment.author}</p>
@@ -215,7 +215,7 @@ const Blog = () => {
             )}
           </div>
         ))}
-      </form> */}
+      </form>
 
       <div className="back-to">
         {user?.role === "Registered User" && (
