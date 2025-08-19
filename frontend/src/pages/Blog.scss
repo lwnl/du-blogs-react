@@ -1,3 +1,5 @@
+$breakpoint-sm: 599px;
+
 .Blog {
   display: flex;
   flex-direction: column;
@@ -70,53 +72,48 @@
     }
 
     p.image-caption {
-      width: 100%;
+      width: 50%;
       max-width: 600px;
       margin: -10px auto 20px auto;
       font-size: var(--fs-300);
       color: #6b7280;
       font-style: italic;
-      text-align: center;
+      text-align: left;
     }
   }
 
   .comments-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--size-400);
     text-align: left;
     background: white;
     padding: 24px;
-    border-radius: 12px;
+    border-radius: var(--size-300);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
     .title {
       background-color: #f8fafc;
-      padding: 16px;
-      margin: -24px -24px 16px -24px;
-      border-radius: 12px 12px 0 0;
-      font-size: 20px;
-      color: #374151;
+      padding: var(--size-400);
+      margin: -24px -24px var(--size-400) -24px;
+      border-radius: var(--size-300) var(--size-300) 0 0;
+      font-size: var(--fs-500);
     }
 
     button {
       padding: 10px 24px;
       margin-left: auto;
       width: fit-content;
-      background: #2563eb;
+      background: #3876D2;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: var(--size-200);
       font-weight: 500;
       cursor: pointer;
       transition: background-color 0.2s;
       
       &:hover {
-        background: #1d4ed8;
-      }
-      
-      &:active {
-        background: #1e40af;
+        background: #173760;
       }
     }
   }
@@ -142,9 +139,9 @@
 
     .comment-author {
       background-color: #f8fafc;
-      padding: 8px 12px;
-      margin: -20px -20px 16px -20px;
-      border-radius: 12px 12px 0 0;
+      padding: var(--size-200) var(--size-300);
+      margin: -20px -20px var(--size-400) -20px;
+      border-radius: var(--size-300) var(--size-300) 0 0;
       font-weight: 500;
       color: #374151;
       font-size: 14px;
@@ -153,18 +150,18 @@
     .comment-content {
       white-space: pre-wrap;
       line-height: 1.5;
-      margin: 12px 0;
+      margin: var(--size-300) 0;
       color: #374151;
     }
 
     .button-container {
       display: flex;
       justify-content: flex-end;
-      gap: 12px;
+      gap: var(--size-300);
       margin-top: 16px;
       
       button {
-        padding: 8px 16px;
+        padding: var(--size-200) var(--size-400);
         border: 1px solid #d1d5db;
         border-radius: 6px;
         background: white;
@@ -179,22 +176,22 @@
         }
         
         &:first-child {
-          background: #2563eb;
+          background: #3876D2;
           color: white;
-          border-color: #2563eb;
+          border-color: #3876D2;
           
           &:hover {
-            background: #1d4ed8;
+            background: #173760;
           }
         }
         
         &:last-child {
-          background: #ef4444;
+          background: #3c0505;
           color: white;
-          border-color: #ef4444;
+          border-color: #3c0505;
           
           &:hover {
-            background: #dc2626;
+            background: #a71313;
           }
         }
       }
@@ -212,10 +209,10 @@
     }
     
     a {
-      padding: 12px 24px;
+      padding: var(--size-300) var(--size-600);
       background: #f8fafc;
       border: 1px solid #e5e7eb;
-      border-radius: 8px;
+      border-radius: var(--size-200);
       transition: all 0.2s;
       
       &:hover {
@@ -236,36 +233,15 @@
 }
 
 // 响应式设计
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-sm) {
   .Blog {
-    gap: 30px;
-    padding: 16px;
-    
-    .title {
-      font-size: 24px;
-    }
-    
     .article-content {
-      font-size: 15px;
-      
       img {
-        margin: 16px auto;
+        width: 80%;
       }
-    }
-    
-    .comments-form,
-    .show-comments .comment-item {
-      padding: 16px;
-    }
-    
-    .back-to {
-      flex-direction: column;
-      gap: 16px;
-      align-items: center;
-      
-      a {
-        width: 200px;
-        text-align: center;
+
+      p.image-caption {
+        width: 80%;
       }
     }
   }
