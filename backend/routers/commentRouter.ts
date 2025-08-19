@@ -20,12 +20,18 @@ commentRouter.post('/new', auth, async (req: AuthRequest, res: Response) => {
       author
     });
 
-    // 2. 把评论 ID 追加到文章中
+   // 2. 把评论 ID 插入到文章 comments 数组的最前面
     await Article.findByIdAndUpdate(
       subjectId,
-      { $push: { comments: newComment._id } }
+      { 
+        $push: { 
+          comments: { 
+            $each: [newComment._id], 
+            $position: 0 
+          } 
+        } 
+      }
     );
-
     res.status(201).json({ message: "评论成功", newComment });
   } catch (error) {
     console.error('添加评论失败：', (error as Error).message)

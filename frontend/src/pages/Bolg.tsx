@@ -115,7 +115,8 @@ const Blog = () => {
 
       // 更新评论列表
       const { newComment: createdComment } = res.data;
-      setComments((prev) => [...(prev || []), createdComment]);
+      //最新留言置顶
+      setComments((prev) => [createdComment, ...(prev || [])]);
     } catch (error) {
       console.error("发表评论失败", (error as Error).message);
       Swal.fire("", "发表评论失败", "error");
