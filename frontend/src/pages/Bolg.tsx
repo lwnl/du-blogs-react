@@ -22,9 +22,8 @@ const Blog = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
-  const [commentToEdit, setCommentToEdit] = useState<string>("");
-  const [isMyComment, setIsMyComment] = useState<boolean>(false);
-  const [isEdittingComment, setIsEdittingComment] = useState<boolean>(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState<string>("");
   const [comments, setComments] = useState<IComment[] | null>(null);
 
   const {
@@ -84,7 +83,7 @@ const Blog = () => {
         // 用户选择取消，不发表评论
         Swal.fire("已取消", "", "info");
       }
-      return
+      return;
     }
 
     //注册用户发表留言
@@ -122,7 +121,60 @@ const Blog = () => {
     }
   };
 
-  const updateComment = async (e: React.FormEvent) => {};
+  const saveEditedComment = async (
+    commentId: string,
+    updatedContent: string
+  ) => {
+    try {
+      await axios.patch(
+        `${HOST}/comments/update/${commentId}`,
+        { content: updatedContent },
+        { withCredentials: true }
+      );
+      setComments(
+        (prev) =>
+          prev?.map((c) =>
+            c._id === commentId ? { ...c, content: updatedContent } : c
+          ) || null
+      );
+      setEditingCommentId(null);
+      Swal.fire({
+        icon: "success",
+        title: "评论已更新",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("", "更新评论失败", "error");
+    }
+  };
+
+  const deleteComment = async (commentId: string) => {
+    const result = await Swal.fire({
+      title: "确认删除？",
+      showCancelButton: true,
+      confirmButtonText: "删除",
+      cancelButtonText: "取消",
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      await axios.delete(`${HOST}/comments/delete/${commentId}`, {
+        withCredentials: true,
+      });
+      setComments((prev) => prev?.filter((c) => c._id !== commentId) || null);
+      Swal.fire({
+        icon: "success",
+        title: "评论已删除",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("", "删除评论失败", "error");
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -134,8 +186,6 @@ const Blog = () => {
       .then((res) => {
         setBlog(res.data.blog);
         setComments(res.data.comments);
-        console.log('res.data: ', res.data)
-        console.log('comments: ', comments)
         setError(null);
       })
       .catch((err) => {
@@ -182,35 +232,46 @@ const Blog = () => {
       {/* 展示评论 */}
       <form className="show-commnents">
         {comments?.map((comment) => (
-          <div key={comment._id}>
+          <div key={comment._id} className="comment-item">
             <p className="comment-author">{comment.author}</p>
-
-            {isEdittingComment ? (
-              <textarea
-                value={comment.content}
-                onChange={(e) => {
-                  setCommentToEdit(e.target.value);
-                }}
-              />
-            ) : (
-              <textarea value={comment.content} readOnly />
-            )}
+            <textarea
+              value={
+                editingCommentId === comment._id
+                  ? editingContent
+                  : comment.content
+              }
+              readOnly={editingCommentId !== comment._id}
+              onChange={(e) => setEditingContent(e.target.value)}
+            />
 
             {user?.userName === comment.author && (
               <div className="edit-comment">
-                {isEdittingComment ? (
-                  <button onClick={() => {}}>更新</button>
+                {editingCommentId === comment._id ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      saveEditedComment(comment._id, comment.content)
+                    }
+                  >
+                    更新
+                  </button>
                 ) : (
                   <button
                     type="button"
                     onClick={() => {
-                      setIsEdittingComment(true);
+                      setEditingCommentId(comment._id);
+                      setEditingContent(comment.content);
                     }}
                   >
                     编辑
                   </button>
                 )}
-                <button>删除</button>
+                <button
+                  type="button"
+                  onClick={() => deleteComment(comment._id)}
+                >
+                  删除
+                </button>
               </div>
             )}
           </div>
