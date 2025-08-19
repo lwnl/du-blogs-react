@@ -8,6 +8,12 @@
     text-decoration: none;
   }
 
+  textarea {
+    padding: var(--size-200);
+    width: 100%;
+    resize: none;
+  }
+
   .title {
     font-weight: bold;
     margin-bottom: var(--size-200);
@@ -56,20 +62,39 @@
     text-align: left;
 
     .title {
-      background-color: #F5F5F5;
-      padding: var(--size-300)
-    }
-
-    textarea {
-      padding: var(--size-200);
-      width: 100%;
-      min-height: 150px;
+      background-color: #f5f5f5;
+      padding: var(--size-300);
     }
 
     button {
       padding: 2px 5px;
       margin-left: auto;
       width: fit-content;
+    }
+  }
+
+  .show-commnents {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-400);
+    text-align: left;
+
+    textarea {
+      border: none;
+    }
+
+    .comment-author {
+      background-color: #f5f5f5;
+      padding: 2px 5px;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: right;
+      button {
+        padding: 2px 5px;
+        margin-left: var(--size-400);
+      }
     }
   }
 

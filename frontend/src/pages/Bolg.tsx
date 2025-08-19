@@ -6,6 +6,7 @@ import { IArticle } from "./MyBlogs";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import "./Blog.scss";
 import Swal from "sweetalert2";
+import TextareaAutosize from "react-textarea-autosize";
 
 export interface IComment {
   _id: string;
@@ -121,22 +122,39 @@ const Blog = () => {
     }
   };
 
+  // 更新评论内容
   const saveEditedComment = async (
     commentId: string,
     updatedContent: string
   ) => {
+    if (!updatedContent.trim()) {
+      Swal.fire("", "评论内容不能为空！", "error");
+      return;
+    }
+
+    // 先更新本地状态，提供即时反馈
+    setComments(
+      (prev) =>
+        prev?.map((comment) =>
+          comment._id === commentId
+            ? { ...comment, content: updatedContent }
+            : comment
+        ) || null
+    );
+
     try {
-      await axios.patch(
+      const { data } = await axios.patch(
         `${HOST}/comments/update/${commentId}`,
         { content: updatedContent },
         { withCredentials: true }
       );
+
       setComments(
         (prev) =>
-          prev?.map((c) =>
-            c._id === commentId ? { ...c, content: updatedContent } : c
-          ) || null
+          prev?.map((c) => (c._id === commentId ? data.updatedComment : c)) ||
+          null
       );
+      setEditingContent("");
       setEditingCommentId(null);
       Swal.fire({
         icon: "success",
@@ -219,9 +237,10 @@ const Blog = () => {
       {/* 评论留言 */}
       <form className="comments-form" onSubmit={submitComment}>
         <p className="title">评论</p>
-        <textarea
+        <TextareaAutosize
           placeholder="撰写评论"
           value={newComment}
+          minRows={2}
           onChange={(e) => {
             setNewComment(e.target.value);
           }}
@@ -233,8 +252,8 @@ const Blog = () => {
       <form className="show-commnents">
         {comments?.map((comment) => (
           <div key={comment._id} className="comment-item">
-            <p className="comment-author">{comment.author}</p>
-            <textarea
+            <p className="comment-author">{comment.author}留言：</p>
+            <TextareaAutosize
               value={
                 editingCommentId === comment._id
                   ? editingContent
@@ -245,12 +264,12 @@ const Blog = () => {
             />
 
             {user?.userName === comment.author && (
-              <div className="edit-comment">
+              <div className="button-container">
                 {editingCommentId === comment._id ? (
                   <button
                     type="button"
                     onClick={() =>
-                      saveEditedComment(comment._id, comment.content)
+                      saveEditedComment(comment._id, editingContent)
                     }
                   >
                     更新

@@ -7,6 +7,7 @@ import Article from '../models/Article'
 
 const commentRouter = express.Router()
 
+// 新建评论
 commentRouter.post('/new', auth, async (req: AuthRequest, res: Response) => {
   try {
     const { subjectId, content } = req.body;
@@ -33,5 +34,75 @@ commentRouter.post('/new', auth, async (req: AuthRequest, res: Response) => {
     })
   }
 })
+
+// 更新评论
+commentRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response) => {
+  const id = req.params.id
+  const userName = req.user.userName
+  const { content } = req.body
+
+  const updatedComment = await Comment.findById(id)
+  if (!updatedComment) {
+    return res.status(404).json({
+      message: '该评论不存在！'
+    })
+  }
+
+  if (userName !== updatedComment.author) {
+    return res.status(403).json({
+      message: '只有评论者本人才能修改该评论！'
+    })
+  }
+
+  // 更新评论
+  try {
+    await Comment.findByIdAndUpdate(id, {
+      content
+    }, {
+      new: true
+    })
+    res.status(200).json({
+      message: '更新评论成功！',
+      updatedComment
+    })
+  } catch (error) {
+    console.error('更新评论失败:', (error as Error).message)
+    res.status(500).json({
+      error: '更新评论失败！'
+    })
+  }
+})
+
+// 删除评论
+commentRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response) => {
+  const id = req.params.id
+  const userName = req.user.userName
+
+  const deletedComment = await Comment.findById(id)
+  if (!deletedComment) {
+    return res.status(404).json({ error: '该评论不存在！' })
+  }
+
+  if (userName !== deletedComment.author) {
+    return res.status(403).json({ message: '只有评论者本人才能删除该评论！' })
+  }
+
+  try {
+    await Comment.findByIdAndDelete(id)
+
+    // 从 Article 中删除该评论 id
+    await Article.findByIdAndUpdate(
+      deletedComment.subjectId,
+      { $pull: { comments: deletedComment._id } }
+    )
+
+    res.status(200).json({ message: '成功删除评论' })
+  } catch (error) {
+    console.error('删除评论错误：', (error as Error).message)
+    res.status(500).json({ error: '删除评论出错！' })
+  }
+})
+
+
 
 export default commentRouter
