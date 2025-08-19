@@ -123,21 +123,21 @@ const Blog = () => {
   };
 
   // 更新评论内容
-  const saveEditedComment = async (
-    commentId: string,
-    updatedContent: string
-  ) => {
+  const saveEditedComment = async (commentId: string, updatedContent: string) => {
     if (!updatedContent.trim()) {
       Swal.fire("", "评论内容不能为空！", "error");
       return;
     }
+
+    // 保存原始内容用于错误恢复
+    const originalContent = comments?.find(c => c._id === commentId)?.content || '';
 
     // 先更新本地状态，提供即时反馈
     setComments(
       (prev) =>
         prev?.map((comment) =>
           comment._id === commentId
-            ? { ...comment, content: updatedContent }
+            ? { ...comment, content: updatedContent }  // 使用参数updatedContent而不是editingContent
             : comment
         ) || null
     );
@@ -149,6 +149,7 @@ const Blog = () => {
         { withCredentials: true }
       );
 
+      // 使用服务器返回的数据再次更新，确保数据一致性
       setComments(
         (prev) =>
           prev?.map((c) => (c._id === commentId ? data.updatedComment : c)) ||
@@ -163,6 +164,16 @@ const Blog = () => {
         showConfirmButton: false,
       });
     } catch (err) {
+      // 如果更新失败，恢复原始内容
+      setComments(
+        (prev) =>
+          prev?.map((comment) =>
+            comment._id === commentId
+              ? { ...comment, content: originalContent }
+              : comment
+          ) || null
+      );
+      
       console.error(err);
       Swal.fire("", "更新评论失败", "error");
     }
@@ -249,23 +260,18 @@ const Blog = () => {
       </form>
 
       {/* 展示评论 */}
-      <form className="show-commnents">
+      <div className="show-comments">
         {comments?.map((comment) => (
           <div key={comment._id} className="comment-item">
             <p className="comment-author">{comment.author}留言：</p>
-            <TextareaAutosize
-              value={
-                editingCommentId === comment._id
-                  ? editingContent
-                  : comment.content
-              }
-              readOnly={editingCommentId !== comment._id}
-              onChange={(e) => setEditingContent(e.target.value)}
-            />
-
-            {user?.userName === comment.author && (
-              <div className="button-container">
-                {editingCommentId === comment._id ? (
+            {editingCommentId === comment._id ? (
+              <>
+                <TextareaAutosize
+                  value={editingContent}
+                  onChange={(e) => setEditingContent(e.target.value)}
+                  minRows={2}
+                />
+                <div className="button-container">
                   <button
                     type="button"
                     onClick={() =>
@@ -274,28 +280,44 @@ const Blog = () => {
                   >
                     更新
                   </button>
-                ) : (
                   <button
                     type="button"
                     onClick={() => {
-                      setEditingCommentId(comment._id);
-                      setEditingContent(comment.content);
+                      setEditingCommentId(null);
+                      setEditingContent("");
                     }}
                   >
-                    编辑
+                    取消
                   </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="comment-content">{comment.content}</div>
+                {user?.userName === comment.author && (
+                  <div className="button-container">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingCommentId(comment._id);
+                        setEditingContent(comment.content);
+                      }}
+                    >
+                      编辑
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteComment(comment._id)}
+                    >
+                      删除
+                    </button>
+                  </div>
                 )}
-                <button
-                  type="button"
-                  onClick={() => deleteComment(comment._id)}
-                >
-                  删除
-                </button>
-              </div>
+              </>
             )}
           </div>
         ))}
-      </form>
+      </div>
 
       <div className="back-to">
         {user?.role === "Registered User" && (
