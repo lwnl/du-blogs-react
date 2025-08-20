@@ -53,7 +53,7 @@ export default function Header() {
         <nav className="nav-links">
           <NavLink to="/blogs/mine" end>我的博客</NavLink>
           <NavLink to="/blogs" end>博客园地</NavLink>
-          <NavLink to="/downloads">禁书下载</NavLink>
+          <NavLink to="/banned-books">禁书下载</NavLink>
         </nav>
 
         <div className="search-field">

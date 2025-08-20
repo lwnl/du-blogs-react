@@ -23,7 +23,7 @@ export default function App() {
         <Route path="/blogs/new" element={<NewBlog />} />
         <Route path="/blogs/update/:id" element={<UpdateBlog />} />
         <Route path="/blogs/mine" element={<MyBlogs />} />
-        <Route path="/bannedBooks" element={<BannedBooks />} />
+        <Route path="/banned-books" element={<BannedBooks />} />
         {/* <Route path="/bannedBooks/:id" element={<BannedBook/>} /> */}
 
          {/* 404 页面通配符路由 */}

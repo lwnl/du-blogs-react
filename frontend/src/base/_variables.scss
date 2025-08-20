@@ -7,6 +7,25 @@
   --bgc-dark-mode: rgba(0, 0, 0, 0.8);
   --bgc-current: var(--bgc-transparent);
 
+  --color-primary: #2563eb;
+  --color-primary-dark: #173760;
+  --color-accent: #3876d2;
+
+  --color-danger: #ef4444;
+  --color-danger-dark: #a71313;
+  --color-danger-bg: #3c0505;
+
+  --color-bg-light: #f8fafc;
+  --color-bg-lighter: #f1f5f9;
+  --color-bg-white: #ffffff;
+
+  --color-border: #d1d5db;
+  --color-border-light: #e5e7eb;
+
+  --color-text-dark: #1f2937;
+  --color-text-gray: #374151;
+  --color-text-light: #6b7280;
+
   /* Font Sizes */
   --fs-100: 0.7rem;
   --fs-200: 0.8125rem;
@@ -30,6 +49,7 @@
   --size-900: 5rem;
 
   /* Screens */
+  --breakpoint-sm: 599px;
   --maxw-handy: 428px;
   --maxh-handy: 926px;
 }
