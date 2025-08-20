@@ -4,10 +4,10 @@ import MyBlogs from "./pages/MyBlogs";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import NewBlog from "./pages/NewBlog";
-import Downloads from "./pages/Downloads";
 import Blog from "./pages/Bolg";
 import UpdateBlog from "./pages/UpdateBlog";
 import AllBlogs from "./pages/AllBlogs";
+import BannedBooks from "./pages/BannedBooks";
 
 
 export default function App() {
@@ -22,7 +22,7 @@ export default function App() {
         <Route path="/blogs/new" element={<NewBlog />} />
         <Route path="/blogs/update/:id" element={<UpdateBlog />} />
         <Route path="/blogs/mine" element={<MyBlogs />} />
-        <Route path="/downloads" element={<Downloads />} />
+        <Route path="/bannedBooks" element={<BannedBooks />} />
       </Route>
     </Routes>
   );
