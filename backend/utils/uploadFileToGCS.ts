@@ -13,7 +13,7 @@ export const bucket = storage.bucket(bucketName);
 export const uploadFileToGCS = async (file: Express.Multer.File) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const filePath = `projects/my-blog/images/${Date.now()}-${file.originalname}`;
+      const filePath = `projects/my-blog/images/in-blogs/${Date.now()}-${file.originalname}`;
       const blob = bucket.file(filePath);
       const blobStream = blob.createWriteStream({
         resumable: false,

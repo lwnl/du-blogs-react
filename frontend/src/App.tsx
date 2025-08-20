@@ -8,6 +8,7 @@ import Blog from "./pages/Bolg";
 import UpdateBlog from "./pages/UpdateBlog";
 import AllBlogs from "./pages/AllBlogs";
 import BannedBooks from "./pages/BannedBooks";
+import NotFound from "./pages/NotFound";
 
 
 export default function App() {
@@ -23,6 +24,10 @@ export default function App() {
         <Route path="/blogs/update/:id" element={<UpdateBlog />} />
         <Route path="/blogs/mine" element={<MyBlogs />} />
         <Route path="/bannedBooks" element={<BannedBooks />} />
+        {/* <Route path="/bannedBooks/:id" element={<BannedBook/>} /> */}
+
+         {/* 404 页面通配符路由 */}
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );
