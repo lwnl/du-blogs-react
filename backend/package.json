@@ -7,7 +7,8 @@
     "typescript": "^5"
   },
   "scripts": {
-    "dev": "bun --watch index.ts"
+    "dev": "bun --watch index.ts",
+    "seed": "bun run seeds/seed.ts"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.16.0",

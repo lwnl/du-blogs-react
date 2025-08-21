@@ -3,8 +3,10 @@ import { jsonDateTransform } from '../utils/formatDate';
 
 export interface IBannedBook extends Document {
   bookName: string,
+  coverLink: string,
+  downloadLink: string,
   format: string,
-  review: number,
+  review: string,
   summary: string,
   comments: string[],
   createdAt: Date;
@@ -16,12 +18,20 @@ const BookSchema: Schema<IBannedBook> = new Schema({
     type: String,
     required: true,
   },
+  coverLink: {
+    type: String,
+    required: true,
+  },
+  downloadLink: {
+    type: String,
+    required: true,
+  },
   format: {
     type: String,
     required: true,
   },
   review: {
-    type: Number,
+    type: String,
   },
   summary: {
     type: String,

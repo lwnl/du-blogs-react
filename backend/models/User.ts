@@ -23,7 +23,6 @@ const UserSchema: Schema<IUser> = new Schema({
     type: String,
   },
 
-
   role: {
     type: String,
     enum: Object.values(UserRole),
