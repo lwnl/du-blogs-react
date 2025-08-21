@@ -1,4 +1,4 @@
-import BannedBook, { type IBannedBook } from "../models/BannedBook";
+import BannedBook from "../models/BannedBook";
 
 const bannedBooks = [
   {
@@ -40,8 +40,9 @@ export async function seedBannedBook() {
     console.log("开始清空 User 集合...");
     await BannedBook.deleteMany();
     console.log("✅ 所有禁书已清空！");
-    // 根据bannedBooks数据初始化BannedBook
+    await BannedBook.insertMany(bannedBooks);
+     console.log("✅ 禁书数据初始化完成！");
   } catch (error) {
-    console.error("❌ 清空禁书失败:", (error as Error).message);
+    console.error("❌ 初始化禁书数据失败:", (error as Error).message);
   }
 }
