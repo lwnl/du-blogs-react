@@ -6,6 +6,7 @@ import dbConnection from './utils/db'
 import userRouter from './routers/userRouter'
 import articleRouter from './routers/articleRouter'
 import commentRouter from './routers/commentRouter'
+import bannedBookRouter from './routers/bannedBookRouter'
 
 dotenv.config()
 
@@ -25,6 +26,7 @@ app.use(cookieParser())
 app.use('/users', userRouter)
 app.use('/articles', articleRouter)
 app.use('/comments', commentRouter)
+app.use('/banned-books', bannedBookRouter)
 
 // 允许浏览器通过 /temp/... 访问临时文件
 
