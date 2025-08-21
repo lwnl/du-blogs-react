@@ -19,7 +19,7 @@ const BannedBooks = () => {
             <p className="book-intro flex-column">
               <span className="book-name">毛泽东鲜为人知的故事</span>
               <span>文件格式：PDF</span>
-              <a href="">
+              <a href="https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/books/%E6%AF%9B%E6%B3%BD%E4%B8%9C%EF%BC%9A%E9%B2%9C%E4%B8%BA%E4%BA%BA%E7%9F%A5%E7%9A%84%E6%95%85%E4%BA%8B.pdf" target="_blank">
                 <span>下载</span>
               </a>
             </p>
