@@ -72,10 +72,13 @@ export default function Header() {
           </div>
 
           <nav className="sidenav-links">
-            <NavLink to="/news" onClick={toggleSidebar}>
+            <NavLink to="/blogs/mine" onClick={toggleSidebar}>
               我的博客
             </NavLink>
-            <NavLink to="/downloads" onClick={toggleSidebar}>
+            <NavLink to="/blogs" onClick={toggleSidebar}>
+              博客园地
+            </NavLink>
+            <NavLink to="/banned-books" onClick={toggleSidebar}>
               禁书下载
             </NavLink>
           </nav>

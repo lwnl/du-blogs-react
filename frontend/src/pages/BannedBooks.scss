@@ -1,9 +1,23 @@
+// 变量定义
+$breakpoint-sm: 599px;
+$book-cover-width: 150px;
+$line-number: 9;
+
 .BannedBooks {
   padding-inline: var(--size-400);
+
+  a {
+    text-underline-offset: var(--size-100);
+  }
 
   li {
     padding-bottom: var(--size-400);
     border-bottom: 1px solid var(--color-border);
+  }
+
+  .flex-column {
+    display: flex;
+    flex-direction: column;
   }
 
   .book-item {
@@ -12,15 +26,19 @@
   }
 
   .book-cover img {
-    width: 150px;
-    min-width: 150px;
+    width: $book-cover-width;
+    min-width: $book-cover-width;
+    margin-bottom: var(--size-100);
+  }
+
+  .book-intro {
+    font-size: var(--fs-300);
+    gap: var(--size-100);
   }
 
   .book-info {
     padding-left: var(--size-500);
     border-left: 1px solid var(--color-border);
-    display: flex;
-    flex-direction: column;
     gap: var(--size-400);
 
     & > p {
@@ -29,16 +47,35 @@
     }
 
     article {
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      .book-summary {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre-wrap;
+        line-height: 1.6;
 
-      -webkit-line-clamp: 5; /* Chrome/Safari */
-      line-clamp: 5; /* 标准属性，未来兼容 */
+        -webkit-line-clamp: $line-number; /* Chrome/Safari */
+        line-clamp: $line-number; /* 标准属性，未来兼容 */
 
-      line-height: 1.5em;
-      max-height: calc(1.5em * 5);
+        line-height: 1.5em;
+
+        &.expanded {
+          display: block;
+          height: auto;
+        }
+      }
+
+      button {
+        color: rgb(85, 26, 139);
+        text-decoration: underline;
+        text-underline-offset: var(--size-100);
+        width: fit-content;
+        margin-left: auto;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+      }
     }
   }
 
@@ -65,6 +102,27 @@
     img {
       width: var(--size-400);
       height: var(--size-400);
+    }
+  }
+
+  // 小屏幕适配
+  @media (max-width: $breakpoint-sm) {
+    .book-item {
+      flex-direction: column;
+    }
+
+    .book-cover {
+      display: flex;
+      gap: var(--size-600);
+    }
+
+    .book-intro {
+      font-size: var(--fs-400);
+    }
+
+    .book-info {
+      padding: 0;
+      border: none;
     }
   }
 }

@@ -2,12 +2,10 @@
   --ff-primary: Roboto, "Helvetica Neue", sans-serif;
 
   /* Colors */
-  --primary-fc: #000000;
   --bgc-transparent: rgba(0, 0, 0, 0.4);
   --bgc-dark-mode: rgba(0, 0, 0, 0.8);
-  --bgc-current: var(--bgc-transparent);
 
-  --color-primary: #2A76D2;
+  --color-primary: #2a76d2;
   --color-primary-dark: #173760;
 
   --color-danger: #ef4444;
@@ -16,7 +14,6 @@
 
   --color-bg-light: #f8fafc;
   --color-bg-lighter: #ededed;
-  --color-bg-white: #ffffff;
 
   --color-border: #d1d5db;
   --color-border-light: #e5e7eb;
@@ -48,7 +45,6 @@
   --size-900: 5rem;
 
   /* Screens */
-  --breakpoint-sm: 599px;
   --maxw-handy: 428px;
   --maxh-handy: 926px;
 }
