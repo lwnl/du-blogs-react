@@ -1,5 +1,70 @@
-
-
 .BannedBooks {
-  
+  padding-inline: var(--size-400);
+
+  li {
+    padding-bottom: var(--size-400);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .book-item {
+    display: flex;
+    gap: var(--size-400);
+  }
+
+  .book-cover img {
+    width: 150px;
+    min-width: 150px;
+  }
+
+  .book-info {
+    padding-left: var(--size-500);
+    border-left: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-400);
+
+    & > p {
+      display: flex;
+      gap: var(--size-700);
+    }
+
+    article {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      -webkit-line-clamp: 5; /* Chrome/Safari */
+      line-clamp: 5; /* 标准属性，未来兼容 */
+
+      line-height: 1.5em;
+      max-height: calc(1.5em * 5);
+    }
+  }
+
+  .book-review {
+    display: flex;
+    gap: var(--size-500);
+
+    p {
+      color: var(--color-primary);
+    }
+    span {
+      color: #f24e01;
+    }
+  }
+
+  .book-name {
+    font-weight: 500;
+    color: var(--color-primary);
+  }
+
+  .book-stars {
+    display: flex;
+    align-items: center;
+    img {
+      width: var(--size-400);
+      height: var(--size-400);
+    }
+  }
 }
