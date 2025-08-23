@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./BannedBooks.scss";
 import axios from "axios";
 import { useAuthCheck } from "../hooks/useAuthCheck";
@@ -17,11 +17,12 @@ const BannedBooks = () => {
     updatedAt: Date;
   }
 
-  const [currentBookId, setCurrentBookId] = useState<string | null>(null);
-  const { HOST, authenticated, user } = useAuthCheck();
-  const [loading, setLoading] = useState(true); // <-- 新增 loading 状态
-  const [error, setError] = useState<string | null>(null); // <-- 错误状态
+  const { HOST, user } = useAuthCheck();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [bannedBooks, setBannedBooks] = useState<IBannedBook[] | null>(null);
+  const [currentBookId, setCurrentBookId] = useState<string | null>(null);
+  const [overflowMap, setOverflowMap] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     axios
@@ -38,19 +39,35 @@ const BannedBooks = () => {
       });
   }, [user]);
 
-  if (loading) {
-    return <div className="BannedBooks">正在加载中...</div>; // loading 提示
-  }
+  // 检查文本是否溢出
+  const checkOverflow = (id: string) => {
+    const el = document.getElementById(`summary-${id}`);
+    if (el) {
+      return el.scrollHeight > el.clientHeight;
+    }
+    return false;
+  };
 
-  if (error) {
-    return <div className="BannedBooks">{error}</div>; // 错误提示
-  }
+  useEffect(() => {
+    if (bannedBooks) {
+      const map: Record<string, boolean> = {};
+      bannedBooks.forEach((book) => {
+        map[book._id] = checkOverflow(book._id);
+      });
+      setOverflowMap(map);
+    }
+  }, [bannedBooks]);
+
+  if (loading) return <div className="BannedBooks">正在加载中...</div>;
+  if (error) return <div className="BannedBooks">{error}</div>;
 
   return (
     <div className="BannedBooks">
       <ul>
         {bannedBooks?.map((book) => {
           const isExpanded = currentBookId === book._id;
+          const isOverflow = overflowMap[book._id];
+
           return (
             <li key={book._id} className="book-item">
               <div className="book-cover">
@@ -68,26 +85,15 @@ const BannedBooks = () => {
               <div className="book-info flex-column">
                 <div className="book-review">
                   <div className="book-stars">
-                    <img
-                      src="https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif"
-                      alt="star-null"
-                    />
-                    <img
-                      src="https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif"
-                      alt="star-null"
-                    />
-                    <img
-                      src="https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif"
-                      alt="star-null"
-                    />
-                    <img
-                      src="https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif"
-                      alt="star-null"
-                    />
-                    <img
-                      src="https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif"
-                      alt="star-null"
-                    />
+                    {Array(5)
+                      .fill(0)
+                      .map((_, i) => (
+                        <img
+                          key={i}
+                          src="https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif"
+                          alt="star-null"
+                        />
+                      ))}
                   </div>
                   <p>
                     <span>0 </span>分
@@ -99,17 +105,20 @@ const BannedBooks = () => {
 
                 <article className="flex-column">
                   <div
+                    id={`summary-${book._id}`}
                     dangerouslySetInnerHTML={{ __html: book.summary }}
                     className={
                       isExpanded ? "book-summary expanded" : "book-summary"
                     }
                   ></div>
-                  {isExpanded ? (
-                    <button onClick={() => setCurrentBookId(null)}>收起</button>
-                  ) : (
-                    <button onClick={() => setCurrentBookId(book._id)}>
-                      阅读更多
-                    </button>
+                  {isOverflow && (
+                    isExpanded ? (
+                      <button onClick={() => setCurrentBookId(null)}>收起</button>
+                    ) : (
+                      <button onClick={() => setCurrentBookId(book._id)}>
+                        阅读更多
+                      </button>
+                    )
                   )}
                 </article>
               </div>
