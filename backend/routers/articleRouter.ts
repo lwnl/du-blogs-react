@@ -163,6 +163,12 @@ articleRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response
     if (!deletedBlog) {
       return res.status(404).json({ error: '文章不存在或无权限删除' });
     }
+    // 删除该文章中的所有评论
+    if (deletedBlog.comments.length > 0) {
+      await Promise.all (
+        deletedBlog.comments.map((id) => Comment.findByIdAndDelete(id))
+      )
+    }
     res.status(200).json({
       message: '文章删除成功'
     })
