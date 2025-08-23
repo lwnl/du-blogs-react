@@ -92,7 +92,6 @@ $line-number: 9;
   .book-name {
     font-weight: 500;
     color: var(--color-primary);
-    display: inline-block; // 或 block
     width: $book-cover-width; // 自己设定合适宽度
     overflow: hidden;
     white-space: nowrap;
@@ -126,6 +125,11 @@ $line-number: 9;
     .book-info {
       padding: 0;
       border: none;
+    }
+
+    .book-name {
+      width: auto;
+      white-space: wrap;
     }
   }
 }
