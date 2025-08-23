@@ -73,6 +73,7 @@ const Blog = () => {
                 withCredentials: true,
               }
             );
+            refetchAuth() //重新校验用户身份
             //用游客身份发表评论
             await postComment();
           } catch (error) {
