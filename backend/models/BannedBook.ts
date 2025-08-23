@@ -1,6 +1,11 @@
 import mongoose, { Document, Schema, Model } from 'mongoose'
 import { jsonDateTransform } from '../utils/formatDate';
 
+interface IComment {
+  userName: string;
+  content: string;
+}
+
 export interface IBannedBook extends Document {
   bookName: string,
   coverLink: string,
@@ -8,10 +13,16 @@ export interface IBannedBook extends Document {
   format: string,
   review: string,
   summary: string,
-  comments: string[],
+  comments: IComment[],
   createdAt: Date;
   updatedAt: Date;
 }
+
+// 子 Schema：评论
+const CommentSchema = new Schema<IComment>({
+  userName: { type: String, required: true },
+  content: { type: String, required: true }
+});
 
 const BookSchema: Schema<IBannedBook> = new Schema({
   bookName: {
@@ -38,7 +49,7 @@ const BookSchema: Schema<IBannedBook> = new Schema({
     required: true,
   },
   comments: {
-    type: [String]
+    type: [CommentSchema], default: []
   },
 }, {
   timestamps: {
