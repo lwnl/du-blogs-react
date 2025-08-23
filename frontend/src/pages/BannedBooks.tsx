@@ -48,15 +48,28 @@ const BannedBooks = () => {
     return false;
   };
 
-  useEffect(() => {
-    if (bannedBooks) {
-      const map: Record<string, boolean> = {};
-      bannedBooks.forEach((book) => {
-        map[book._id] = checkOverflow(book._id);
-      });
-      setOverflowMap(map);
-    }
-  }, [bannedBooks]);
+useEffect(() => {
+  if (!bannedBooks) return;
+
+  const updateOverflowMap = () => {
+    const map: Record<string, boolean> = {};
+    bannedBooks.forEach((book) => {
+      map[book._id] = checkOverflow(book._id);
+    });
+    setOverflowMap(map);
+  };
+
+  // 初始化时先算一遍
+  updateOverflowMap();
+
+  // 监听窗口大小变化
+  window.addEventListener("resize", updateOverflowMap);
+
+  // 清理监听器
+  return () => {
+    window.removeEventListener("resize", updateOverflowMap);
+  };
+}, [bannedBooks]);
 
   if (loading) return <div className="BannedBooks">正在加载中...</div>;
   if (error) return <div className="BannedBooks">{error}</div>;
