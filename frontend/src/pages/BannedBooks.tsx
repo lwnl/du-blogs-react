@@ -38,7 +38,7 @@ const BannedBooks = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [user]);
 
   if (loading) {
     return <div className="BannedBooks">正在加载中...</div>; // loading 提示
