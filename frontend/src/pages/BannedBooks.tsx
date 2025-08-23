@@ -75,7 +75,9 @@ const BannedBooks = () => {
                   <img src={book.coverLink} alt={book.bookName} />
                 </div>
                 <p className="book-intro flex-column">
-                  <span className="book-name">{book.bookName}</span>
+                  <span className="book-name" title={book.bookName}>
+                    {book.bookName}
+                  </span>
                   <span>文件格式：{book.format}</span>
                   <a href={book.downloadLink} target="_blank">
                     <span>下载</span>
@@ -111,15 +113,16 @@ const BannedBooks = () => {
                       isExpanded ? "book-summary expanded" : "book-summary"
                     }
                   ></div>
-                  {isOverflow && (
-                    isExpanded ? (
-                      <button onClick={() => setCurrentBookId(null)}>收起</button>
+                  {isOverflow &&
+                    (isExpanded ? (
+                      <button onClick={() => setCurrentBookId(null)}>
+                        收起
+                      </button>
                     ) : (
                       <button onClick={() => setCurrentBookId(book._id)}>
                         阅读更多
                       </button>
-                    )
-                  )}
+                    ))}
                 </article>
               </div>
             </li>

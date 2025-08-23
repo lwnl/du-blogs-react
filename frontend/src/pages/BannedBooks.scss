@@ -92,6 +92,11 @@ $line-number: 9;
   .book-name {
     font-weight: 500;
     color: var(--color-primary);
+    display: inline-block; // 或 block
+    width: $book-cover-width; // 自己设定合适宽度
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; // 省略号
   }
 
   .book-stars {
