@@ -20,8 +20,9 @@ const BannedBooks = () => {
     updatedAt: Date;
   }
 
-  const { HOST } = useAuthCheck();
-
+  const { HOST, authenticated, user } = useAuthCheck();
+  const [loading, setLoading] = useState(true); // <-- 新增 loading 状态
+  const [error, setError] = useState<string | null>(null); // <-- 错误状态
   const [bannedBooks, setBannedBooks] = useState<IBannedBook[] | null>(null);
 
   useEffect(() => {
@@ -31,10 +32,22 @@ const BannedBooks = () => {
         setBannedBooks(res.data.bannedBooks);
       })
       .catch((err) => {
-        const error = err.response?.data?.error || "加载禁书失败";
-        console.error(error);
+        const errorMsg = err.response?.data?.error || "加载禁书失败";
+        setError(errorMsg);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
+
+  if (loading) {
+    return <div className="BannedBooks">正在加载中...</div>; // loading 提示
+  }
+
+  if (error) {
+    return <div className="BannedBooks">{error}</div>; // 错误提示
+  }
+
   return (
     <div className="BannedBooks">
       <ul>
