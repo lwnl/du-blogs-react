@@ -4,6 +4,7 @@ import BannedBook from '../models/BannedBook'
 
 const bannedBookRouter = express.Router()
 
+//获取所有禁书
 bannedBookRouter.get('/', async (req: Request, res: Response) => {
   try {
     const bannedBooks = await BannedBook.find()
@@ -13,13 +14,39 @@ bannedBookRouter.get('/', async (req: Request, res: Response) => {
       })
     }
     res.status(200).json({
-      message:'成功获取禁书数据！',
+      message: '成功获取禁书数据！',
       bannedBooks
     })
   } catch (error) {
     console.error('获取禁书失败：', (error as Error).message)
     res.status(500).json({
       error: '获取禁书失败'
+    })
+  }
+})
+
+//根据id获取禁书
+bannedBookRouter.get('/:id', async (req: Request, res: Response) => {
+  const id = req.params.id
+  console.log('id is:', id)
+
+  try {
+    const book = await BannedBook.findById(id)
+
+    console.log('book is:', book)
+
+    if (!book) return res.status(404).json({
+      error: '数据不存在！'
+    })
+
+    res.status(200).json({
+      message: '成功获取数据！',
+      book
+    })
+  } catch (error) {
+    console.error('获取数据出错：', (error as Error).message)
+    res.status(500).json({
+      error: '获取数据出错!'
     })
   }
 })

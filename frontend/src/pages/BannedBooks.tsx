@@ -2,27 +2,37 @@ import { useEffect, useState, useRef } from "react";
 import "./BannedBooks.scss";
 import axios from "axios";
 import { useAuthCheck } from "../hooks/useAuthCheck";
+import { Link } from "react-router-dom";
+
+export interface IBannedBook {
+  _id: string;
+  bookName: string;
+  coverLink: string;
+  downloadLink: string;
+  format: string;
+  review: string;
+  summary: string;
+  comments: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const BannedBooks = () => {
-  interface IBannedBook {
-    _id: string;
-    bookName: string;
-    coverLink: string;
-    downloadLink: string;
-    format: string;
-    review: string;
-    summary: string;
-    comments: string[];
-    createdAt: Date;
-    updatedAt: Date;
-  }
-
   const { HOST, user } = useAuthCheck();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bannedBooks, setBannedBooks] = useState<IBannedBook[] | null>(null);
   const [currentBookId, setCurrentBookId] = useState<string | null>(null);
   const [overflowMap, setOverflowMap] = useState<Record<string, boolean>>({});
+
+  // 检查文本是否溢出
+  const checkOverflow = (id: string) => {
+    const el = document.getElementById(`summary-${id}`);
+    if (el) {
+      return el.scrollHeight > el.clientHeight;
+    }
+    return false;
+  };
 
   useEffect(() => {
     axios
@@ -39,37 +49,28 @@ const BannedBooks = () => {
       });
   }, [user]);
 
-  // 检查文本是否溢出
-  const checkOverflow = (id: string) => {
-    const el = document.getElementById(`summary-${id}`);
-    if (el) {
-      return el.scrollHeight > el.clientHeight;
-    }
-    return false;
-  };
+  useEffect(() => {
+    if (!bannedBooks) return;
 
-useEffect(() => {
-  if (!bannedBooks) return;
+    const updateOverflowMap = () => {
+      const map: Record<string, boolean> = {};
+      bannedBooks.forEach((book) => {
+        map[book._id] = checkOverflow(book._id);
+      });
+      setOverflowMap(map);
+    };
 
-  const updateOverflowMap = () => {
-    const map: Record<string, boolean> = {};
-    bannedBooks.forEach((book) => {
-      map[book._id] = checkOverflow(book._id);
-    });
-    setOverflowMap(map);
-  };
+    // 初始化时先算一遍
+    updateOverflowMap();
 
-  // 初始化时先算一遍
-  updateOverflowMap();
+    // 监听窗口大小变化
+    window.addEventListener("resize", updateOverflowMap);
 
-  // 监听窗口大小变化
-  window.addEventListener("resize", updateOverflowMap);
-
-  // 清理监听器
-  return () => {
-    window.removeEventListener("resize", updateOverflowMap);
-  };
-}, [bannedBooks]);
+    // 清理监听器
+    return () => {
+      window.removeEventListener("resize", updateOverflowMap);
+    };
+  }, [bannedBooks]);
 
   if (loading) return <div className="BannedBooks">正在加载中...</div>;
   if (error) return <div className="BannedBooks">{error}</div>;
@@ -111,10 +112,14 @@ useEffect(() => {
                       ))}
                   </div>
                   <p>
-                    <span>0 </span>分
+                    <Link to={`./${book._id}`}>
+                      <span>0 </span>分
+                    </Link>
                   </p>
                   <p>
-                    <span>0 </span>人评价
+                    <Link to={`./${book._id}`}>
+                      <span>0 </span>人评价
+                    </Link>
                   </p>
                 </div>
 
