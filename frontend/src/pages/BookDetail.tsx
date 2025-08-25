@@ -163,6 +163,7 @@ const BookDetail = () => {
     }
   };
 
+  // 删除评论内容
   const deleteComment = async (commentId: string) => {
     const result = await Swal.fire({
       title: "确认删除？",
