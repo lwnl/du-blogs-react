@@ -21,32 +21,38 @@ const BookDetail = () => {
   } = useAuthCheck();
   // 更新文本是否溢出
 
-  const checkOverflow = () => {
-    if (!book) return;
-    const el = document.getElementById(`summary-${book._id}`);
-    if (el) {
-      setIsOverflow(el.scrollHeight > el.clientHeight);
-    }
-  };
-
   useEffect(() => {
     if (!id) return;
     axios
       .get(`${HOST}/banned-books/${id}`)
       .then((res) => {
         setBook(res.data.book);
-
-        //检查文本溢出并挂载监听器
-        checkOverflow();
-        window.addEventListener("resize", checkOverflow);
-        return () => {
-          window.removeEventListener("resize", checkOverflow);
-        };
       })
       .catch((error) => {
         console.error("加载书籍失败：", (error as Error).message);
       });
   }, [id]);
+
+  useEffect(() => {
+  if (!book) return;
+  const checkOverflow = () => {
+    const el = document.getElementById(`summary-${book._id}`);
+    if (el) {
+      const overflow = el.scrollHeight > el.clientHeight;
+      setIsOverflow(overflow);
+    }
+  };
+
+  // 初始检查
+  checkOverflow();
+
+  // 监听窗口变化
+  window.addEventListener("resize", checkOverflow);
+
+  return () => {
+    window.removeEventListener("resize", checkOverflow);
+  };
+}, [book]);
 
   if (book)
     return (
