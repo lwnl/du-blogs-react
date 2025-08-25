@@ -2,16 +2,29 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Register-Login.scss";
+import Swal from "sweetalert2";
 
 const Register = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [repeatPassword, setRepeatPassword] = useState(""); // 单独的重复密码状态
   const navigate = useNavigate();
   const HOST = (import.meta as any).env.VITE_HOST;
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 前端校验
+    if (password !== repeatPassword) {
+      Swal.fire("", "两次输入密码不一致", "error");
+      return;
+    }
+
+    if (loading) return; // 避免重复点击
+    setLoading(true);
+
+    setLoading(true);
 
     try {
       const res = await axios.post(
@@ -32,6 +45,8 @@ const Register = () => {
         alert("Registration error");
         console.error("Registration error", (error as Error).message);
       }
+    } finally {
+      setLoading(false); // 不管成功失败都恢复按钮
     }
   };
 
@@ -67,7 +82,7 @@ const Register = () => {
         required
       />
 
-      <button type="submit">注册</button>
+      <button type="submit"> {loading ? "注册中..." : "注册"}</button>
 
       <button
         type="button"
@@ -75,6 +90,7 @@ const Register = () => {
         onClick={() => {
           navigate("/users/login");
         }}
+        disabled={loading} // 注册过程中禁用跳转
       >
         已注册? 登录
       </button>
