@@ -1,6 +1,7 @@
 import express from 'express'
 import type { Request, Response } from 'express'
 import BannedBook from '../models/BannedBook'
+import { auth, type AuthRequest } from '../utils/auth'
 
 const bannedBookRouter = express.Router()
 
@@ -47,6 +48,33 @@ bannedBookRouter.get('/:id', async (req: Request, res: Response) => {
     console.error('获取数据出错：', (error as Error).message)
     res.status(500).json({
       error: '获取数据出错!'
+    })
+  }
+})
+
+// 追加评论
+bannedBookRouter.patch('/comments/:bookId', auth, async (req: AuthRequest, res: Response) => {
+  const bookId = req.params.bookId
+  const { newComment } = req.body
+  try {
+    const updatedBannedBook = await BannedBook.findByIdAndUpdate(bookId, {
+      $push: {
+        comments: {
+          $each: [newComment], //要追加的元素
+          $position: 0         // 追加的位置
+        }
+      }
+    }, {
+      new: true
+    })
+    res.status(200).json({
+      message: '追加评论成功！',
+      updatedBannedBook
+    })
+  } catch (error) {
+    console.error('追加评论错误：', (error as Error).message)
+    res.status(500).json({
+      error: '追加评论错误：'
     })
   }
 })

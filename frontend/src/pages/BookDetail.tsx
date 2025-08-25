@@ -1,15 +1,28 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import "./BookDetail.scss";
 import { IBannedBook } from "./BannedBooks";
 import { useEffect, useState } from "react";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import axios from "axios";
+import TextareaAutosize from "react-textarea-autosize";
+import Swal from "sweetalert2";
+
+export interface IComment {
+  _id: string;
+  author: string;
+  content: string;
+}
 
 const BookDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id: bookId } = useParams<{ id: string }>();
   const [book, setBook] = useState<IBannedBook | null>(null);
   const [isExpanded, setIsExpanded] = useState<boolean | null>(null);
   const [isOverflow, setIsOverflow] = useState<boolean>(false);
+  const [newCommentContent, setNewCommentContent] = useState("");
+  const [comments, setComments] = useState<IComment[]>([]);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState<string>("");
+
   const {
     HOST,
     user,
@@ -19,44 +32,202 @@ const BookDetail = () => {
     isError,
     refetchAuth,
   } = useAuthCheck();
-  // 更新文本是否溢出
+
+  const submitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newCommentContent.trim()) {
+      Swal.fire("", "评论内容不能为空！", "error");
+      return;
+    }
+
+    // 判断用户是否登录
+    // 若未登录，使用Swal弹出对话框询问用户是否以游客身份发表评论？
+    if (!authenticated || user?.role === "Guest") {
+      const result = await Swal.fire({
+        title: "您尚未登录",
+        text: "是否以游客身份发表评论？",
+        showCancelButton: true,
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+      });
+
+      if (result.isConfirmed) {
+        // 创建游客用户 或者 使用当前游客身份
+
+        // 检查是否具备游客身份
+        if (user?.role === "Guest") {
+          //用游客身份发表评论
+          await postComment();
+        } else {
+          // 若还没有游客身份，创建游客身份
+          try {
+            await axios.post(
+              `${HOST}/users/guests/new`,
+              {},
+              {
+                withCredentials: true,
+              }
+            );
+            refetchAuth(); //重新校验用户身份
+            //用游客身份发表评论
+            await postComment();
+          } catch (error) {
+            console.error("创建游客失败", (error as Error).message);
+            Swal.fire("", "创建游客失败", "error");
+          }
+        }
+      } else {
+        // 用户选择取消，不发表评论
+        Swal.fire("已取消", "", "info");
+      }
+      return;
+    }
+
+    //注册用户发表留言
+    await postComment();
+  };
+
+  // 发表评论子程序
+  const postComment = async () => {
+    try {
+      const newComment = {
+        author: user?.userName,
+        content: newCommentContent,
+      };
+      const res = await axios.patch(
+        `${HOST}/banned-books/comments/${bookId}`,
+        {
+          newComment,
+        },
+        { withCredentials: true }
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "发表评论成功！",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      setNewCommentContent("");
+
+      // 更新评论列表
+      const { updatedBannedBook } = res.data;
+      setComments(updatedBannedBook.comments);
+    } catch (error) {
+      console.error("发表评论失败", (error as Error).message);
+      Swal.fire("", "发表评论失败", "error");
+    }
+  };
+
+  // 更新评论内容
+  const saveEditedComment = async (
+    commentId: string,
+    updatedContent: string
+  ) => {
+    if (!updatedContent.trim()) {
+      Swal.fire("", "评论内容不能为空！", "error");
+      return;
+    }
+
+    try {
+      const { data } = await axios.patch(
+        `${HOST}/comments/update/${commentId}`,
+        { content: updatedContent },
+        { withCredentials: true }
+      );
+
+      const updatedComment = data.updatedComment;
+
+      setComments((prev) => {
+        if (!prev) return [];
+        const updated = prev.map((c) =>
+          c._id.toString() === commentId.toString() ? updatedComment : c
+        );
+        return updated;
+      });
+
+      // 重置编辑状态
+      setEditingContent("");
+      setEditingCommentId(null);
+
+      Swal.fire({
+        icon: "success",
+        title: "评论已更新",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("更新评论失败:", err);
+      Swal.fire("", "更新评论失败", "error");
+    }
+  };
+
+  const deleteComment = async (commentId: string) => {
+    const result = await Swal.fire({
+      title: "确认删除？",
+      showCancelButton: true,
+      confirmButtonText: "删除",
+      cancelButtonText: "取消",
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      await axios.delete(`${HOST}/comments/delete/${commentId}`, {
+        withCredentials: true,
+      });
+      setComments((prev) => prev?.filter((c) => c._id !== commentId) || null);
+      Swal.fire({
+        icon: "success",
+        title: "评论已删除",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("", "删除评论失败", "error");
+    }
+  };
 
   useEffect(() => {
-    if (!id) return;
+    if (!bookId) return;
     axios
-      .get(`${HOST}/banned-books/${id}`)
+      .get(`${HOST}/banned-books/${bookId}`)
       .then((res) => {
         setBook(res.data.book);
+        setComments(res.data.book.comments);
       })
       .catch((error) => {
         console.error("加载书籍失败：", (error as Error).message);
       });
-  }, [id]);
+  }, [bookId]);
 
   useEffect(() => {
-  if (!book) return;
-  const checkOverflow = () => {
-    const el = document.getElementById(`summary-${book._id}`);
-    if (el) {
-      const overflow = el.scrollHeight > el.clientHeight;
-      setIsOverflow(overflow);
-    }
-  };
+    if (!book) return;
+    // 检查溢出函数
+    const checkOverflow = () => {
+      const el = document.getElementById(`summary-${book._id}`);
+      if (el) {
+        const overflow = el.scrollHeight > el.clientHeight;
+        setIsOverflow(overflow);
+      }
+    };
 
-  // 初始检查
-  checkOverflow();
+    // 初始检查
+    checkOverflow();
 
-  // 监听窗口变化
-  window.addEventListener("resize", checkOverflow);
+    // 监听窗口变化
+    window.addEventListener("resize", checkOverflow);
 
-  return () => {
-    window.removeEventListener("resize", checkOverflow);
-  };
-}, [book]);
+    return () => {
+      window.removeEventListener("resize", checkOverflow);
+    };
+  }, [book]);
 
   if (book)
     return (
       <div className="book-detail">
+        {/* 封面信息 */}
         <div className="book-cover">
           <div>
             <img src={book.coverLink} alt={book.bookName} />
@@ -71,6 +242,7 @@ const BookDetail = () => {
             </a>
           </p>
         </div>
+        {/* 评分，简介 */}
         <div className="book-info flex-column">
           <div className="book-review">
             <div className="book-stars">
@@ -102,14 +274,100 @@ const BookDetail = () => {
               (isExpanded ? (
                 <button onClick={() => setIsExpanded(false)}>收起</button>
               ) : (
-                <button onClick={() => setIsExpanded(true)}>
-                  阅读更多
-                </button>
+                <button onClick={() => setIsExpanded(true)}>阅读更多</button>
               ))}
           </article>
+
+          {/* 评论留言 */}
+          <form className="comments-form" onSubmit={submitComment}>
+            <p className="title">评论</p>
+            <TextareaAutosize
+              placeholder="撰写评论"
+              value={newCommentContent}
+              minRows={2}
+              onChange={(e) => setNewCommentContent(e.target.value)}
+            />
+            <button>评分留言</button>
+          </form>
+          
+          {/* 展示评论 */}
+          <div className="show-comments">
+            {comments?.map((comment) => (
+              <div key={comment._id} className="comment-item">
+                <p className="comment-author">{comment.author}留言：</p>
+
+                {editingCommentId === comment._id ? (
+                  // 编辑模式
+                  <>
+                    <TextareaAutosize
+                      value={editingContent}
+                      onChange={(e) => setEditingContent(e.target.value)}
+                      minRows={2}
+                    />
+                    <div className="button-container">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          saveEditedComment(comment._id, editingContent)
+                        }
+                      >
+                        更新
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingCommentId(null);
+                          setEditingContent("");
+                        }}
+                      >
+                        取消
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  // 查看模式 - 直接显示内容
+                  <>
+                    <div className="comment-content">{comment.content}</div>
+                    {user?.userName === comment.author && (
+                      <div className="button-container">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingCommentId(comment._id);
+                            setEditingContent(comment.content);
+                          }}
+                        >
+                          编辑
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteComment(comment._id)}
+                        >
+                          删除
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* 返回 */}
+          <div className="back-to">
+            {user?.role === "Registered User" && (
+              <p>
+                <Link to="/blogs/mine">返回我的博客</Link>
+              </p>
+            )}
+            <p>
+              <Link to="/blogs">返回博客园地</Link>
+            </p>
+          </div>
         </div>
       </div>
     );
+  else return <div>正在加载书籍信息...</div>;
 };
 
 export default BookDetail;
