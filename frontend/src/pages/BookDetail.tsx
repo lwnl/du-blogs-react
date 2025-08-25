@@ -112,8 +112,8 @@ const BookDetail = () => {
       setNewCommentContent("");
 
       // 更新评论列表
-      const { updatedBannedBook } = res.data;
-      setComments(updatedBannedBook.comments);
+      const { updatedBook } = res.data;
+      setComments(updatedBook.comments);
     } catch (error) {
       console.error("发表评论失败", (error as Error).message);
       Swal.fire("", "发表评论失败", "error");
@@ -173,9 +173,12 @@ const BookDetail = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`${HOST}/comments/delete/${commentId}`, {
-        withCredentials: true,
-      });
+      await axios.delete(
+        `${HOST}/banned-books/${bookId}/comments/${commentId}`,
+        {
+          withCredentials: true,
+        }
+      );
       setComments((prev) => prev?.filter((c) => c._id !== commentId) || null);
       Swal.fire({
         icon: "success",
@@ -289,7 +292,7 @@ const BookDetail = () => {
             />
             <button>评分留言</button>
           </form>
-          
+
           {/* 展示评论 */}
           <div className="show-comments">
             {comments?.map((comment) => (

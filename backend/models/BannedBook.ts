@@ -1,7 +1,8 @@
-import mongoose, { Document, Schema, Model } from 'mongoose'
+import mongoose, { Document, Schema, Model, Types } from 'mongoose'
 import { jsonDateTransform } from '../utils/formatDate';
 
 interface IComment {
+    _id?: Types.ObjectId; // 可选，因为新建时可能没有
   author: string;
   content: string;
 }

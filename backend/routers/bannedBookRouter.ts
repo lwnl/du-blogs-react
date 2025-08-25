@@ -57,7 +57,7 @@ bannedBookRouter.patch('/comments/:bookId', auth, async (req: AuthRequest, res: 
   const bookId = req.params.bookId
   const { newComment } = req.body
   try {
-    const updatedBannedBook = await BannedBook.findByIdAndUpdate(bookId, {
+    const updatedBook = await BannedBook.findByIdAndUpdate(bookId, {
       $push: {
         comments: {
           $each: [newComment], //要追加的元素
@@ -69,7 +69,7 @@ bannedBookRouter.patch('/comments/:bookId', auth, async (req: AuthRequest, res: 
     })
     res.status(200).json({
       message: '追加评论成功！',
-      updatedBannedBook
+      updatedBook
     })
   } catch (error) {
     console.error('追加评论错误：', (error as Error).message)
@@ -78,5 +78,42 @@ bannedBookRouter.patch('/comments/:bookId', auth, async (req: AuthRequest, res: 
     })
   }
 })
+
+// 删除某条评论
+bannedBookRouter.delete('/:bookId/comments/:commentId', auth, async (req: AuthRequest, res: Response) => {
+  const { bookId, commentId } = req.params;
+  try {
+    const checkUpdatedBook = await BannedBook.findById(bookId);
+    if (!checkUpdatedBook) {
+      return res.status(404).json({ error: '书籍不存在' });
+    }
+
+    const comment = checkUpdatedBook.comments.find(c => c._id?.toString() === commentId);
+    if (!comment) {
+      return res.status(404).json({ error: '评论不存在' });
+    }
+
+    if (req.user.userName !== comment.author) {
+      return res.status(403).json({
+        error: '只能删除本人的评论'
+      });
+    }
+
+    // 执行删除逻辑
+    const updatedBook = await BannedBook.findByIdAndUpdate(
+      bookId,
+      { $pull: { comments: { _id: commentId } } }, // 从数组中删除匹配的子文档
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: '评论已删除',
+      updatedBook,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: '删除失败' });
+  }
+});
 
 export default bannedBookRouter
