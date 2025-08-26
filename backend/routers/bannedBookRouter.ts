@@ -1,9 +1,43 @@
 import express from 'express'
-import type { Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import BannedBook from '../models/BannedBook'
 import { auth, type AuthRequest } from '../utils/auth'
 
 const bannedBookRouter = express.Router()
+
+// 预检中间件：检查书籍和评论是否存在 & 是否为本人
+export const idChecking = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { bookId, commentId } = req.params;
+
+  try {
+    const book = await BannedBook.findById(bookId);
+    if (!book) {
+      return res.status(404).json({ error: "书籍不存在" });
+    }
+
+    const comment = book.comments.find((c) => c._id?.toString() === commentId);
+    if (!comment) {
+      return res.status(404).json({ error: "评论不存在" });
+    }
+
+    if (req.user.userName !== comment.author) {
+      return res.status(403).json({ error: "只能操作本人的评论" });
+    }
+
+    // 挂到 req 上，后续中间件/路由直接用
+    (req as any).book = book;
+    (req as any).comment = comment;
+
+    next();
+  } catch (error) {
+    console.error("预检失败:", (error as Error).message);
+    res.status(500).json({ error: "预检失败" });
+  }
+};
 
 //获取所有禁书
 bannedBookRouter.get('/', async (req: Request, res: Response) => {
@@ -80,27 +114,11 @@ bannedBookRouter.patch('/:bookId/comments/new', auth, async (req: AuthRequest, r
 })
 
 // 更新某条评论
-bannedBookRouter.patch('/:bookId/comments/update/:commentId', auth, async (req: AuthRequest, res: Response) => {
+bannedBookRouter.patch('/:bookId/comments/update/:commentId', auth, idChecking, async (req: AuthRequest, res: Response) => {
   const { bookId, commentId } = req.params;
   const { updatedContent } = req.body
 
   try {
-    const checkUpdatedBook = await BannedBook.findById(bookId);
-    if (!checkUpdatedBook) {
-      return res.status(404).json({ error: '书籍不存在' });
-    }
-
-    const comment = checkUpdatedBook.comments.find(c => c._id?.toString() === commentId);
-    if (!comment) {
-      return res.status(404).json({ error: '评论不存在' });
-    }
-
-    if (req.user.userName !== comment.author) {
-      return res.status(403).json({
-        error: '只能修改本人的评论'
-      });
-    }
-
      // ✅ 更新评论内容，使用 $ 定位数组中的那一条
     const updatedBook = await BannedBook.findOneAndUpdate(
       { _id: bookId, "comments._id": commentId },
@@ -118,27 +136,10 @@ bannedBookRouter.patch('/:bookId/comments/update/:commentId', auth, async (req: 
   }
 })
 
-
 // 删除某条评论
-bannedBookRouter.delete('/:bookId/comments/:commentId', auth, async (req: AuthRequest, res: Response) => {
+bannedBookRouter.delete('/:bookId/comments/:commentId', auth, idChecking, async (req: AuthRequest, res: Response) => {
   const { bookId, commentId } = req.params;
   try {
-    const checkUpdatedBook = await BannedBook.findById(bookId);
-    if (!checkUpdatedBook) {
-      return res.status(404).json({ error: '书籍不存在' });
-    }
-
-    const comment = checkUpdatedBook.comments.find(c => c._id?.toString() === commentId);
-    if (!comment) {
-      return res.status(404).json({ error: '评论不存在' });
-    }
-
-    if (req.user.userName !== comment.author) {
-      return res.status(403).json({
-        error: '只能删除本人的评论'
-      });
-    }
-
     // 执行删除逻辑
     const updatedBook = await BannedBook.findByIdAndUpdate(
       bookId,
