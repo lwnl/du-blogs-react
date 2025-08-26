@@ -351,13 +351,8 @@ const BookDetail = () => {
 
           {/* 返回 */}
           <div className="back-to">
-            {user?.role === "Registered User" && (
-              <p>
-                <Link to="/blogs/mine">返回我的博客</Link>
-              </p>
-            )}
             <p>
-              <Link to="/blogs">返回博客园地</Link>
+              <Link to="/banned-books">返回</Link>
             </p>
           </div>
         </div>
