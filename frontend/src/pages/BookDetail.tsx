@@ -96,7 +96,7 @@ const BookDetail = () => {
         content: newCommentContent,
       };
       const res = await axios.patch(
-        `${HOST}/banned-books/comments/${bookId}`,
+        `${HOST}/banned-books/${bookId}/comments/new`,
         {
           newComment,
         },
@@ -131,21 +131,13 @@ const BookDetail = () => {
     }
 
     try {
-      const { data } = await axios.patch(
-        `${HOST}/comments/update/${commentId}`,
-        { content: updatedContent },
+      const {data} = await axios.patch(
+        `${HOST}/banned-books/${bookId}/comments/update/${commentId}`,
+        { updatedContent },
         { withCredentials: true }
       );
 
-      const updatedComment = data.updatedComment;
-
-      setComments((prev) => {
-        if (!prev) return [];
-        const updated = prev.map((c) =>
-          c._id.toString() === commentId.toString() ? updatedComment : c
-        );
-        return updated;
-      });
+      setComments(data.updatedBook.comments);
 
       // 重置编辑状态
       setEditingContent("");

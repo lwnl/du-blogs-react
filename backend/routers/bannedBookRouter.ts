@@ -53,7 +53,7 @@ bannedBookRouter.get('/:id', async (req: Request, res: Response) => {
 })
 
 // 追加评论
-bannedBookRouter.patch('/comments/:bookId', auth, async (req: AuthRequest, res: Response) => {
+bannedBookRouter.patch('/:bookId/comments/new', auth, async (req: AuthRequest, res: Response) => {
   const bookId = req.params.bookId
   const { newComment } = req.body
   try {
@@ -78,6 +78,46 @@ bannedBookRouter.patch('/comments/:bookId', auth, async (req: AuthRequest, res: 
     })
   }
 })
+
+// 更新某条评论
+bannedBookRouter.patch('/:bookId/comments/update/:commentId', auth, async (req: AuthRequest, res: Response) => {
+  const { bookId, commentId } = req.params;
+  const { updatedContent } = req.body
+
+  try {
+    const checkUpdatedBook = await BannedBook.findById(bookId);
+    if (!checkUpdatedBook) {
+      return res.status(404).json({ error: '书籍不存在' });
+    }
+
+    const comment = checkUpdatedBook.comments.find(c => c._id?.toString() === commentId);
+    if (!comment) {
+      return res.status(404).json({ error: '评论不存在' });
+    }
+
+    if (req.user.userName !== comment.author) {
+      return res.status(403).json({
+        error: '只能修改本人的评论'
+      });
+    }
+
+     // ✅ 更新评论内容，使用 $ 定位数组中的那一条
+    const updatedBook = await BannedBook.findOneAndUpdate(
+      { _id: bookId, "comments._id": commentId },
+      { $set: { "comments.$.content": updatedContent } },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message:'更新评论成功',
+      updatedBook
+    })
+  } catch (error) {
+    console.error('更新评论失败:', (error as Error).message);
+    res.status(500).json({ error: '更新评论失败！' });
+  }
+})
+
 
 // 删除某条评论
 bannedBookRouter.delete('/:bookId/comments/:commentId', auth, async (req: AuthRequest, res: Response) => {
@@ -111,8 +151,8 @@ bannedBookRouter.delete('/:bookId/comments/:commentId', auth, async (req: AuthRe
       updatedBook,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: '删除失败' });
+    console.error('删除评论失败:', (error as Error).message);
+    res.status(500).json({ error: '删除评论失败' });
   }
 });
 
