@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export const HOST = (import.meta as any).env.VITE_HOST
 
-type User = {
+export type User = {
   id: string,
   userName: string,
   role: string

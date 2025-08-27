@@ -1,28 +1,48 @@
 import { useState } from "react";
 import "./starRating.scss";
 
-const StarRating = () => {
+interface StarRatingProps {
+  submitRating?: (score: number) => void;
+  currentRating?: number | null;
+}
+
+export const starNull =
+  "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif";
+export const starOne =
+  "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_one.gif";
+
+const StarRating: React.FC<StarRatingProps> = ({
+  submitRating,
+  currentRating,
+}) => {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // hover 的索引
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null); // 点击选中的索引
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(currentRating||null);
   const [clickedIndex, setClickedIndex] = useState<number | null>(null); // 点击动画的索引
 
-  const starNull =
-    "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif";
-  const starOne =
-    "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_one.gif";
+  const handleClick = (index: number) => {
+    setSelectedIndex(index); // 永久高亮
+    setClickedIndex(index); // 动画
+    setTimeout(() => setClickedIndex(null), 600); // 让动画可以再次实现
+
+    const score = index + 1; // 星星数量 = 评分
+    if (submitRating) submitRating(score); // 回调父组件
+  };
+
+ 
 
   return (
     <div className="book-stars">
+      <span>{currentRating ? "您当前" : ""}评分：</span>
       {Array(5)
         .fill(0)
         .map((_, i) => {
           // 判断是否需要高亮
           const isHighlighted =
-            hoverIndex !== null
-              ? i <= hoverIndex // hover 时显示
-              : selectedIndex !== null
+            selectedIndex !== null
               ? i <= selectedIndex // 点击后显示
-              : false;
+              : hoverIndex !== null
+              ? i <= hoverIndex // hover 时显示
+              : true; // 默认满分
 
           return (
             <img
@@ -33,10 +53,7 @@ const StarRating = () => {
               onMouseEnter={() => setHoverIndex(i)}
               onMouseLeave={() => setHoverIndex(null)}
               onClick={() => {
-                setSelectedIndex(i); // 点击后永久高亮
-                setClickedIndex(i); // 触发动画
-                // 动画结束后移除 class，保证下次点击还能触发
-                setTimeout(() => setClickedIndex(null), 600);
+                handleClick(i);
               }}
             />
           );

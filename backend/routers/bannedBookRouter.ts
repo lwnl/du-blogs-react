@@ -1,43 +1,11 @@
 import express from 'express'
 import type { NextFunction, Request, Response } from 'express'
 import BannedBook from '../models/BannedBook'
+import { idChecking } from '../utils/idChecking'
 import { auth, type AuthRequest } from '../utils/auth'
+import { authOptional } from '../utils/authOptional'
 
 const bannedBookRouter = express.Router()
-
-// 预检中间件：检查书籍和评论是否存在 & 是否为本人
-export const idChecking = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const { bookId, commentId } = req.params;
-
-  try {
-    const book = await BannedBook.findById(bookId);
-    if (!book) {
-      return res.status(404).json({ error: "书籍不存在" });
-    }
-
-    const comment = book.comments.find((c) => c._id?.toString() === commentId);
-    if (!comment) {
-      return res.status(404).json({ error: "评论不存在" });
-    }
-
-    if (req.user.userName !== comment.author) {
-      return res.status(403).json({ error: "只能操作本人的评论" });
-    }
-
-    // 挂到 req 上，后续中间件/路由直接用
-    (req as any).book = book;
-    (req as any).comment = comment;
-
-    next();
-  } catch (error) {
-    console.error("预检失败:", (error as Error).message);
-    res.status(500).json({ error: "预检失败" });
-  }
-};
 
 //获取所有禁书
 bannedBookRouter.get('/', async (req: Request, res: Response) => {
@@ -61,22 +29,33 @@ bannedBookRouter.get('/', async (req: Request, res: Response) => {
 })
 
 //根据id获取禁书
-bannedBookRouter.get('/:id', async (req: Request, res: Response) => {
+bannedBookRouter.get('/:id', authOptional, async (req: AuthRequest, res: Response) => {
   const id = req.params.id
-  console.log('id is:', id)
 
   try {
     const book = await BannedBook.findById(id)
-
-    console.log('book is:', book)
-
     if (!book) return res.status(404).json({
       error: '数据不存在！'
     })
 
+    const user = req.user?.userName
+
+    console.log('当前用户为：', user)
+
+    let currentRating: number | null = null
+
+    if (user) {
+      // 查找该用户的评论
+      const userComment = book.comments.find(c => c.author === user)
+      if (userComment) {
+        currentRating = userComment.rating
+      }
+    }
+
     res.status(200).json({
       message: '成功获取数据！',
-      book
+      book,
+      currentRating  // 增加返回用户的当前评分
     })
   } catch (error) {
     console.error('获取数据出错：', (error as Error).message)
@@ -101,6 +80,24 @@ bannedBookRouter.patch('/:bookId/comments/new', auth, async (req: AuthRequest, r
     }, {
       new: true
     })
+
+    if (!updatedBook) {
+      return res.status(404).json({ error: '书籍不存在' });
+    }
+
+    // 更新当前用户在该书下所有评论的 rating
+    if (req.user?.userName) {
+      updatedBook.comments = updatedBook.comments.map((c) => {
+        if (c.author === req.user?.userName) {
+          return { ...c.toObject(), rating: newComment.rating }; // 更新rating
+        }
+        return c;
+      });
+
+      // 保存修改
+      await updatedBook.save();
+    }
+
     res.status(200).json({
       message: '追加评论成功！',
       updatedBook
@@ -119,7 +116,7 @@ bannedBookRouter.patch('/:bookId/comments/update/:commentId', auth, idChecking, 
   const { updatedContent } = req.body
 
   try {
-     // ✅ 更新评论内容，使用 $ 定位数组中的那一条
+    // ✅ 更新评论内容，使用 $ 定位数组中的那一条
     const updatedBook = await BannedBook.findOneAndUpdate(
       { _id: bookId, "comments._id": commentId },
       { $set: { "comments.$.content": updatedContent } },
@@ -127,7 +124,7 @@ bannedBookRouter.patch('/:bookId/comments/update/:commentId', auth, idChecking, 
     );
 
     res.status(200).json({
-      message:'更新评论成功',
+      message: '更新评论成功',
       updatedBook
     })
   } catch (error) {

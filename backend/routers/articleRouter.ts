@@ -1,7 +1,6 @@
 import express from 'express'
 import type { Request, Response } from 'express'
-import { auth } from '../utils/auth'
-import type { AuthRequest } from '../utils/auth'
+import { auth, type AuthRequest } from '../utils/auth'
 import multer from 'multer'
 import { bucket, uploadFileToGCS } from '../utils/uploadFileToGCS'
 import Article from '../models/Article'

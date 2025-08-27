@@ -19,6 +19,5 @@ export const authOptional = (req: AuthRequest, res: Response, next: NextFunction
   } catch (error) {
     console.warn('Invalid or expired token, proceeding as guest');
   }
-  
   next();
 };

@@ -1,10 +1,10 @@
 import mongoose, { Document, Schema, Model, Types } from 'mongoose'
 import { jsonDateTransform } from '../utils/formatDate';
 
-interface IComment {
-    _id?: Types.ObjectId; // 可选，因为新建时可能没有
+export interface IComment extends Document {
   author: string;
   content: string;
+  rating: number;
 }
 
 export interface IBannedBook extends Document {
@@ -22,7 +22,8 @@ export interface IBannedBook extends Document {
 // 子 Schema：评论
 const CommentSchema = new Schema<IComment>({
   author: { type: String, required: true },
-  content: { type: String, required: true }
+  content: { type: String },
+  rating: { type: Number, required: true }
 });
 
 const BookSchema: Schema<IBannedBook> = new Schema({

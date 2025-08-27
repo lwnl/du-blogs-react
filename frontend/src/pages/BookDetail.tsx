@@ -6,12 +6,13 @@ import { useAuthCheck } from "../hooks/useAuthCheck";
 import axios from "axios";
 import TextareaAutosize from "react-textarea-autosize";
 import Swal from "sweetalert2";
-import StarRating from "../components/StarRating";
+import StarRating, { starNull, starOne } from "../components/StarRating";
 
 export interface IComment {
   _id: string;
   author: string;
   content: string;
+  rating: number;
 }
 
 const BookDetail = () => {
@@ -23,6 +24,7 @@ const BookDetail = () => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
+  const [currentRating, setCurrentRating] = useState<number | null>(5); // rating 为当前用户评分，默认为满分
 
   const {
     HOST,
@@ -36,11 +38,6 @@ const BookDetail = () => {
 
   const submitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!newCommentContent.trim()) {
-      Swal.fire("", "评论内容不能为空！", "error");
-      return;
-    }
 
     // 判断用户是否登录
     // 若未登录，使用Swal弹出对话框询问用户是否以游客身份发表评论？
@@ -95,6 +92,7 @@ const BookDetail = () => {
       const newComment = {
         author: user?.userName,
         content: newCommentContent,
+        rating: currentRating,
       };
       const res = await axios.patch(
         `${HOST}/banned-books/${bookId}/comments/new`,
@@ -189,9 +187,12 @@ const BookDetail = () => {
   useEffect(() => {
     if (!bookId) return;
     axios
-      .get(`${HOST}/banned-books/${bookId}`)
+      .get(`${HOST}/banned-books/${bookId}`, { withCredentials: true })
       .then((res) => {
+        console.log("res.data=", res.data);
         setBook(res.data.book);
+        setCurrentRating(Number(res.data.currentRating) - 1 || 4);
+        console.log("currentRating is：", currentRating);
         setComments(res.data.book.comments);
       })
       .catch((error) => {
@@ -242,15 +243,11 @@ const BookDetail = () => {
         {/* 评分，简介 */}
         <div className="book-info flex-column">
           <div className="book-review">
-              <div className="book-stars">
+            <div className="book-stars">
               {Array(5)
                 .fill(0)
                 .map((_, i) => (
-                  <img
-                    key={i}
-                    src="https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif"
-                    alt="star-null"
-                  />
+                  <img key={i} src={starOne} alt="star-one" />
                 ))}
             </div>
             <p>
@@ -277,21 +274,39 @@ const BookDetail = () => {
 
           {/* 评论留言 */}
           <form className="comments-form" onSubmit={submitComment}>
-            <StarRating />
+            <StarRating
+              submitRating={(score) => {
+                setCurrentRating(score);
+              }}
+              currentRating={currentRating}
+            />
             <TextareaAutosize
               placeholder="撰写留言"
               value={newCommentContent}
               minRows={2}
               onChange={(e) => setNewCommentContent(e.target.value)}
             />
-            <button>评分留言</button>
+            <button>提交</button>
           </form>
 
           {/* 展示评论 */}
           <div className="show-comments">
             {comments?.map((comment) => (
               <div key={comment._id} className="comment-item">
-                <p className="comment-author">{comment.author}留言：</p>
+                <div className="comment-author">
+                  <p>{comment.author}评分：</p>
+                  <div className="book-stars">
+                    {Array(5)
+                      .fill(0)
+                      .map((_, i) => (
+                        <img
+                          key={i}
+                          src={i < comment.rating ? starOne : starNull}
+                          alt="star-one"
+                        />
+                      ))}
+                  </div>
+                </div>
 
                 {editingCommentId === comment._id ? (
                   // 编辑模式
