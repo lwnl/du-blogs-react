@@ -67,9 +67,8 @@ const BookDetail = () => {
                 withCredentials: true,
               }
             );
-            refetchAuth(); //重新校验用户身份
-            //用游客身份发表评论
-            await postComment();
+            const authData = await refetchAuth();
+            await postComment(authData.data?.user?.userName);
           } catch (error) {
             console.error("创建游客失败", (error as Error).message);
             Swal.fire("", "创建游客失败", "error");
@@ -87,18 +86,16 @@ const BookDetail = () => {
   };
 
   // 发表评论子程序
-  const postComment = async () => {
+  const postComment = async (authorOverride?: string) => {
     try {
       const newComment = {
-        author: user?.userName,
+        author: authorOverride || user?.userName,
         content: newCommentContent,
         rating: currentRating,
       };
       const res = await axios.patch(
         `${HOST}/banned-books/${bookId}/comments/new`,
-        {
-          newComment,
-        },
+        { newComment },
         { withCredentials: true }
       );
 
@@ -110,7 +107,6 @@ const BookDetail = () => {
       });
       setNewCommentContent("");
 
-      // 更新评论列表
       const { updatedBook } = res.data;
       setComments(updatedBook.comments);
     } catch (error) {

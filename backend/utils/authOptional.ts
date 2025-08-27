@@ -7,7 +7,7 @@ dotenv.config()
 const JWT_SECRET = process.env.JWT_SECRET || 'your_default_dev_secret'
 
 export const authOptional = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const token = req.cookies?.token;
+  const token = req.cookies?.token || req.cookies.guestToken; 
 
   if (!token) {
     return next(); // 未登录，直接放行

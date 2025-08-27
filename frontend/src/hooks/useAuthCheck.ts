@@ -1,5 +1,5 @@
-import {useQuery} from "@tanstack/react-query"
-import {HOST, checkLogin, LoginCheckResponse} from '../api/auth'
+import {useQuery, QueryObserverResult} from "@tanstack/react-query";
+import {HOST, checkLogin, LoginCheckResponse} from '../api/auth';
 
 type UseAuthCheckReturn = {
   HOST: string,
@@ -8,16 +8,16 @@ type UseAuthCheckReturn = {
   message?: string,
   isLoading: boolean,
   isError: boolean,
-  refetchAuth: () => void
+  refetchAuth: () => Promise<QueryObserverResult<LoginCheckResponse, unknown>>
 }
 
-export const useAuthCheck = () :UseAuthCheckReturn => { 
+export const useAuthCheck = (): UseAuthCheckReturn => { 
   const {data, isLoading, isError, refetch} = useQuery<LoginCheckResponse>({
     queryKey: ['authCheck'],
     queryFn: checkLogin,
     staleTime: 1000*60*5,
     retry: false,
-  })
+  });
 
   return {
     HOST,
@@ -28,4 +28,4 @@ export const useAuthCheck = () :UseAuthCheckReturn => {
     isError,
     refetchAuth: refetch
   }
- }
+}
