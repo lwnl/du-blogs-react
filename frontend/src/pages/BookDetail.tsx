@@ -24,7 +24,7 @@ const BookDetail = () => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
-  const [currentRating, setCurrentRating] = useState<number | null>(5); // rating 为当前用户评分，默认为满分
+  const [currentRating, setCurrentRating] = useState<number | null>(null); // rating 为当前用户评分，默认为满分
 
   const {
     HOST,
@@ -91,7 +91,7 @@ const BookDetail = () => {
       const newComment = {
         author: authorOverride || user?.userName,
         content: newCommentContent,
-        rating: currentRating,
+        rating: currentRating || 5 //用户没有手动设置，默认评分为满分
       };
       const res = await axios.patch(
         `${HOST}/banned-books/${bookId}/comments/new`,
@@ -187,8 +187,8 @@ const BookDetail = () => {
       .then((res) => {
         console.log("res.data=", res.data);
         setBook(res.data.book);
-        setCurrentRating(Number(res.data.currentRating) - 1 || 4);
-        console.log("currentRating is：", currentRating);
+        setCurrentRating(res.data.currentRating ? Number(res.data.currentRating) - 1 : null);
+        console.log("currentRating 父组件：", currentRating);
         setComments(res.data.book.comments);
       })
       .catch((error) => {

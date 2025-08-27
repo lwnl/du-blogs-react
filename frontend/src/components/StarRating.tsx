@@ -16,8 +16,9 @@ const StarRating: React.FC<StarRatingProps> = ({
   currentRating,
 }) => {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // hover 的索引
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(currentRating||null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(currentRating || null);
   const [clickedIndex, setClickedIndex] = useState<number | null>(null); // 点击动画的索引
+  console.log('currentRating 字组件：', currentRating)
 
   const handleClick = (index: number) => {
     setSelectedIndex(index); // 永久高亮
