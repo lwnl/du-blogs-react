@@ -1,0 +1,24 @@
+.book-stars {
+  display: flex;
+  align-items: center;
+  user-select: none;
+
+  img {
+    width: var(--size-400);
+    height: var(--size-400);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  // 点击动画
+  img.clicked {
+    animation: pop 0.6s ease forwards;
+  }
+
+  @keyframes pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.4); }
+    70%  { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+}

@@ -6,6 +6,7 @@ import { useAuthCheck } from "../hooks/useAuthCheck";
 import axios from "axios";
 import TextareaAutosize from "react-textarea-autosize";
 import Swal from "sweetalert2";
+import StarRating from "../components/StarRating";
 
 export interface IComment {
   _id: string;
@@ -131,7 +132,7 @@ const BookDetail = () => {
     }
 
     try {
-      const {data} = await axios.patch(
+      const { data } = await axios.patch(
         `${HOST}/banned-books/${bookId}/comments/update/${commentId}`,
         { updatedContent },
         { withCredentials: true }
@@ -241,7 +242,7 @@ const BookDetail = () => {
         {/* 评分，简介 */}
         <div className="book-info flex-column">
           <div className="book-review">
-            <div className="book-stars">
+              <div className="book-stars">
               {Array(5)
                 .fill(0)
                 .map((_, i) => (
@@ -276,9 +277,9 @@ const BookDetail = () => {
 
           {/* 评论留言 */}
           <form className="comments-form" onSubmit={submitComment}>
-            <p className="title">评论</p>
+            <StarRating />
             <TextareaAutosize
-              placeholder="撰写评论"
+              placeholder="撰写留言"
               value={newCommentContent}
               minRows={2}
               onChange={(e) => setNewCommentContent(e.target.value)}
