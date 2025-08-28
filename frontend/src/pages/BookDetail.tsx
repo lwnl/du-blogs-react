@@ -34,7 +34,7 @@ const BookDetail = () => {
 
   const _setCurrentRating = (value: number | null) => {
     setCurrentRating(value);
-    currentRatingRef.current = value
+    currentRatingRef.current = value;
   };
 
   const {
@@ -97,11 +97,6 @@ const BookDetail = () => {
     await postComment();
   };
 
-  // 评分子程序
-  const scoring = () => {
-    // const updatedRating = ratingResult + currentRating;
-  };
-
   // 发表评论子程序
   const postComment = async (authorOverride?: string) => {
     try {
@@ -126,10 +121,12 @@ const BookDetail = () => {
         timer: 1500,
         showConfirmButton: false,
       });
+
       setNewCommentContent("");
 
       const { updatedBook } = res.data;
       setComments(updatedBook.comments);
+      setRatingResult(updatedBook.ratingResult);
     } catch (error) {
       console.error("发表评论失败", (error as Error).message);
       Swal.fire("", "发表评论失败", "error");
@@ -182,13 +179,17 @@ const BookDetail = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(
+      const res = await axios.delete(
         `${HOST}/banned-books/${bookId}/comments/${commentId}`,
         {
           withCredentials: true,
         }
       );
-      setComments((prev) => prev?.filter((c) => c._id !== commentId) || null);
+      
+      const { updatedBook } = res.data;
+      setComments(updatedBook.comments);
+      setRatingResult(updatedBook.ratingResult);
+
       Swal.fire({
         icon: "success",
         title: "评论已删除",
