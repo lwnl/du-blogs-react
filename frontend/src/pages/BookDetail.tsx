@@ -201,7 +201,7 @@ const BookDetail = () => {
         if (res.data.currentRating) {
           setCurrentRating(res.data.currentRating);
         }
-        console.log('前端res.data.currentRating is', res.data.currentRating)
+        console.log("前端res.data.currentRating is", res.data.currentRating);
         setRatingResult(res.data.book.ratingResult);
         setComments(res.data.book.comments);
       })
@@ -296,7 +296,7 @@ const BookDetail = () => {
               submitRating={(score) => {
                 setCurrentRating(score);
               }}
-              currentRating={currentRating}
+              starIndex={(currentRating ?? 1) - 1}
             />
             <TextareaAutosize
               placeholder="撰写留言"

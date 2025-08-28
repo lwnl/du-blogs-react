@@ -3,7 +3,7 @@ import "./UserRating.scss";
 
 interface UserRatingProps {
   submitRating?: (score: number) => void;
-  currentRating?: number | null;
+  starIndex?: number | null;
 }
 
 export const starNull =
@@ -15,12 +15,14 @@ export const starHalf =
 
 const UserRating: React.FC<UserRatingProps> = ({
   submitRating,
-  currentRating,
+  starIndex,
 }) => {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // hover 的索引
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(currentRating || null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(
+    starIndex || null
+  );
   const [clickedIndex, setClickedIndex] = useState<number | null>(null); // 点击动画的索引
-  console.log('currentRating 字组件：', currentRating)
+  console.log("currentRating 字组件：", starIndex);
 
   const handleClick = (index: number) => {
     setSelectedIndex(index); // 永久高亮
@@ -31,11 +33,9 @@ const UserRating: React.FC<UserRatingProps> = ({
     if (submitRating) submitRating(score); // 回调父组件
   };
 
- 
-
   return (
     <div className="book-stars">
-      <span>{currentRating ? "您的" : "请您"}评分：</span>
+      <span>{starIndex ? "您的" : "请您"}评分：</span>
       {Array(5)
         .fill(0)
         .map((_, i) => {
