@@ -104,7 +104,7 @@ const BookDetail = () => {
       const newComment = {
         author: authorOverride || user?.userName,
         content: newCommentContent,
-        rating: currentRating || 5, //用户没有手动设置，默认评分为满分
+        rating: currentRating ?? 5, //用户没有手动设置，默认评分为满分
       };
       const res = await axios.patch(
         `${HOST}/banned-books/${bookId}/comments/new`,
