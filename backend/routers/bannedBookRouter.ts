@@ -1,3 +1,4 @@
+import { appendFile } from 'fs';
 import express from 'express'
 import type { NextFunction, Request, Response } from 'express'
 import BannedBook from '../models/BannedBook'
@@ -5,8 +6,25 @@ import { idChecking } from '../utils/idChecking'
 import { auth, type AuthRequest } from '../utils/auth'
 import { authOptional } from '../utils/authOptional'
 import type { IComment } from '../models/BannedBook'
+import type { IBannedBook } from '../models/BannedBook'
 
 const bannedBookRouter = express.Router()
+
+// 计算当前评分
+const caculateRating = (currentBook: IBannedBook) => {
+  const userSet = new Set<string>(); // 存储唯一用户
+  let sum = 0;
+
+  currentBook.comments.forEach((c: IComment) => {
+    if (!userSet.has(c.author)) {
+      userSet.add(c.author);
+      sum += c.rating;
+    }
+  });
+
+  const ratingResult = userSet.size ? +(sum / userSet.size).toFixed(1) : 0;
+  return ratingResult
+}
 
 //获取所有禁书
 bannedBookRouter.get('/', async (req: Request, res: Response) => {
@@ -102,21 +120,8 @@ bannedBookRouter.patch('/:bookId/comments/new', auth, async (req: AuthRequest, r
       await updatedBook.save();
     }
 
-    // 计算当前评分
-    const userSet = new Set<string>(); // 存储唯一用户
-    let sum = 0;
-
-    updatedBook.comments.forEach((c: IComment) => {
-      if (!userSet.has(c.author)) {
-        userSet.add(c.author);
-        sum += c.rating;
-      }
-    });
-
-    const ratingResult = userSet.size ? +(sum / userSet.size).toFixed(1) : 0;
-
     //更新评分
-    updatedBook.ratingResult = ratingResult
+    updatedBook.ratingResult = caculateRating(updatedBook)
     await updatedBook.save()
 
     res.status(200).json({
@@ -164,6 +169,15 @@ bannedBookRouter.delete('/:bookId/comments/:commentId', auth, idChecking, async 
       { $pull: { comments: { _id: commentId } } }, // 从数组中删除匹配的子文档
       { new: true }
     );
+
+    if (!updatedBook) {
+      return res.status(404).json({ error: '书籍不存在' });
+    }
+
+    // 更新评分
+    updatedBook.ratingResult = caculateRating(updatedBook)
+    await updatedBook.save()
+
 
     res.status(200).json({
       message: '评论已删除',
