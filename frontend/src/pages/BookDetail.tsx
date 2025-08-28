@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import "./BookDetail.scss";
 import { IBannedBook } from "./BannedBooks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import axios from "axios";
 import TextareaAutosize from "react-textarea-autosize";
@@ -28,7 +28,7 @@ const BookDetail = () => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
-  const [currentRating, setCurrentRating] = useState<number | null>(null); // rating 为当前用户评分,默认为满分
+  const [currentRating, setCurrentRating] = useState<number | null>(null); // rating 为当前用户评分
   const [ratingResult, setRatingResult] = useState<number>(0);
 
   const {
