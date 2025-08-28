@@ -283,7 +283,7 @@ const BookDetail = () => {
               <span>{ratingResult} </span>分
             </p>
             <p>
-              <span>0 </span>评价
+              <span>{comments.length} </span>评价
             </p>
           </div>
 
