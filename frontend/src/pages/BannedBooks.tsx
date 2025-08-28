@@ -3,6 +3,7 @@ import "./BannedBooks.scss";
 import axios from "axios";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import { Link } from "react-router-dom";
+import { starHalf, starNull, starOne } from "../components/UserRating";
 
 export interface IBannedBook {
   _id: string;
@@ -13,6 +14,7 @@ export interface IBannedBook {
   review: string;
   summary: string;
   comments: string[];
+  ratingResult: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -81,6 +83,7 @@ const BannedBooks = () => {
         {bannedBooks?.map((book) => {
           const isExpanded = currentBookId === book._id;
           const isOverflow = overflowMap[book._id];
+          const rating = book.ratingResult
 
           return (
             <li key={book._id} className="book-item">
@@ -103,22 +106,29 @@ const BannedBooks = () => {
                   <div className="book-stars">
                     {Array(5)
                       .fill(0)
-                      .map((_, i) => (
-                        <img
-                          key={i}
-                          src="https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif"
-                          alt="star-null"
-                        />
-                      ))}
+                      .map((_, i) => {
+                        let starIcon;
+                        if (i + 1 <= rating) {
+                          starIcon = starOne; // 满星
+                        } else if (
+                          i < rating &&
+                          rating < i + 1
+                        ) {
+                          starIcon = starHalf; // 半星
+                        } else {
+                          starIcon = starNull; // 空星
+                        }
+                        return <img key={i} src={starIcon} alt={`star-${i}`} />;
+                      })}
                   </div>
                   <p>
                     <Link to={`./${book._id}`}>
-                      <span>0 </span>分
+                      <span>{rating} </span>分
                     </Link>
                   </p>
                   <p>
                     <Link to={`./${book._id}`}>
-                      <span>0 </span>人评价
+                      <span>{book.comments.length} </span>评价
                     </Link>
                   </p>
                 </div>

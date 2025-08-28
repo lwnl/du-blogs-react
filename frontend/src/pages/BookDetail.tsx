@@ -6,7 +6,11 @@ import { useAuthCheck } from "../hooks/useAuthCheck";
 import axios from "axios";
 import TextareaAutosize from "react-textarea-autosize";
 import Swal from "sweetalert2";
-import UserRating, { starNull, starOne } from "../components/UserRating";
+import UserRating, {
+  starNull,
+  starOne,
+  starHalf,
+} from "../components/UserRating";
 
 export interface IComment {
   _id: string;
@@ -24,7 +28,8 @@ const BookDetail = () => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
-  const [currentRating, setCurrentRating] = useState<number | null>(null); // rating 为当前用户评分，默认为满分
+  const [currentRating, setCurrentRating] = useState<number>(5); // rating 为当前用户评分,默认为满分
+  const [ratingResult, setRatingResult] = useState<number>(0);
 
   const {
     HOST,
@@ -36,6 +41,7 @@ const BookDetail = () => {
     refetchAuth,
   } = useAuthCheck();
 
+  // 提交评论和评分数据
   const submitComment = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -85,13 +91,18 @@ const BookDetail = () => {
     await postComment();
   };
 
+  // 评分子程序
+  const scoring = () => {
+    const updatedRating = ratingResult + currentRating;
+  };
+
   // 发表评论子程序
   const postComment = async (authorOverride?: string) => {
     try {
       const newComment = {
         author: authorOverride || user?.userName,
         content: newCommentContent,
-        rating: currentRating || 5 //用户没有手动设置，默认评分为满分
+        rating: currentRating || 5, //用户没有手动设置，默认评分为满分
       };
       const res = await axios.patch(
         `${HOST}/banned-books/${bookId}/comments/new`,
@@ -187,8 +198,11 @@ const BookDetail = () => {
       .then((res) => {
         console.log("res.data=", res.data);
         setBook(res.data.book);
-        setCurrentRating(res.data.currentRating ? Number(res.data.currentRating) - 1 : null);
-        console.log("currentRating 父组件：", currentRating);
+        if (res.data.currentRating) {
+          setCurrentRating(res.data.currentRating);
+        }
+        console.log('前端res.data.currentRating is', res.data.currentRating)
+        setRatingResult(res.data.book.ratingResult);
         setComments(res.data.book.comments);
       })
       .catch((error) => {
@@ -242,15 +256,23 @@ const BookDetail = () => {
             <div className="book-stars">
               {Array(5)
                 .fill(0)
-                .map((_, i) => (
-                  <img key={i} src={starOne} alt="star-one" />
-                ))}
+                .map((_, i) => {
+                  let starIcon;
+                  if (i + 1 <= ratingResult) {
+                    starIcon = starOne; // 满星
+                  } else if (i < ratingResult && ratingResult < i + 1) {
+                    starIcon = starHalf; // 半星
+                  } else {
+                    starIcon = starNull; // 空星
+                  }
+                  return <img key={i} src={starIcon} alt={`star-${i}`} />;
+                })}
             </div>
             <p>
-              <span>0 </span>分
+              <span>{ratingResult} </span>分
             </p>
             <p>
-              <span>0 </span>人评价
+              <span>0 </span>评价
             </p>
           </div>
 

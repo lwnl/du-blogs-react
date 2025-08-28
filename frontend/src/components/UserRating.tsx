@@ -10,13 +10,15 @@ export const starNull =
   "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif";
 export const starOne =
   "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_one.gif";
+export const starHalf =
+  "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_half.gif";
 
 const UserRating: React.FC<UserRatingProps> = ({
   submitRating,
   currentRating,
 }) => {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // hover 的索引
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(currentRating || null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(Number(currentRating) -1 || null);
   const [clickedIndex, setClickedIndex] = useState<number | null>(null); // 点击动画的索引
   console.log('currentRating 字组件：', currentRating)
 

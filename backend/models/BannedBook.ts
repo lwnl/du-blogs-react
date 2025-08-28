@@ -15,6 +15,7 @@ export interface IBannedBook extends Document {
   review: string,
   summary: string,
   comments: IComment[],
+  ratingResult: number,
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,6 +53,10 @@ const BookSchema: Schema<IBannedBook> = new Schema({
   },
   comments: {
     type: [CommentSchema], default: []
+  },
+  ratingResult: {
+    type: Number,
+    default: 0,
   },
 }, {
   timestamps: {

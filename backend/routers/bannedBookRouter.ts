@@ -28,7 +28,7 @@ bannedBookRouter.get('/', async (req: Request, res: Response) => {
   }
 })
 
-//根据id获取禁书
+//根据id获取禁书和当前用户的评分
 bannedBookRouter.get('/:id', authOptional, async (req: AuthRequest, res: Response) => {
   const id = req.params.id
 
@@ -40,10 +40,9 @@ bannedBookRouter.get('/:id', authOptional, async (req: AuthRequest, res: Respons
 
     const user = req.user?.userName
 
-    console.log('当前用户为：', user)
-
+    
     let currentRating: number | null = null
-
+    
     if (user) {
       // 查找该用户的评论
       const userComment = book.comments.find(c => c.author === user)
@@ -51,7 +50,8 @@ bannedBookRouter.get('/:id', authOptional, async (req: AuthRequest, res: Respons
         currentRating = userComment.rating
       }
     }
-
+    console.log('当前用户为：', user)
+    console.log('currentRating is', currentRating)
     res.status(200).json({
       message: '成功获取数据！',
       book,
