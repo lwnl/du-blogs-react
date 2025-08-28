@@ -21,10 +21,12 @@ const UserRating: React.FC<UserRatingProps> = ({
   const [selectedIndex, setSelectedIndex] = useState<number | null>(
     starIndex || null
   );
+  const [isClicked, setIsClicked] = useState<boolean>(false)
   const [clickedIndex, setClickedIndex] = useState<number | null>(null); // 点击动画的索引
   console.log("starIndex 字组件：", starIndex);
 
   const handleClick = (index: number) => {
+    setIsClicked(true)
     setSelectedIndex(index); // 永久高亮
     setClickedIndex(index); // 动画
     setTimeout(() => setClickedIndex(null), 600); // 让动画可以再次实现
@@ -35,7 +37,7 @@ const UserRating: React.FC<UserRatingProps> = ({
 
   return (
     <div className="book-stars">
-      <span>{starIndex ? "您的" : "请您"}评分：</span>
+      <span>{starIndex || isClicked ? "您的" : "请您"}评分：</span>
       {Array(5)
         .fill(0)
         .map((_, i) => {

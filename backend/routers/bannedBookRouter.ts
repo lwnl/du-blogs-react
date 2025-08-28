@@ -4,6 +4,7 @@ import BannedBook from '../models/BannedBook'
 import { idChecking } from '../utils/idChecking'
 import { auth, type AuthRequest } from '../utils/auth'
 import { authOptional } from '../utils/authOptional'
+import type { IComment } from '../models/BannedBook'
 
 const bannedBookRouter = express.Router()
 
@@ -40,9 +41,9 @@ bannedBookRouter.get('/:id', authOptional, async (req: AuthRequest, res: Respons
 
     const user = req.user?.userName
 
-    
+
     let currentRating: number | null = null
-    
+
     if (user) {
       // 查找该用户的评论
       const userComment = book.comments.find(c => c.author === user)
@@ -100,6 +101,23 @@ bannedBookRouter.patch('/:bookId/comments/new', auth, async (req: AuthRequest, r
       // 保存修改
       await updatedBook.save();
     }
+
+    // 计算当前评分
+    const userSet = new Set<string>(); // 存储唯一用户
+    let sum = 0;
+
+    updatedBook.comments.forEach((c: IComment) => {
+      if (!userSet.has(c.author)) {
+        userSet.add(c.author);
+        sum += c.rating;
+      }
+    });
+
+    const ratingResult = userSet.size ? +(sum / userSet.size).toFixed(1) : 0;
+
+    //更新评分
+    updatedBook.ratingResult = ratingResult
+    await updatedBook.save()
 
     res.status(200).json({
       message: '追加评论成功！',
