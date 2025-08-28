@@ -33,7 +33,7 @@ const StarRating: React.FC<StarRatingProps> = ({
 
   return (
     <div className="book-stars">
-      <span>{currentRating ? "您当前" : ""}评分：</span>
+      <span>{currentRating ? "您的" : "请您"}评分：</span>
       {Array(5)
         .fill(0)
         .map((_, i) => {
