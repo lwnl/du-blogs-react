@@ -22,7 +22,7 @@ const UserRating: React.FC<UserRatingProps> = ({
     starIndex || null
   );
   const [clickedIndex, setClickedIndex] = useState<number | null>(null); // 点击动画的索引
-  console.log("currentRating 字组件：", starIndex);
+  console.log("starIndex 字组件：", starIndex);
 
   const handleClick = (index: number) => {
     setSelectedIndex(index); // 永久高亮
