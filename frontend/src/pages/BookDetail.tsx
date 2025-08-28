@@ -28,7 +28,7 @@ const BookDetail = () => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
-  const [currentRating, setCurrentRating] = useState<number>(5); // rating 为当前用户评分,默认为满分
+  const [currentRating, setCurrentRating] = useState<number | null>(null); // rating 为当前用户评分,默认为满分
   const [ratingResult, setRatingResult] = useState<number>(0);
 
   const {
@@ -93,7 +93,7 @@ const BookDetail = () => {
 
   // 评分子程序
   const scoring = () => {
-    const updatedRating = ratingResult + currentRating;
+    // const updatedRating = ratingResult + currentRating;
   };
 
   // 发表评论子程序
