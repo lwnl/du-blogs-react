@@ -1,7 +1,7 @@
 import { useState } from "react";
-import "./starRating.scss";
+import "./UserRating.scss";
 
-interface StarRatingProps {
+interface UserRatingProps {
   submitRating?: (score: number) => void;
   currentRating?: number | null;
 }
@@ -11,7 +11,7 @@ export const starNull =
 export const starOne =
   "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_one.gif";
 
-const StarRating: React.FC<StarRatingProps> = ({
+const UserRating: React.FC<UserRatingProps> = ({
   submitRating,
   currentRating,
 }) => {
@@ -63,4 +63,4 @@ const StarRating: React.FC<StarRatingProps> = ({
   );
 };
 
-export default StarRating;
+export default UserRating;

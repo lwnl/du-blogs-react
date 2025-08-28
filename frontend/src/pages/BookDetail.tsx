@@ -6,7 +6,7 @@ import { useAuthCheck } from "../hooks/useAuthCheck";
 import axios from "axios";
 import TextareaAutosize from "react-textarea-autosize";
 import Swal from "sweetalert2";
-import StarRating, { starNull, starOne } from "../components/StarRating";
+import UserRating, { starNull, starOne } from "../components/UserRating";
 
 export interface IComment {
   _id: string;
@@ -270,7 +270,7 @@ const BookDetail = () => {
 
           {/* 评论留言 */}
           <form className="comments-form" onSubmit={submitComment}>
-            <StarRating
+            <UserRating
               submitRating={(score) => {
                 setCurrentRating(score);
               }}
