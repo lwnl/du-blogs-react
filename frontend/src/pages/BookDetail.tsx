@@ -99,6 +99,8 @@ const BookDetail = () => {
   // 发表评论子程序
   const postComment = async (authorOverride?: string) => {
     try {
+      //用户没有手动设置，默认评分为满分
+      !currentRating && setCurrentRating(5);
       const newComment = {
         author: authorOverride || user?.userName,
         content: newCommentContent,
