@@ -168,7 +168,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       const removedImages = storedImages.filter(
         (url: string) => !currentImages.includes(url)
       );
-      console.log("将被删除的图片:", removedImages);
+      // console.log("将被删除的图片:", removedImages);
 
       if (removedImages.length > 0) {
         await Promise.all(
@@ -223,8 +223,8 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     setIsSubmitting(true);
     const currentImages = getCurrentImages();
 
-    const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
-    console.log("localStorage中存储的图片:", storedImages);
+    // const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
+    // console.log("localStorage中存储的图片:", storedImages);
 
     if (!title.trim() || editor?.isEmpty) {
       setFeedback("请填写所有字段");
@@ -285,10 +285,6 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   useEffect(() => {
     localStorage.setItem(titleKey, title);
   }, [title, titleKey]);
-
-  useEffect(() => {
-    console.log("isSubmitting 更新为:", isSubmitting);
-  }, [isSubmitting]);
 
   // 实时保存内容
   useEffect(() => {
