@@ -196,32 +196,31 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   }, [contentKey, imagesKey, titleKey, editor]);
 
   // 提取当前编辑器中的图片
- const getCurrentImages = useCallback((): string[] => {
-  const html = editor?.getHTML() || "";
-  const imageRegex = /<img[^>]+src="([^">]+)"/g;
-  const images: string[] = [];
-  let match;
+  const getCurrentImages = useCallback((): string[] => {
+    const html = editor?.getHTML() || "";
+    const imageRegex = /<img[^>]+src="([^">]+)"/g;
+    const images: string[] = [];
+    let match;
 
-  while ((match = imageRegex.exec(html)) !== null) {
-    // decode HTML 实体
-    const url = match[1].replace(/&amp;/g, "&");
-    images.push(url);
-  }
+    while ((match = imageRegex.exec(html)) !== null) {
+      // decode HTML 实体
+      const url = match[1].replace(/&amp;/g, "&");
+      images.push(url);
+    }
 
-  return images;
-}, [editor]);
+    return images;
+  }, [editor]);
 
   // 处理表单提交
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     const currentImages = getCurrentImages();
     console.log("=== 调试信息 ===");
-    console.log("编辑器中图片:", currentImages);
 
     const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
     console.log("localStorage中存储的图片:", storedImages);
 
-    if (!title.trim() || !editor?.getHTML().trim()) {
+    if (!title.trim() || editor?.isEmpty) {
       setFeedback("请填写所有字段");
       return;
     }
