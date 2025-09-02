@@ -16,6 +16,12 @@
     font-size: var(--fs-400);
   }
 
+  .loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+  }
+
   .editor {
     border: 1px solid #ccc;
     padding: var(--size-200);
@@ -75,15 +81,37 @@
     .ProseMirror em {
       font-style: italic;
     }
+
+    // [修复] 添加编辑器覆盖层样式
+    .editor-overlay {
+      position: fixed; // 固定在视口
+      top: 0;
+      left: 0;
+      width: 100vw; // 占满整个视口宽度
+      height: 100vh; // 占满整个视口高度
+      background: rgba(255, 255, 255, 0.8); // 半透明遮罩
+      display: flex;
+      align-items: center; // 垂直居中
+      justify-content: center; // 水平居中
+      z-index: 10; // 遮盖其他内容
+      color: #666;
+      font-weight: bold;
+    }
   }
 
+  // [修复] 将反馈样式移到外层，提高优先级
   .feedback {
-    font-weight: bold;
-    color: green;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+  }
 
-    &.error {
-      color: red;
-    }
+  .feedback.success {
+    color: #155724;
+  }
+
+  .feedback.error {
+    color: #721c24;
   }
 
   button[type="submit"] {
@@ -94,8 +122,38 @@
     border: none;
     transition: background-color 0.2s;
 
-    &:hover {
+    // [更改] 添加flex布局用于加载动画
+    &:hover:not(:disabled) {
       background-color: #cecece;
+    }
+
+    &:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+
+    // [更改] 添加提交中的样式
+    &.submitting {
+      background-color: #17a2b8;
+    }
+  }
+
+  // [更改] 添加加载动画
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
     }
   }
 }

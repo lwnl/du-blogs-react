@@ -10,7 +10,7 @@ const UpdateBlog = () => {
   const { id } = useParams<{ id: string }>();
   const { authenticated, isLoading: authLoading, HOST } = useAuthCheck();
   const navigate = useNavigate();
-  
+
   const {
     title,
     setTitle,
@@ -19,12 +19,13 @@ const UpdateBlog = () => {
     isLoading: editorLoading,
     setLink,
     addImage,
-    handleSubmit
+    isSubmitting,
+    handleSubmit,
   } = useBlogEditor({
     id,
     HOST,
     type: "update",
-    navigate
+    navigate,
   });
 
   if (authLoading || editorLoading) return <p>检测权限...</p>;
@@ -45,16 +46,40 @@ const UpdateBlog = () => {
       />
 
       <div className="editor">
-        <EditorToolbar
-          editor={editor}
-          setLink={setLink}
-          addImage={addImage}
-        />
+        <EditorToolbar editor={editor} setLink={setLink} addImage={addImage} />
         <EditorContent className="content-container" editor={editor} />
+        {isSubmitting && <div className="editor-overlay">提交中...</div>}
       </div>
 
-      {feedback && <p className="feedback">{feedback}</p>}
-      <button type="submit">提交</button>
+      {/* [更改] 添加了成功/错误样式 */}
+      {feedback && (
+        <p
+          className={`feedback ${
+            feedback.includes("✅") ? "success" : "error"
+          }`}
+        >
+          {feedback}
+        </p>
+      )}
+
+      {/* [更改] 添加了按钮容器和加载状态样式 */}
+      <div className="actions">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={isSubmitting ? "submitting" : ""}
+        >
+          {/* [更改] 添加了加载动画 */}
+          {isSubmitting ? (
+            <>
+              <span className="spinner"></span>
+              提交中...
+            </>
+          ) : (
+            "提交"
+          )}
+        </button>
+      </div>
     </form>
   );
 };

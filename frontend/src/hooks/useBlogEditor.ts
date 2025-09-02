@@ -227,7 +227,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     // console.log("localStorage中存储的图片:", storedImages);
 
     if (!title.trim() || editor?.isEmpty) {
-      setFeedback("请填写所有字段");
+      setFeedback("请填写所有字段！");
       setIsSubmitting(false);
       return;
     }

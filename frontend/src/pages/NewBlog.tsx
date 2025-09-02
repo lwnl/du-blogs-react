@@ -5,6 +5,7 @@ import EditorToolbar from "../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
 import { useBlogEditor } from "../hooks/useBlogEditor";
+import { useEffect } from "react";
 
 const NewBlog = () => {
   const { authenticated, isLoading: authLoading, HOST } = useAuthCheck();
@@ -25,7 +26,20 @@ const NewBlog = () => {
     navigate,
   });
 
-  if (authLoading) return <p>检测权限...</p>;
+  console.log(
+    "feedback:",
+    feedback,
+    "className:",
+    `feedback ${feedback.includes("✅") ? "success" : "error"}`
+  );
+
+  if (authLoading) return <div className="loading">检测权限...</div>;
+  if (!authenticated) {
+    navigate("/users/login");
+    return null;
+  }
+
+  if (authLoading) return <div className="loading">检测权限...</div>;
   if (!authenticated) {
     navigate("/users/login");
     return null;
@@ -40,17 +54,44 @@ const NewBlog = () => {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
+        disabled={isSubmitting}
       />
 
       <div className="editor">
         <EditorToolbar editor={editor} setLink={setLink} addImage={addImage} />
         <EditorContent className="content-container" editor={editor} />
+        {isSubmitting && <div className="editor-overlay">提交中...</div>}
       </div>
 
-      {feedback && <p className="feedback">{feedback}</p>}
-      <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "提交中..." : "提交"}
-      </button>
+      {/* [更改] 添加了成功/错误样式 */}
+      {feedback && (
+        <p
+          className={`feedback ${
+            feedback.includes("✅") ? "success" : "error"
+          }`}
+        >
+          {feedback}
+        </p>
+      )}
+
+      {/* [更改] 添加了按钮容器和加载状态样式 */}
+      <div className="actions">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={isSubmitting ? "submitting" : ""}
+        >
+          {/* [更改] 添加了加载动画 */}
+          {isSubmitting ? (
+            <>
+              <span className="spinner"></span>
+              提交中...
+            </>
+          ) : (
+            "提交"
+          )}
+        </button>
+      </div>
     </form>
   );
 };
