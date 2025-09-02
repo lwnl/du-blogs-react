@@ -48,6 +48,8 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   );
   const [feedback, setFeedback] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(type === "update");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const editor = useEditor({
     extensions: [
@@ -213,15 +215,20 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
 
   // 处理表单提交
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    if (isSubmitting) {
+      e.preventDefault();
+      return;
+    }
     e.preventDefault();
+    setIsSubmitting(true);
     const currentImages = getCurrentImages();
-    console.log("=== 调试信息 ===");
 
     const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
     console.log("localStorage中存储的图片:", storedImages);
 
     if (!title.trim() || editor?.isEmpty) {
       setFeedback("请填写所有字段");
+      setIsSubmitting(false);
       return;
     }
 
@@ -258,6 +265,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     } catch (error) {
       console.error("操作失败:", error);
       setFeedback(type === "update" ? "❌ 更新失败" : "❌ 创建失败");
+      setIsSubmitting(false);
     }
   }, [
     title,
@@ -268,13 +276,19 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     getCurrentImages,
     removeUnusedImages,
     clearDraft,
-    navigate
+    navigate,
+    isSubmitting,
+    imagesKey
   ]);
 
   // 实时保存标题
   useEffect(() => {
     localStorage.setItem(titleKey, title);
   }, [title, titleKey]);
+
+  useEffect(() => {
+    console.log("isSubmitting 更新为:", isSubmitting);
+  }, [isSubmitting]);
 
   // 实时保存内容
   useEffect(() => {
@@ -330,6 +344,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     isLoading,
     setLink,
     addImage,
+    isSubmitting,
     handleSubmit
   };
 };

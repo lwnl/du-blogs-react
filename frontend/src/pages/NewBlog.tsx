@@ -9,7 +9,7 @@ import { useBlogEditor } from "../hooks/useBlogEditor";
 const NewBlog = () => {
   const { authenticated, isLoading: authLoading, HOST } = useAuthCheck();
   const navigate = useNavigate();
-  
+
   const {
     title,
     setTitle,
@@ -17,11 +17,12 @@ const NewBlog = () => {
     editor,
     setLink,
     addImage,
-    handleSubmit
+    handleSubmit,
+    isSubmitting,
   } = useBlogEditor({
     HOST,
     type: "new",
-    navigate
+    navigate,
   });
 
   if (authLoading) return <p>检测权限...</p>;
@@ -42,16 +43,14 @@ const NewBlog = () => {
       />
 
       <div className="editor">
-        <EditorToolbar
-          editor={editor}
-          setLink={setLink}
-          addImage={addImage}
-        />
+        <EditorToolbar editor={editor} setLink={setLink} addImage={addImage} />
         <EditorContent className="content-container" editor={editor} />
       </div>
 
       {feedback && <p className="feedback">{feedback}</p>}
-      <button type="submit">提交</button>
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "提交中..." : "提交"}
+      </button>
     </form>
   );
 };
