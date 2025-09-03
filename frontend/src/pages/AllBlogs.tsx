@@ -31,7 +31,7 @@ const AllBlogs = () => {
       .then((res) => {
         setBlogs(res.data.blogs);
       })
-      .catch((error) => {
+      .catch((error:any) => {
         if (error.response) {
           // 后端返回的错误响应
           console.error("后端错误消息:", error.response.data.error);

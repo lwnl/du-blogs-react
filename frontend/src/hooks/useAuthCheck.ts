@@ -1,5 +1,9 @@
-import {useQuery, QueryObserverResult} from "@tanstack/react-query";
-import {HOST, checkLogin, LoginCheckResponse} from '../api/auth';
+import {useQuery} from "@tanstack/react-query";
+import type { QueryObserverResult } from "@tanstack/react-query";
+
+import {HOST, checkLogin} from '../api/auth';
+import type { LoginCheckResponse } from '../api/auth';
+
 
 type UseAuthCheckReturn = {
   HOST: string,

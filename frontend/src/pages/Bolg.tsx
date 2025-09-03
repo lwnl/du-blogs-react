@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { IArticle } from "./MyBlogs";
+import type { IArticle } from "./MyBlogs";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import "./Blog.scss";
 import Swal from "sweetalert2";

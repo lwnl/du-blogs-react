@@ -32,7 +32,7 @@ const MyBlogs = () => {
         console.log("文章删除成功");
         setBlogs((prev) => prev.filter((blog) => blog._id !== id));
       })
-      .catch((error) => {
+      .catch((error: any) => {
         if (error.response) {
           console.error("服务器错误", error.response.data.error);
         }
@@ -46,7 +46,7 @@ const MyBlogs = () => {
       .then((res) => {
         res.data.user ? setBlogs(res.data.blogs) : setBlogs([]);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         if (error.response) {
           // 后端返回的错误响应
           console.error("后端错误消息:", error.response.data.error);

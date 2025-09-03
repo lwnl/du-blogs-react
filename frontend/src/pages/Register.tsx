@@ -38,7 +38,7 @@ const Register = () => {
       setUserName("");
       alert("注册成功！");
       navigate("/users/login");
-    } catch (error) {
+    } catch (error:any) {
       if (error.response) {
         alert(error.response.data.message || "Registration failed!");
       } else {

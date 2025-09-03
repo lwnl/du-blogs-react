@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import "./BookDetail.scss";
-import { IBannedBook } from "./BannedBooks";
+import type { IBannedBook } from "./BannedBooks";
 import { useEffect, useRef, useState } from "react";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import axios from "axios";
