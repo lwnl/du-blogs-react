@@ -65,6 +65,25 @@ articleRouter.post('/upload-blog', auth, async (req: AuthRequest, res: Response)
 //获取所有文章列表
 articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => {
   try {
+    const blogs = await Article.find().sort({
+      createdAt: -1
+    })
+
+    res.status(200).json({
+      blogs,
+      user: req.user
+    })
+  } catch (error) {
+    console.error('error fetching blogs:', (error as Error).message)
+    res.status(500).json({
+      error: '获取文章失败'
+    })
+  }
+})
+
+//获取本人文章列表
+articleRouter.get('/mine', authOptional, async (req: AuthRequest, res: Response) => {
+  try {
     const filter = req.user ? { author: req.user.userName } : {}
     const blogs = await Article.find(filter).sort({
       createdAt: -1

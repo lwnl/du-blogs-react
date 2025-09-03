@@ -15,6 +15,7 @@ export interface IArticle extends Document {
 
 const AllBlogs = () => {
   const {
+    HOST,
     user,
     authenticated,
     message,
@@ -23,10 +24,6 @@ const AllBlogs = () => {
     refetchAuth,
   } = useAuthCheck();
   const [blogs, setBlogs] = useState<IArticle[]>([]);
-
-  const HOST = import.meta.env.VITE_HOST;
-
-  console.log('HOST is', HOST)
 
   useEffect(() => {
     axios

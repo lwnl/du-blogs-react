@@ -42,7 +42,7 @@ const MyBlogs = () => {
 
   useEffect(() => {
     axios
-      .get(`${HOST}/api/articles`, { withCredentials: true })
+      .get(`${HOST}/api/articles/mine`, { withCredentials: true })
       .then((res) => {
         res.data.user ? setBlogs(res.data.blogs) : setBlogs([]);
       })
