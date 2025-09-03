@@ -73,7 +73,7 @@ const BookDetail = () => {
           // 若还没有游客身份，创建游客身份
           try {
             await axios.post(
-              `${HOST}/users/guests/new`,
+              `${HOST}/api/users/guests/new`,
               {},
               {
                 withCredentials: true,
@@ -110,7 +110,7 @@ const BookDetail = () => {
         rating: currentRating ?? currentRatingRef.current, //用户没有手动设置，默认评分为满分
       };
       const res = await axios.patch(
-        `${HOST}/banned-books/${bookId}/comments/new`,
+        `${HOST}/api/banned-books/${bookId}/comments/new`,
         { newComment },
         { withCredentials: true }
       );
@@ -145,7 +145,7 @@ const BookDetail = () => {
 
     try {
       const { data } = await axios.patch(
-        `${HOST}/banned-books/${bookId}/comments/update/${commentId}`,
+        `${HOST}/api/banned-books/${bookId}/comments/update/${commentId}`,
         { updatedContent },
         { withCredentials: true }
       );
@@ -180,7 +180,7 @@ const BookDetail = () => {
 
     try {
       const res = await axios.delete(
-        `${HOST}/banned-books/${bookId}/comments/${commentId}`,
+        `${HOST}/api/banned-books/${bookId}/comments/${commentId}`,
         {
           withCredentials: true,
         }
@@ -205,7 +205,7 @@ const BookDetail = () => {
   useEffect(() => {
     if (!bookId) return;
     axios
-      .get(`${HOST}/banned-books/${bookId}`, { withCredentials: true })
+      .get(`${HOST}/api/banned-books/${bookId}`, { withCredentials: true })
       .then((res) => {
         console.log("res.data=", res.data);
         setBook(res.data.book);

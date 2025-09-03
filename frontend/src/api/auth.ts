@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const HOST = (import.meta as any).env.VITE_HOST
+export const HOST = (import.meta as any).env.VITE_HOST || ''
 
 export type User = {
   id: string,
@@ -16,7 +16,7 @@ export type LoginCheckResponse = {
 
 export const checkLogin = async (): Promise<LoginCheckResponse> => {
   try {
-    const res = await axios.get<LoginCheckResponse>(`${HOST}/users/login-check`, {
+    const res = await axios.get<LoginCheckResponse>(`${HOST}/api/users/login-check`, {
       withCredentials: true,
     });
     return res.data

@@ -130,7 +130,7 @@ articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
 });
 
 // 追加评论
-articleRouter.patch('update-comments/:id', auth, async (req: AuthRequest, res: Response) => {
+articleRouter.patch('/update-comments/:id', auth, async (req: AuthRequest, res: Response) => {
   const id = req.params.id
   const { newCommentId } = req.body
 

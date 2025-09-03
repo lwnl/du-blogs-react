@@ -237,14 +237,14 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       if (type === "update" && id) {
         // 更新博客
         await axios.patch(
-          `${HOST}/articles/update/${id}`,
+          `${HOST}/api/articles/update/${id}`,
           { title, content: editor.getHTML() },
           { withCredentials: true }
         );
       } else {
         // 创建新博客
         await axios.post(
-          `${HOST}/articles/upload-blog`,
+          `${HOST}/api/articles/upload-blog`,
           { title, content: editor.getHTML() },
           { withCredentials: true }
         );
@@ -309,7 +309,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
 
       if (!hasLocalDraft) {
         axios
-          .get(`${HOST}/articles/${id}`)
+          .get(`${HOST}/api/articles/${id}`)
           .then((res) => {
             const { blog } = res.data;
             setTitle(blog.title);

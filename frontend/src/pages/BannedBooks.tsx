@@ -38,7 +38,7 @@ const BannedBooks = () => {
 
   useEffect(() => {
     axios
-      .get(`${HOST}/banned-books`)
+      .get(`${HOST}/api/banned-books`)
       .then((res) => {
         setBannedBooks(res.data.bannedBooks);
       })

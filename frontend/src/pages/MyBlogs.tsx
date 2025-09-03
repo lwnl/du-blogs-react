@@ -27,7 +27,7 @@ const MyBlogs = () => {
 
   const handleDelete = (id: string) => {
     axios
-      .delete(`${HOST}/articles/delete/${id}`, { withCredentials: true })
+      .delete(`${HOST}/api/articles/delete/${id}`, { withCredentials: true })
       .then(() => {
         console.log("文章删除成功");
         setBlogs((prev) => prev.filter((blog) => blog._id !== id));
@@ -42,7 +42,7 @@ const MyBlogs = () => {
 
   useEffect(() => {
     axios
-      .get(`${HOST}/articles`, { withCredentials: true })
+      .get(`${HOST}/api/articles`, { withCredentials: true })
       .then((res) => {
         res.data.user ? setBlogs(res.data.blogs) : setBlogs([]);
       })

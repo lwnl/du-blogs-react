@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${HOST}/users/login`,
+        `${HOST}/api/users/login`,
         { userName, password },
         { withCredentials: true }
       );
@@ -37,7 +37,7 @@ const Login = () => {
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post(`${HOST}/users/logout`, {}, { withCredentials: true });
+      await axios.post(`${HOST}/api/users/logout`, {}, { withCredentials: true });
       await refetchAuth(); // Refresh status after logout
     } catch (error) {
       console.error("Logout error", (error as Error).message);

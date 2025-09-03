@@ -10,7 +10,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [repeatPassword, setRepeatPassword] = useState(""); // 单独的重复密码状态
   const navigate = useNavigate();
-  const HOST = (import.meta as any).env.VITE_HOST;
+  const HOST = (import.meta as any).env.VITE_HOST || '';
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +28,7 @@ const Register = () => {
 
     try {
       const res = await axios.post(
-        `${HOST}/users/registered-user`,
+        `${HOST}/api/users/registered-user`,
         { userName, password },
         { withCredentials: true }
       );

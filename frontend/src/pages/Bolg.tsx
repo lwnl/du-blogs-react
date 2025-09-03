@@ -67,7 +67,7 @@ const Blog = () => {
           // 若还没有游客身份，创建游客身份
           try {
             await axios.post(
-              `${HOST}/users/guests/new`,
+              `${HOST}/api/users/guests/new`,
               {},
               {
                 withCredentials: true,
@@ -177,7 +177,7 @@ const Blog = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`${HOST}/comments/delete/${commentId}`, {
+      await axios.delete(`${HOST}/api/comments/delete/${commentId}`, {
         withCredentials: true,
       });
       setComments((prev) => prev?.filter((c) => c._id !== commentId) || null);
@@ -199,7 +199,7 @@ const Blog = () => {
     setLoading(true);
 
     axios
-      .get(`${HOST}/articles/${id}`)
+      .get(`${HOST}/api/articles/${id}`)
       .then((res) => {
         setBlog(res.data.blog);
         setComments(res.data.comments);
