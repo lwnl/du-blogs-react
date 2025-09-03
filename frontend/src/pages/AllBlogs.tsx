@@ -52,7 +52,7 @@ const AllBlogs = () => {
             </h5>
             <div className="blog-info">
               <span>作者：{blog.author}</span>
-              <span>更新时间： {blog.updatedAt}</span>
+              <span>更新： {blog.updatedAt}</span>
             </div>
           </li>
         ))}

@@ -223,7 +223,7 @@ const Blog = () => {
         <h3 className="title">{blog.title}</h3>
         <div>
           <span className="author">作者： {blog.author}</span>
-          <span>更新时间： {blog.updatedAt}</span>
+          <span>更新： {blog.updatedAt}</span>
         </div>
       </div>
 
