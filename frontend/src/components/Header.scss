@@ -2,6 +2,14 @@
 $breakpoint-sm: 599px;
 
 header {
+  //网站标题
+  .website-title {
+    font-family: "KaiTi", "STKaiti", "KaiTi TC", "楷体", cursive; /* 行书/楷体效果 */
+    color: rgb(16, 16, 228);
+    font-weight: 900;
+    text-align: center;
+    padding: var(--size-200)
+  }
   // 顶部工具栏
   .toolbar {
     background-color: var(--color-primary);
@@ -9,6 +17,10 @@ header {
     padding: 8px 12px;
     display: flex;
     align-items: center;
+
+    a {
+      text-underline-offset: var(--size-100);
+    }
 
     .nav-links a {
       text-decoration: none;

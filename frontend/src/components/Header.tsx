@@ -29,6 +29,7 @@ export default function Header() {
 
   return (
     <header>
+      <h2 className="website-title">畅言网</h2>
       <div className="toolbar">
         {authenticated ? (
           <span className="register-login">
