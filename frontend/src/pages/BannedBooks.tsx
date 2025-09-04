@@ -36,7 +36,10 @@ const BannedBooks = () => {
     return false;
   };
 
+ 
+
   useEffect(() => {
+     console.log('HOST is:', HOST)
     axios
       .get(`${HOST}/api/banned-books`)
       .then((res) => {
