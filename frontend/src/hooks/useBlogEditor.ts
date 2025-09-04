@@ -137,7 +137,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
 
       try {
         const res = await axios.post(
-          `${HOST}/articles/image/upload`,
+          `${HOST}/api/articles/image/upload`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -175,7 +175,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
           removedImages.map((url: string) =>
             axios
               .post(
-                `${HOST}/articles/image/delete`,
+                `${HOST}/api/articles/image/delete`,
                 { url },
                 { withCredentials: true }
               )

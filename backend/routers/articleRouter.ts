@@ -147,25 +147,6 @@ articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
   }
 });
 
-// 追加评论
-articleRouter.patch('/update-comments/:id', auth, async (req: AuthRequest, res: Response) => {
-  const id = req.params.id
-  const { newCommentId } = req.body
-
-  const updatedBlog = await Article.findByIdAndUpdate(
-    id,
-    { $push: { comments: newCommentId }, },
-    { new: true }// 返回更新后的文档
-  )
-
-  if (!updatedBlog) {
-    return res.status(404).json({
-      message: '文章不存在'
-    })
-  }
-  res.status(200).json({ message: '评论追加成功', blog: updatedBlog });
-})
-
 // 删除文章
 articleRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response) => {
   const id = req.params.id

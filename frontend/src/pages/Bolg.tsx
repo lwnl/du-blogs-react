@@ -98,7 +98,7 @@ const Blog = () => {
 
     try {
       const res = await axios.post(
-        `${HOST}/comments/new`,
+        `${HOST}/api/comments/new`,
         {
           subjectId: blog._id,
           content: newComment,
@@ -136,7 +136,7 @@ const Blog = () => {
 
     try {
       const { data } = await axios.patch(
-        `${HOST}/comments/update/${commentId}`,
+        `${HOST}/api/comments/update/${commentId}`,
         { content: updatedContent },
         { withCredentials: true }
       );
