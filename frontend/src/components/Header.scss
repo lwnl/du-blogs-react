@@ -5,10 +5,11 @@ header {
   //网站标题
   .website-title {
     font-family: "KaiTi", "STKaiti", "KaiTi TC", "楷体", cursive; /* 行书/楷体效果 */
-    color: rgb(16, 16, 228);
+    color: var(--color-primary);
     font-weight: 900;
     text-align: center;
-    padding: var(--size-200)
+    padding: var(--size-200);
+     text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.2); /* 阴影效果 */
   }
   // 顶部工具栏
   .toolbar {
