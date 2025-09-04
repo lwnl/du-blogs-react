@@ -44,7 +44,7 @@ const MyBlogs = () => {
     axios
       .get(`${HOST}/api/articles/mine`, { withCredentials: true })
       .then((res) => {
-        res.data.user ? setBlogs(res.data.blogs) : setBlogs([]);
+        setBlogs(res.data.blogs);
       })
       .catch((error: any) => {
         if (error.response) {

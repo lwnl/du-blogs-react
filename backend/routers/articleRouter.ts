@@ -84,10 +84,9 @@ articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => 
 //获取本人文章列表
 articleRouter.get('/mine', authOptional, async (req: AuthRequest, res: Response) => {
   try {
-    const filter = req.user ? { author: req.user.userName } : {}
-    const blogs = await Article.find(filter).sort({
+    const blogs = req.user ? await Article.find({ author: req.user.userName }).sort({
       createdAt: -1
-    })
+    }) : []
 
     res.status(200).json({
       blogs,
