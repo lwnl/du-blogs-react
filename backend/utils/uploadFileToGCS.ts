@@ -7,6 +7,8 @@ const storage = new Storage({
   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // 从 .env 读取
 });
 
+console.log('googleStorage is', storage)
+
 const bucketName = 'daniel-jansen7879-bucket-1';
 export const bucket = storage.bucket(bucketName);
 
