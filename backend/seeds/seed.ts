@@ -5,6 +5,7 @@ import { seedArticles } from './articles.seed'
 import { seedComments } from './comments.seed'
 import { seedUsers } from './users.seed'
 import { seedBannedBook } from "./bannedBook.seed";
+import { seedBannedBookComments } from "./bannedBook.comments.seed";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -15,7 +16,7 @@ async function seed() {
   try {
     await dbConnection()
     rl.question(
-      "请选择初始化数据内容:\n1. 用户数据\n2. 评论数据\n3. 文章数据\n4. 禁书数据\n5. 所有数据\n请输入编号: ",
+      "请选择初始化数据内容:\n1. 用户数据\n2. 评论数据\n3. 文章数据\n4. 禁书数据\n5. 书评数据\n6. 所有数据\n请输入编号: ",
       async (choice) => {
         try {
           switch (choice.trim()) {
@@ -32,13 +33,16 @@ async function seed() {
               await seedBannedBook()
               break;
             case "5":
+              await seedBannedBookComments()
+              break;
+            case "6":
               await seedUsers();
               await seedComments();
               await seedArticles();
               await seedBannedBook()
               break;
             default:
-              console.log("❌ 输入无效，请输入 1, 2, 3 或 4");
+              console.log("❌ 输入无效，请输入数字1-6");
           }
         } catch (err) {
           console.error("❌ 初始化数据时出错:", err);
