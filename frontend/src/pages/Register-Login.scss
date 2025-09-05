@@ -22,6 +22,15 @@
 
   p {
     text-align: center;
+
+    &.note{
+      text-align: start;
+      color:#7e7e7e;
+
+      span.error {
+        color: red;
+      }
+    }
   }
 
   input {

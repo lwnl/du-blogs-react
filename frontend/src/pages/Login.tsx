@@ -54,8 +54,8 @@ const Login = () => {
   if (authenticated)
     return (
       <form className="login" onSubmit={handleLogout}>
-        <p>You are already logged in!</p>
-        <button type="submit">Logout</button>
+        <p>您已经登录！</p>
+        <button type="submit">登出</button>
       </form>
     );
 

@@ -5,7 +5,6 @@ import EditorToolbar from "../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
 import { useBlogEditor } from "../hooks/useBlogEditor";
-import { useEffect } from "react";
 
 const NewBlog = () => {
   const { authenticated, isLoading: authLoading, HOST } = useAuthCheck();
@@ -25,13 +24,6 @@ const NewBlog = () => {
     type: "new",
     navigate,
   });
-
-  console.log(
-    "feedback:",
-    feedback,
-    "className:",
-    `feedback ${feedback.includes("✅") ? "success" : "error"}`
-  );
 
   if (authLoading) return <div className="loading">检测权限...</div>;
   if (!authenticated) {

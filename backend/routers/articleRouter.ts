@@ -2,10 +2,10 @@ import express from 'express'
 import type { Request, Response } from 'express'
 import { auth, type AuthRequest } from '../utils/auth'
 import multer from 'multer'
-import { bucket, uploadFileToGCS } from '../utils/uploadFileToGCS'
 import Article from '../models/Article'
 import { authOptional } from '../utils/authOptional'
 import Comment from '../models/Comment'
+import { bucket, deleteImagesFromContent, uploadFileToGCS } from '../utils/gcsOperating'
 
 const articleRouter = express.Router()
 
@@ -100,7 +100,7 @@ articleRouter.get('/mine', authOptional, async (req: AuthRequest, res: Response)
   }
 })
 
-// 获取具体文章及其所有评论内容
+// 获取具体文章
 articleRouter.get('/:id', async (req: Request, res: Response) => {
   try {
     const blog = await Article.findById(req.params.id)
@@ -147,7 +147,7 @@ articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
   }
 });
 
-// 删除文章
+// 删除文章，文章评论，文章图片
 articleRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response) => {
   const id = req.params.id
   if (!id) {
@@ -161,12 +161,17 @@ articleRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response
     if (!deletedBlog) {
       return res.status(404).json({ error: '文章不存在或无权限删除' });
     }
+
     // 删除该文章中的所有评论
     if (deletedBlog.comments.length > 0) {
       await Promise.all (
         deletedBlog.comments.map((id) => Comment.findByIdAndDelete(id))
       )
     }
+
+    // 删除文章中的所有保存在gcs中的图片
+    await deleteImagesFromContent(deletedBlog.content);
+    
     res.status(200).json({
       message: '文章删除成功'
     })

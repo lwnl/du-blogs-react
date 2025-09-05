@@ -146,13 +146,17 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
         );
 
         if (res.data?.url) {
+          const url = decodeUrl(res.data.url);
+          editor?.chain().focus().setImage({ src: url }).run();
           editor?.chain().focus().setImage({ src: res.data.url }).run();
 
-          const storedImages = JSON.parse(
-            localStorage.getItem(imagesKey) || "[]"
-          );
-          storedImages.push(res.data.url);
-          localStorage.setItem(imagesKey, JSON.stringify(storedImages));
+          // ✅ 只保存 GCS 上传的图片
+          const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-blogs/";
+          if (res.data.url.startsWith(gcsPrefix)) {
+            const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
+            storedImages.push(res.data.url);
+            localStorage.setItem(imagesKey, JSON.stringify(storedImages));
+          }
         }
       } catch (error) {
         console.error("upload image error:", (error as Error).message);
@@ -164,24 +168,21 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   // 清理未使用的图片
   const removeUnusedImages = useCallback(
     async (currentImages: string[]) => {
-      const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
+      const storedImages: string[] = JSON.parse(localStorage.getItem(imagesKey) || "[]");
+      const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-blogs/";
+
       const removedImages = storedImages.filter(
-        (url: string) => !currentImages.includes(url)
+        (url) => url.startsWith(gcsPrefix) && !currentImages.includes(url)
       );
-      // console.log("将被删除的图片:", removedImages);
+
+      console.log('被删除的图片为：', removedImages)
 
       if (removedImages.length > 0) {
         await Promise.all(
-          removedImages.map((url: string) =>
+          removedImages.map((url) =>
             axios
-              .post(
-                `${HOST}/api/articles/image/delete`,
-                { url },
-                { withCredentials: true }
-              )
-              .catch((err) => {
-                console.error("图片删除失败:", url, err);
-              })
+              .post(`${HOST}/api/articles/image/delete`, { url }, { withCredentials: true })
+              .catch((err) => console.error("图片删除失败:", url, err))
           )
         );
       }
@@ -196,6 +197,16 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     localStorage.removeItem(contentKey);
     localStorage.removeItem(imagesKey);
   }, [contentKey, imagesKey, titleKey, editor]);
+
+  /**
+  * 根据文章ID清理localStorage草稿
+  * 用于删除文章时调用
+  */
+  const clearDraftById = useCallback((articleId: string) => {
+    localStorage.removeItem(`draft_${articleId}_title`);
+    localStorage.removeItem(`draft_${articleId}_content`);
+    localStorage.removeItem(`blogImages_${articleId}`);
+  }, []);
 
   // 提取当前编辑器中的图片
   const getCurrentImages = useCallback((): string[] => {
@@ -223,8 +234,8 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     setIsSubmitting(true);
     const currentImages = getCurrentImages();
 
-    // const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
-    // console.log("localStorage中存储的图片:", storedImages);
+    const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
+    console.log("localStorage中存储的图片:", storedImages);
 
     if (!title.trim() || editor?.isEmpty) {
       setFeedback("请填写所有字段！");
@@ -255,7 +266,11 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       await removeUnusedImages(currentImages);
 
       // 清除草稿
-      clearDraft();
+      if (type === "update" && id) {
+        clearDraftById(id);
+      } else {
+        clearDraft();
+      }
 
       // 设置成功反馈
       setFeedback(type === "update" ? "✅ 更新成功!" : "✅ 创建成功!");
@@ -301,6 +316,8 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     };
   }, [editor, contentKey]);
 
+  const decodeUrl = (url: string) => url.replace(/&amp;/g, "&");
+
   // 初始化数据（仅用于更新博客）
   useEffect(() => {
     if (type === "update" && id && editor) {
@@ -317,9 +334,10 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
             localStorage.setItem(titleKey, blog.title);
             localStorage.setItem(contentKey, blog.content);
 
-            const imgUrls = Array.from(
-              blog.content.matchAll(/<img[^>]+src="([^">]+)"/g)
-            ).map((m: any) => m[1]);
+            //初始化格式化数据
+
+            const imgUrls = Array.from(blog.content.matchAll(/<img[^>]+src="([^">]+)"/g))
+              .map((m: any) => decodeUrl(m[1]));
             localStorage.setItem(imagesKey, JSON.stringify(imgUrls));
           })
           .catch((error) => {
@@ -341,6 +359,8 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     setLink,
     addImage,
     isSubmitting,
-    handleSubmit
+    handleSubmit,
+    clearDraft,
+    clearDraftById,
   };
 };

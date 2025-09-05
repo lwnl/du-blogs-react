@@ -3,13 +3,27 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import type { Request, Response } from 'express'
-import User, { UserRole } from '../models/User'
+import User from '../models/User'
 import { auth } from '../utils/auth'
 import type { AuthRequest } from '../utils/auth'
 
 dotenv.config()
 const userRouter = express.Router()
 const JWT_SECRET = process.env.JWT_SECRET || 'your_default_dev_secret'
+
+
+// 获取所有用户
+userRouter.get('/', async (req: Request, res: Response) => {
+  try {
+    const users = await User.find()
+    res.status(200).json({ users })
+  } catch (error) {
+    console.error('获取用户数据出错：', (error as Error).message)
+    res.status(500).json({
+      error: '获取用户数据出错!'
+    })
+  }
+})
 
 // User registration
 userRouter.post('/registered-user', async (req: Request, res: Response) => {
@@ -24,14 +38,14 @@ userRouter.post('/registered-user', async (req: Request, res: Response) => {
   try {
     const existingUser = await User.findOne({ userName })
     if (existingUser) {
-      return res.status(400).json({ message: 'Username already exists, please choose another one' })
+      return res.status(400).json({ message: '用户名已存在！' })
     }
 
     // Hash the password before storing
     const hashedPassword = await bcrypt.hash(password, 10)
 
     // Create a new user
-    const newUser = await User.create({ userName, password: hashedPassword, role: UserRole.RegisteredUser })
+    const newUser = await User.create({ userName, password: hashedPassword, role: "Registered User" })
 
     // generate JWT token
     const token = jwt.sign(

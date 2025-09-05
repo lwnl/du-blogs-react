@@ -3,6 +3,7 @@ import "./Blogs.scss";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useBlogEditor } from "../hooks/useBlogEditor";
 
 export interface IArticle {
   _id: string;
@@ -23,6 +24,12 @@ const MyBlogs = () => {
     isError,
     refetchAuth,
   } = useAuthCheck();
+
+  const { clearDraftById } = useBlogEditor({
+    HOST,
+    type: "update",
+    navigate: () => {},
+  });
   const [blogs, setBlogs] = useState<IArticle[]>([]);
 
   const handleDelete = (id: string) => {
@@ -30,6 +37,8 @@ const MyBlogs = () => {
       .delete(`${HOST}/api/articles/delete/${id}`, { withCredentials: true })
       .then(() => {
         console.log("文章删除成功");
+        // 清理 localStorage 草稿
+        clearDraftById(id);
         setBlogs((prev) => prev.filter((blog) => blog._id !== id));
       })
       .catch((error: any) => {

@@ -1,15 +1,10 @@
 import mongoose, { Schema, Document, Model } from 'mongoose'
 
-export enum UserRole {
-  Guest = "Guest",
-  RegisteredUser = "Registered User",
-  Admin = "Administrator"
-}
 
 export interface IUser extends Document {
   userName: string
   password: string
-  role: UserRole
+  role: "Guest" | "Registered User" | "Administrator"
 }
 
 const UserSchema: Schema<IUser> = new Schema({
@@ -25,8 +20,8 @@ const UserSchema: Schema<IUser> = new Schema({
 
   role: {
     type: String,
-    enum: Object.values(UserRole),
-    default: UserRole.Guest,
+    enum: ["Guest", "Registered User", "Administrator"],
+    default: "Guest",
   }, 
 }, 
 
