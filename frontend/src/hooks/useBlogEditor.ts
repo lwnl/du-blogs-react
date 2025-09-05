@@ -48,7 +48,8 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   );
   const [feedback, setFeedback] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(type === "update");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [noExistingBlog, setNoExistingBlog] = useState<boolean>(false);
 
 
   const editor = useEditor({
@@ -329,19 +330,22 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
           .get(`${HOST}/api/articles/${id}`)
           .then((res) => {
             const { blog } = res.data;
+            console.log('blog is', blog)
             setTitle(blog.title);
             editor?.commands.setContent(blog.content);
             localStorage.setItem(titleKey, blog.title);
             localStorage.setItem(contentKey, blog.content);
 
             //初始化格式化数据
-
             const imgUrls = Array.from(blog.content.matchAll(/<img[^>]+src="([^">]+)"/g))
               .map((m: any) => decodeUrl(m[1]));
             localStorage.setItem(imagesKey, JSON.stringify(imgUrls));
           })
           .catch((error) => {
             console.error("获取博客失败", (error as Error).message);
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
+              setNoExistingBlog(true); // ✅ 捕获 404 时设置
+            }
           })
           .finally(() => setIsLoading(false));
       } else {
@@ -362,5 +366,6 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     handleSubmit,
     clearDraft,
     clearDraftById,
+    noExistingBlog
   };
 };

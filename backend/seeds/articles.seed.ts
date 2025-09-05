@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Article from "../models/Article";
 import Comment from "../models/Comment";
+import { deleteImagesFromContent } from "../utils/gcsOperating";
 
 export async function seedArticles() {
   try {
@@ -11,6 +12,8 @@ export async function seedArticles() {
       for (const commentId of articleItem.comments ){
         await Comment.findByIdAndDelete(commentId)
       }
+
+      await deleteImagesFromContent(articleItem.content)
     }
     await Article.deleteMany();
     console.log("✅ 所有文章已清空！");

@@ -5,10 +5,12 @@ import EditorToolbar from "../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
 import { useBlogEditor } from "../hooks/useBlogEditor";
+import Swal from "sweetalert2";
+import { useEffect } from "react";
 
 const UpdateBlog = () => {
   const { id } = useParams<{ id: string }>();
-  const { authenticated, isLoading: authLoading, HOST } = useAuthCheck();
+  const { authenticated, isLoading: authLoading, HOST, user } = useAuthCheck();
   const navigate = useNavigate();
 
   const {
@@ -21,6 +23,7 @@ const UpdateBlog = () => {
     addImage,
     isSubmitting,
     handleSubmit,
+    noExistingBlog,
   } = useBlogEditor({
     id,
     HOST,
@@ -28,11 +31,32 @@ const UpdateBlog = () => {
     navigate,
   });
 
+  useEffect(() => {
+    if (noExistingBlog) {
+      Swal.fire({
+        title: "",
+        text: "该文章不存在！",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then(() => {
+        if (user?.role === "Registered User") {
+          navigate("/blogs/mine");
+        } else {
+          navigate("/blogs");
+        }
+      });
+    }
+  }, [noExistingBlog, user, navigate]);
+
   if (authLoading || editorLoading) return <p>检测权限...</p>;
   if (!authenticated) {
     navigate("/users/login");
     return null;
   }
+
+  // 渲染前就 return null，避免访问不存在的数据
+  if (noExistingBlog) return null;
 
   return (
     <form className="NewBlog" onSubmit={handleSubmit}>

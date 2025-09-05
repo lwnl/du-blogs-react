@@ -1,6 +1,6 @@
 // src/pages/Blog.tsx
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import type { IArticle } from "./MyBlogs";
 import { useAuthCheck } from "../hooks/useAuthCheck";
@@ -26,16 +26,9 @@ const Blog = () => {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
   const [comments, setComments] = useState<IComment[] | null>(null);
+  const navigate = useNavigate();
 
-  const {
-    HOST,
-    user,
-    authenticated,
-    message,
-    isLoading,
-    isError,
-    refetchAuth,
-  } = useAuthCheck();
+  const { HOST, user, authenticated, refetchAuth } = useAuthCheck();
 
   const submitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +66,7 @@ const Blog = () => {
                 withCredentials: true,
               }
             );
-            refetchAuth() //重新校验用户身份
+            refetchAuth(); //重新校验用户身份
             //用游客身份发表评论
             await postComment();
           } catch (error) {
@@ -213,9 +206,26 @@ const Blog = () => {
       });
   }, [id]);
 
+  useEffect(() => {
+    if (!loading && !blog) {
+      Swal.fire({
+        title: "",
+        text: "该文章不存在！",
+        icon: "error",
+        timer: 1500, // 1.5秒后自动关闭
+        showConfirmButton: false,
+      }).then(() => {
+        if (user?.role === "Registered User") {
+          navigate("/blogs/mine");
+        } else {
+          navigate("/blogs");
+        }
+      });
+    }
+  }, [loading, blog, user, navigate]);
+
   if (loading) return <div>加载中...</div>;
-  if (error) return <div className="blogError">错误: {error}</div>;
-  if (!blog) return <div>文章不存在</div>;
+  if (!blog) return null;
 
   return (
     <div className="Blog">
