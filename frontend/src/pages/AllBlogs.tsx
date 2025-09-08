@@ -25,7 +25,7 @@ const AllBlogs = () => {
 
   const [blogs, setBlogs] = useState<IArticle[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 10; // 每页显示条数，可改成参数或配置
+  const pageSize = 2; // 每页显示条数，可改成参数或配置
   const ulHeight = 28.8 * pageSize + 16 * (pageSize - 1); //高度根据pageSize设置为固定值
   const totalPages = Math.ceil(blogs.length / pageSize);
 
