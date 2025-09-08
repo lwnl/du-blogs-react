@@ -1,9 +1,10 @@
 .pagination {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin: 50px 0;
 
-  button {
+  button{
     padding: 0.6rem;
     font-size: var(--fs-400);
     border: none;
@@ -23,7 +24,8 @@
     }
 
     &.active {
-     color:red;
+      color: red;
     }
   }
+
 }
