@@ -35,7 +35,7 @@ const AllBlogs = () => {
     setCurrentPage(pageNumber);
   };
 
-  //当前也数据
+  //当前页面数据
   const startIndex = (currentPage - 1) * pageSize;
   const currentBlogs = blogs.slice(startIndex, startIndex + pageSize);
 
