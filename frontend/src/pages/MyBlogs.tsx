@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import "./Blogs.scss";
+import "./AllBlogs.scss";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useBlogEditor } from "../hooks/useBlogEditor";
+import Swal from "sweetalert2";
 
 export interface IArticle {
   _id: string;
@@ -33,20 +34,37 @@ const MyBlogs = () => {
   const [blogs, setBlogs] = useState<IArticle[]>([]);
 
   const handleDelete = (id: string) => {
-    axios
-      .delete(`${HOST}/api/articles/delete/${id}`, { withCredentials: true })
-      .then(() => {
-        console.log("文章删除成功");
-        // 清理 localStorage 草稿
-        clearDraftById(id);
-        setBlogs((prev) => prev.filter((blog) => blog._id !== id));
-      })
-      .catch((error: any) => {
-        if (error.response) {
-          console.error("服务器错误", error.response.data.error);
-        }
-        console.error("请求失败", (error as Error).message);
-      });
+    Swal.fire({
+      title: "确定删除吗？",
+      text: "此操作不可撤销！",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`${HOST}/api/articles/delete/${id}`, {
+            withCredentials: true,
+          })
+          .then(() => {
+            console.log("文章删除成功");
+            // 清理 localStorage 草稿
+            clearDraftById(id);
+            setBlogs((prev) => prev.filter((blog) => blog._id !== id));
+            //删除成功提示
+            Swal.fire("已删除!", "文章已成功删除。", "success");
+          })
+          .catch((error: any) => {
+            if (error.response) {
+              console.error("服务器错误", error.response.data.error);
+            }
+            console.error("请求失败", (error as Error).message);
+            // 删除失败提示
+            Swal.fire("删除失败", "请稍后重试。", "error");
+          });
+      }
+    });
   };
 
   useEffect(() => {
@@ -77,6 +95,7 @@ const MyBlogs = () => {
             <p className="update-date">{blog.updatedAt}</p>
             <Link to={`/blogs/update/${blog._id}`}>编辑</Link>
             <button
+              className="delete"
               onClick={() => {
                 handleDelete(blog._id);
               }}

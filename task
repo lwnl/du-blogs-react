@@ -45,9 +45,9 @@ react query特点
 加logo，加网站名称：畅言园 ok
 直接用后端获取前端静态资源 ok
 
-seed博客文章时删除所有文章中的评论和图片
-搜索功能
+seed博客文章时删除所有文章中的评论和图片 ok
 排序显示
+搜索功能
 校验哈希值确认内容
 删除文章时，清空localstorage ok
 
@@ -55,7 +55,8 @@ seed博客文章时删除所有文章中的评论和图片
 下载，在线播放视频音频
 语言版本
 总结：为何用api，host cors用法
-总结  useEffect(() => {
+总结  return null 的作用
+useEffect(() => {
     if (noExistingBlog) {
       Swal.fire({
         title: "",
@@ -81,6 +82,39 @@ seed博客文章时删除所有文章中的评论和图片
 
   // 渲染前就 return null，避免访问不存在的数据
   if (noExistingBlog) return null;
+总结分页系统
+    {/* 分页组件 */}
+      {blogs.length > pageSize && (
+        <div className="pagination">
+          <button
+            onClick={() => {
+              return handlePageChange(currentPage - 1);
+            }}
+            disabled={currentPage === 1}
+          >
+            上一页
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              className={currentPage === i + 1 ? "active" : ""}
+              onClick={() => handlePageChange(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => {
+              return handlePageChange(currentPage + 1);
+            }}
+            disabled={currentPage === totalPages}
+          >
+            下一页
+          </button>
+        </div>
+      )}
 
 每页显示数量控制，页数控制
 

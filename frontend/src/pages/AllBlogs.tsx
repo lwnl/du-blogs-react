@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
-import "./Blogs.scss";
+import "./AllBlogs.scss";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Pagination from "../components/Pagination";
+import Swal from "sweetalert2";
 
 export interface IArticle extends Document {
   _id: string;
@@ -18,12 +20,24 @@ const AllBlogs = () => {
     HOST,
     user,
     authenticated,
-    message,
-    isLoading,
-    isError,
     refetchAuth,
   } = useAuthCheck();
+
   const [blogs, setBlogs] = useState<IArticle[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10; // 每页显示条数，可改成参数或配置
+  const ulHeight = 28.8 * pageSize + 16 * (pageSize - 1); //高度根据pageSize设置为固定值
+  const totalPages = Math.ceil(blogs.length / pageSize);
+
+  // 处理翻页
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber < 1 || pageNumber > totalPages) return;
+    setCurrentPage(pageNumber);
+  };
+
+  //当前也数据
+  const startIndex = (currentPage - 1) * pageSize;
+  const currentBlogs = blogs.slice(startIndex, startIndex + pageSize);
 
   useEffect(() => {
     axios
@@ -31,7 +45,7 @@ const AllBlogs = () => {
       .then((res) => {
         setBlogs(res.data.blogs);
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         if (error.response) {
           // 后端返回的错误响应
           console.error("后端错误消息:", error.response.data.error);
@@ -44,8 +58,8 @@ const AllBlogs = () => {
 
   return (
     <div className="Blogs-container">
-      <ul className="blogs">
-        {blogs.map((blog) => (
+      <ul className="blogs" style={{height:`${ulHeight}px`}}>
+        {currentBlogs.map((blog) => (
           <li key={blog._id}>
             <h5>
               <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
@@ -57,6 +71,13 @@ const AllBlogs = () => {
           </li>
         ))}
       </ul>
+
+      {/* 分页组件 */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
 
       {authenticated && user?.role === "Registered User" ? (
         <div className="add-blog">
