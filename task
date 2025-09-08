@@ -49,18 +49,44 @@ seed博客文章时删除所有文章中的评论和图片
 搜索功能
 排序显示
 校验哈希值确认内容
-删除文章时，清空localstorage
+删除文章时，清空localstorage ok
 
 
 下载，在线播放视频音频
 语言版本
 总结：为何用api，host cors用法
+总结  useEffect(() => {
+    if (noExistingBlog) {
+      Swal.fire({
+        title: "",
+        text: "该文章不存在！",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then(() => {
+        if (user?.role === "Registered User") {
+          navigate("/blogs/mine");
+        } else {
+          navigate("/blogs");
+        }
+      });
+    }
+  }, [noExistingBlog, user, navigate]);
+
+  if (authLoading || editorLoading) return <p>检测权限...</p>;
+  if (!authenticated) {
+    navigate("/users/login");
+    return null;
+  }
+
+  // 渲染前就 return null，避免访问不存在的数据
+  if (noExistingBlog) return null;
 
 每页显示数量控制，页数控制
-user增加管理员身份
 
 
 
+user增加管理员身份 
 用户更改用户名密码
 添加禁书上传下载功能
 
