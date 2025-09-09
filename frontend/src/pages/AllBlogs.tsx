@@ -16,18 +16,14 @@ export interface IArticle extends Document {
 }
 
 const AllBlogs = () => {
-  const {
-    HOST,
-    user,
-    authenticated,
-    refetchAuth,
-  } = useAuthCheck();
+  const { HOST, user, authenticated, refetchAuth } = useAuthCheck();
 
   const [blogs, setBlogs] = useState<IArticle[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
   const pageSize = 9; // 每页显示条数，可改成参数或配置
   const ulHeight = 28.8 * pageSize + 16 * (pageSize - 1); //高度根据pageSize设置为固定值
-  const totalPages = Math.ceil(blogs.length / pageSize);
 
   // 处理翻页
   const handlePageChange = (pageNumber: number) => {
@@ -35,15 +31,14 @@ const AllBlogs = () => {
     setCurrentPage(pageNumber);
   };
 
-  //当前页面数据
-  const startIndex = (currentPage - 1) * pageSize;
-  const currentBlogs = blogs.slice(startIndex, startIndex + pageSize);
-
   useEffect(() => {
     axios
-      .get(`${HOST}/api/articles`)
+      .get(
+        `${HOST}/api/articles?pageNumber=${currentPage}&pageSize=${pageSize}`
+      )
       .then((res) => {
         setBlogs(res.data.blogs);
+        setTotalPages(Math.ceil(res.data.total / pageSize) || 1);
       })
       .catch((error: any) => {
         if (error.response) {
@@ -54,12 +49,12 @@ const AllBlogs = () => {
           console.error("请求错误:", error.message);
         }
       });
-  }, []);
+  }, [currentPage]);
 
   return (
     <div className="Blogs-container">
-      <ul className="blogs" style={{height:`${ulHeight}px`}}>
-        {currentBlogs.map((blog) => (
+      <ul className="blogs" style={{ height: `${ulHeight}px` }}>
+        {blogs.map((blog) => (
           <li key={blog._id}>
             <h5>
               <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>

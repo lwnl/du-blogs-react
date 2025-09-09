@@ -65,12 +65,19 @@ articleRouter.post('/upload-blog', auth, async (req: AuthRequest, res: Response)
 //获取所有文章列表
 articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => {
   try {
-    const blogs = await Article.find().sort({
+    const pageNumber = parseInt(req.query.pageNumber as string) || 1
+    const pageSize = parseInt(req.query.pageSize as string) || 9
+    const total = await Article.countDocuments()
+    const blogs = await Article.find()
+    .sort({
       createdAt: -1
     })
+    .skip((pageNumber -1)*pageSize)
+    .limit(pageSize)
 
     res.status(200).json({
       blogs,
+      total,
       user: req.user
     })
   } catch (error) {
