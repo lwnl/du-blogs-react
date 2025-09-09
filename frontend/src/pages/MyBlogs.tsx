@@ -24,21 +24,18 @@ const MyBlogs = () => {
     type: "update",
     navigate: () => {},
   });
-  const [blogs, setBlogs] = useState<IArticle[]>([]);
 
-  const pageSize = 10;
-  const ulHeight = 28.8 * pageSize + 16 * (pageSize - 1); //高度根据pageSize设置为固定值
+  const [blogs, setBlogs] = useState<IArticle[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const totalPages = Math.ceil(blogs.length / pageSize);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const pageSize = 2;
+  const ulHeight = 28.8 * pageSize + 16 * (pageSize - 1); //高度根据pageSize设置为固定值
 
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber > totalPages || pageNumber < 1) return;
     setCurrentPage(pageNumber);
   };
-
-  //当前页面数据
-  const startIndex = (currentPage - 1) * pageSize;
-  const currentBlogs = blogs.slice(startIndex, startIndex + pageSize);
 
   const handleDelete = (id: string) => {
     Swal.fire({
@@ -76,9 +73,15 @@ const MyBlogs = () => {
 
   useEffect(() => {
     axios
-      .get(`${HOST}/api/articles/mine`, { withCredentials: true })
+      .get(
+        `${HOST}/api/articles/mine?pageNumber=${currentPage}&pageSize=${pageSize}`,
+        {
+          withCredentials: true,
+        }
+      )
       .then((res) => {
         setBlogs(res.data.blogs);
+        setTotalPages(Math.ceil(res.data.total / pageSize) || 1);
       })
       .catch((error: any) => {
         if (error.response) {
@@ -89,12 +92,12 @@ const MyBlogs = () => {
           console.error("请求错误:", error.message);
         }
       });
-  }, []);
+  }, [currentPage]);
 
   return (
     <div className="Blogs-container">
       <ul className="blogs" style={{ height: `${ulHeight}px` }}>
-        {currentBlogs.map((blog) => (
+        {blogs.map((blog) => (
           <li key={blog._id}>
             <h5>
               <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
@@ -113,7 +116,7 @@ const MyBlogs = () => {
         ))}
       </ul>
 
-        {/* 分页组件 */}
+      {/* 分页组件 */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

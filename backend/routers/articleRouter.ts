@@ -63,22 +63,21 @@ articleRouter.post('/upload-blog', auth, async (req: AuthRequest, res: Response)
 });
 
 //获取所有文章列表
-articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => {
+articleRouter.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber as string) || 1
     const pageSize = parseInt(req.query.pageSize as string) || 9
     const total = await Article.countDocuments()
     const blogs = await Article.find()
-    .sort({
-      createdAt: -1
-    })
-    .skip((pageNumber -1)*pageSize)
-    .limit(pageSize)
+      .sort({
+        createdAt: -1
+      })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
 
     res.status(200).json({
       blogs,
       total,
-      user: req.user
     })
   } catch (error) {
     console.error('error fetching blogs:', (error as Error).message)
@@ -91,12 +90,21 @@ articleRouter.get('/', authOptional, async (req: AuthRequest, res: Response) => 
 //获取本人文章列表
 articleRouter.get('/mine', authOptional, async (req: AuthRequest, res: Response) => {
   try {
-    const blogs = req.user ? await Article.find({ author: req.user.userName }).sort({
-      createdAt: -1
-    }) : []
+    const pageNumber = parseInt(req.query.pageNumber as string) || 1
+    const pageSize = parseInt(req.query.pageSize as string) || 9
+
+    if (!req.user) {
+      return res.status(401).json({ error: "未登录" });
+    }
+    const total = await Article.countDocuments({ author: req.user.userName });
+    const blogs = await Article.find({ author: req.user.userName })
+      .sort({ createdAt: -1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
 
     res.status(200).json({
       blogs,
+      total,
       user: req.user
     })
   } catch (error) {
@@ -171,14 +179,14 @@ articleRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response
 
     // 删除该文章中的所有评论
     if (deletedBlog.comments.length > 0) {
-      await Promise.all (
+      await Promise.all(
         deletedBlog.comments.map((id) => Comment.findByIdAndDelete(id))
       )
     }
 
     // 删除文章中的所有保存在gcs中的图片
     await deleteImagesFromContent(deletedBlog.content);
-    
+
     res.status(200).json({
       message: '文章删除成功'
     })
