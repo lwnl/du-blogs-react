@@ -29,7 +29,7 @@ const MyBlogs = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const pageSize = 2;
+  const pageSize = 10;
   const ulHeight = 28.8 * pageSize + 16 * (pageSize - 1); //高度根据pageSize设置为固定值
 
   const handlePageChange = (pageNumber: number) => {
