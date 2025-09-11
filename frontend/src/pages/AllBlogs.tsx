@@ -65,6 +65,15 @@ const AllBlogs = () => {
             </div>
           </li>
         ))}
+        {authenticated && user?.role === "Registered User" ? (
+          <li className="add-blog">
+            <Link to="/blogs/new">
+              <button>新建博客</button>
+            </Link>
+          </li>
+        ) : (
+          ""
+        )}
       </ul>
 
       {/* 分页组件 */}
@@ -73,16 +82,6 @@ const AllBlogs = () => {
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />
-
-      {authenticated && user?.role === "Registered User" ? (
-        <div className="add-blog">
-          <Link to="/blogs/new">
-            <button>新建博客</button>
-          </Link>
-        </div>
-      ) : (
-        ""
-      )}
     </div>
   );
 };
