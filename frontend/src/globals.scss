@@ -6,14 +6,19 @@
 /* global layout */
 .app-container {
   min-height: 100svh; // 最小撑满视口高度
-  height: 100svh; // 确保总高度 = 视口高度
+  // height: 100svh; // 确保总高度 = 视口高度
   max-width: 1000px;
   min-width: 350px;
   margin: 0 auto;
   padding-inline: var(--size-500);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 50px;
+
+  &:has(.NewBlog) {
+    height: 100svh;
+    gap: 20px;
+  }
 }
 
 .children {
@@ -24,5 +29,5 @@
 }
 
 button {
-  user-select: none
+  user-select: none;
 }

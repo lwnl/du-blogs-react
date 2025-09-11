@@ -229,7 +229,7 @@ const Blog = () => {
 
   return (
     <div className="Blog">
-      <div>
+      <div className="title-container">
         <h3 className="title">{blog.title}</h3>
         <div>
           <span className="author">作者： {blog.author}</span>
