@@ -48,18 +48,18 @@ export async function seedArticles() {
     console.log("✅ 所有文章已清空！");
 
     // 随机生成 100 篇文章
-    const newArticles = [];
-    for (let i = 0; i < 100; i++) {
-      newArticles.push({
-        title: getRandomTitle(),
-        content: getRandomContent(),
-        author: getRandomAuthor(),
-        comments: []
-      });
-    }
+    // const newArticles = [];
+    // for (let i = 0; i < 100; i++) {
+    //   newArticles.push({
+    //     title: getRandomTitle(),
+    //     content: getRandomContent(),
+    //     author: getRandomAuthor(),
+    //     comments: []
+    //   });
+    // }
 
-    await Article.insertMany(newArticles);
-    console.log("✅ 已成功创建 100 篇随机文章！");
+    // await Article.insertMany(newArticles);
+    // console.log("✅ 已成功创建 100 篇随机文章！");
 
     await mongoose.disconnect();
     console.log("🔌 已断开数据库连接");

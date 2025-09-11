@@ -5,18 +5,20 @@
 
 /* global layout */
 .app-container {
-  min-height: 100svh;
+  min-height: 100svh; // 最小撑满视口高度
+  height: 100svh; // 确保总高度 = 视口高度
   max-width: 1000px;
   min-width: 350px;
   margin: 0 auto;
   padding-inline: var(--size-500);
   display: flex;
   flex-direction: column;
-  gap: 50px;
+  gap: 20px;
 }
 
 .children {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  min-height: 0;
 }
