@@ -232,7 +232,7 @@ const Blog = () => {
       <div className="title-container">
         <h3 className="title">{blog.title}</h3>
         <div>
-          <span className="author">作者： {blog.author}</span>
+          <span className="author">用户： {blog.author}</span>
           <span>更新： {blog.updatedAt}</span>
         </div>
       </div>

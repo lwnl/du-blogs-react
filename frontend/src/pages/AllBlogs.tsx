@@ -60,7 +60,7 @@ const AllBlogs = () => {
               <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
             </h5>
             <div className="blog-info">
-              <span>作者：{blog.author}</span>
+              <span>用户：{blog.author}</span>
               <span>更新： {blog.updatedAt}</span>
             </div>
           </li>
