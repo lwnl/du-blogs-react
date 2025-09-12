@@ -88,9 +88,6 @@ bannedBookRouter.get('/:id', authOptional, async (req: AuthRequest, res: Respons
 bannedBookRouter.patch('/:bookId/comments/new', auth, async (req: AuthRequest, res: Response) => {
   const bookId = req.params.bookId
   const { newComment } = req.body
-  const author = req.user?.userName
-  console.log('author is', author)
-  console.log('newComment is', newComment)
   try {
     const updatedBook = await BannedBook.findByIdAndUpdate(bookId, {
       $push: {

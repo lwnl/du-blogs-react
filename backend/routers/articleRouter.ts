@@ -6,13 +6,14 @@ import Article from '../models/Article'
 import { authOptional } from '../utils/authOptional'
 import Comment from '../models/Comment'
 import { bucket, deleteImagesFromContent, uploadFileToGCS } from '../utils/gcsOperating'
+import { authAdmin } from '../utils/authAdmin'
 
 const articleRouter = express.Router()
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 //上传图片至GCS
-articleRouter.post("/image/upload", auth, upload.single("image"), async (req: AuthRequest, res: Response) => {
+articleRouter.post("/image/upload", authAdmin, upload.single("image"), async (req: AuthRequest, res: Response) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -28,7 +29,7 @@ articleRouter.post("/image/upload", auth, upload.single("image"), async (req: Au
 });
 
 // 删除临时文件
-articleRouter.post("/image/delete", auth, async (req: AuthRequest, res: Response) => {
+articleRouter.post("/image/delete", authAdmin, async (req: AuthRequest, res: Response) => {
   const { url } = req.body;
   if (!url) return res.status(400).json({ error: "Missing image URL" });
 
@@ -45,7 +46,7 @@ articleRouter.post("/image/delete", auth, async (req: AuthRequest, res: Response
 });
 
 // 上传博客文章
-articleRouter.post('/upload-blog', auth, async (req: AuthRequest, res: Response) => {
+articleRouter.post('/upload-blog', authAdmin, async (req: AuthRequest, res: Response) => {
   const { title, content } = req.body;
 
   try {
@@ -88,7 +89,7 @@ articleRouter.get('/', async (req: AuthRequest, res: Response) => {
 })
 
 //获取本人文章列表
-articleRouter.get('/mine', authOptional, async (req: AuthRequest, res: Response) => {
+articleRouter.get('/mine', authAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber as string) || 1
     const pageSize = parseInt(req.query.pageSize as string) || 9
@@ -140,7 +141,7 @@ articleRouter.get('/:id', async (req: Request, res: Response) => {
 })
 
 // 作者本人更新文章
-articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response) => {
+articleRouter.patch('/update/:id', authAdmin, async (req: AuthRequest, res: Response) => {
   const { title, content } = req.body; // tempFiles 是前端传来的文件名数组
   try {
     // 保存到 MongoDB
@@ -163,7 +164,7 @@ articleRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
 });
 
 // 删除文章，文章评论，文章图片
-articleRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response) => {
+articleRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Response) => {
   const id = req.params.id
   if (!id) {
     return res.status(400).json({

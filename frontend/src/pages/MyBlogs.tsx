@@ -72,26 +72,28 @@ const MyBlogs = () => {
   };
 
   useEffect(() => {
-    axios
-      .get(
-        `${HOST}/api/articles/mine?pageNumber=${currentPage}&pageSize=${pageSize}`,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        setBlogs(res.data.blogs);
-        setTotalPages(Math.ceil(res.data.total / pageSize) || 1);
-      })
-      .catch((error: any) => {
-        if (error.response) {
-          // 后端返回的错误响应
-          console.error("后端错误消息:", error.response.data.error);
-        } else {
-          // 网络错误或其他错误
-          console.error("请求错误:", error.message);
-        }
-      });
+    if (authenticated && user?.role === "Administrator") {
+      axios
+        .get(
+          `${HOST}/api/articles/mine?pageNumber=${currentPage}&pageSize=${pageSize}`,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          setBlogs(res.data.blogs);
+          setTotalPages(Math.ceil(res.data.total / pageSize) || 1);
+        })
+        .catch((error: any) => {
+          if (error.response) {
+            // 后端返回的错误响应
+            console.error("后端错误消息:", error.response.data.error);
+          } else {
+            // 网络错误或其他错误
+            console.error("请求错误:", error.message);
+          }
+        });
+    }
   }, [currentPage]);
 
   return (
@@ -114,7 +116,7 @@ const MyBlogs = () => {
             </button>
           </li>
         ))}
-        {authenticated && user?.role === "Registered User" ? (
+        {authenticated && user?.role === "Administrator" ? (
           <li className="add-blog">
             <Link to="/blogs/new">
               <button>新建博客</button>

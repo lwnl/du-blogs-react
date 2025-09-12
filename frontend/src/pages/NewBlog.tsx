@@ -7,7 +7,7 @@ import "./NewBlog.scss";
 import { useBlogEditor } from "../hooks/useBlogEditor";
 
 const NewBlog = () => {
-  const { authenticated, isLoading: authLoading, HOST } = useAuthCheck();
+  const { authenticated, isLoading: authLoading, HOST, user } = useAuthCheck();
   const navigate = useNavigate();
 
   const {
@@ -32,7 +32,7 @@ const NewBlog = () => {
   }
 
   if (authLoading) return <div className="loading">检测权限...</div>;
-  if (!authenticated) {
+  if (!authenticated || authenticated && user?.role !== "Administrator") {
     navigate("/users/login");
     return null;
   }

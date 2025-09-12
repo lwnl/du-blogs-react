@@ -65,7 +65,7 @@ const AllBlogs = () => {
             </div>
           </li>
         ))}
-        {authenticated && user?.role === "Registered User" ? (
+        {authenticated && user?.role === "Administrator" ? (
           <li className="add-blog">
             <Link to="/blogs/new">
               <button>新建博客</button>
