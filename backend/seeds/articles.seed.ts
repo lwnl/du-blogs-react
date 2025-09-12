@@ -61,8 +61,6 @@ export async function seedArticles() {
     // await Article.insertMany(newArticles);
     // console.log("✅ 已成功创建 100 篇随机文章！");
 
-    await mongoose.disconnect();
-    console.log("🔌 已断开数据库连接");
   } catch (error) {
     console.error("❌ 清空文章失败:", (error as Error).message);
     process.exit(1);
