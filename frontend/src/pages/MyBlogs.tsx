@@ -104,7 +104,7 @@ const MyBlogs = () => {
             <h5>
               <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
             </h5>
-            <p className="update-date">{blog.updatedAt}</p>
+            <p className="update-date">更新：{blog.updatedAt}</p>
             <Link to={`/blogs/update/${blog._id}`}>编辑</Link>
             <button
               className="delete"

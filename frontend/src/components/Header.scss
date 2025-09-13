@@ -2,6 +2,9 @@
 $breakpoint-sm: 599px;
 
 header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-200);
   //网站标题
   .website-title {
     font-family: "KaiTi", "STKaiti", "KaiTi TC", "楷体", cursive; /* 行书/楷体效果 */
@@ -9,7 +12,41 @@ header {
     font-weight: 900;
     text-align: center;
     padding: var(--size-200);
-     text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+    text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+  }
+  // 基本信息栏
+  .info-bar {
+    display: flex;
+    gap: var(--size-300);
+    align-items: center;
+
+    a {
+      text-underline-offset: var(--size-100);
+    }
+
+    .date {
+      margin-left:auto;
+    }
+
+    .search-field {
+      display: flex;
+      align-items: center;
+      gap: var(--size-100);
+      color: rgba(white, 0.7);
+
+      input {
+        background: none;
+        border: none;
+        border-bottom: 1px solid black;
+        color: white;
+        outline: none;
+
+        &::placeholder {
+          color: rgba(white, 0.7);
+          opacity: 1;
+        }
+      }
+    }
   }
   // 顶部工具栏
   .toolbar {
@@ -19,8 +56,8 @@ header {
     display: flex;
     align-items: center;
 
-    a {
-      text-underline-offset: var(--size-100);
+    .info-bar {
+      display: none;
     }
 
     .nav-links a {
@@ -55,7 +92,7 @@ header {
       flex-grow: 1;
       display: flex;
       justify-content: center;
-      gap: clamp(8px, 10vw, 24px);
+      gap: 10%;
 
       a {
         color: white;
@@ -65,26 +102,6 @@ header {
         &:hover {
           background-color: rgba(white, 0.1);
           border-radius: 4px;
-        }
-      }
-    }
-
-    .search-field {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      color: rgba(white, 0.7);
-
-      input {
-        background: none;
-        border: none;
-        border-bottom: 1px solid rgba(white, 0.5);
-        color: white;
-        outline: none;
-
-        &::placeholder {
-          color: rgba(white, 0.7);
-          opacity: 1;
         }
       }
     }
@@ -175,11 +192,22 @@ header {
 
   // 小屏幕适配
   @media (max-width: $breakpoint-sm) {
+
+    .info-bar {
+      display: none;
+    }
     .toolbar {
       .menu-button {
-        display: inline-flex;
+        display: inline-block;
+        padding-left: var(--size-300);
+        padding-bottom: var(--size-100);
       }
 
+      .info-bar {
+        display: flex;
+        flex-grow: 1;
+        justify-content: space-between;
+      }
       .nav-links,
       .search-field {
         display: none;

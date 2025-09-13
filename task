@@ -50,15 +50,19 @@ seed博客文章时删除所有文章中的评论和图片 ok
 控制页面显示总数 ok
 前端分页系统改为后端分页系统 ok
 删除文章时，清空localstorage ok
+上传文件后在本地显示，图片存储在localstorage里，只有在提交时才上传到服务器。 ok
 
-禁书数据获取
-只有admin可以上传文章
+只有admin可以上传文章 ok
+消息系统
+用户profile定义
+
+更改页首布局，添加新闻栏目，包括视频音频
+
 上传文章区分博客，新闻
-
+游客权限，注册用户权限，管理员权限定义
  
 搜索功能
 校验哈希值确认内容
-
 
 下载，在线播放视频音频
 语言版本
@@ -136,7 +140,3 @@ user增加管理员身份
 密码恢复功能
 博客园地添加作者
 评论组件react-quill
-
-export GOOGLE_APPLICATION_CREDENTIALS="/absolute/path/to/gcs-key.json"
-frontend/gcs-key.json
-上传文件后在本地显示，图片存储在localstorage里，只有在提交时才上传到服务器。

@@ -59,10 +59,8 @@ const AllBlogs = () => {
             <h5>
               <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
             </h5>
-            <div className="blog-info">
-              <span>用户：{blog.author}</span>
-              <span>更新： {blog.updatedAt}</span>
-            </div>
+            <span>用户：{blog.author}</span>
+            <span>更新： {blog.updatedAt}</span>
           </li>
         ))}
         {authenticated && user?.role === "Administrator" ? (

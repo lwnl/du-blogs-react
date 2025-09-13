@@ -30,19 +30,38 @@ export default function Header() {
   return (
     <header>
       <h2 className="website-title">畅言网</h2>
-      <div className="toolbar">
+      <div className="info-bar">
         {authenticated ? (
           <span className="register-login">
             <NavLink to="/users/login">用户：{user?.userName}</NavLink>
-            </span>
+          </span>
         ) : (
           <span className="register-login">
             <NavLink to="/users/login">注册/登录</NavLink>
           </span>
         )}
-
         <span className="date">{date}</span>
+        <div className="search-field">
+          🔍 <input type="search" placeholder="搜索..." />
+        </div>
+      </div>
 
+      <div className="toolbar">
+        <div className="info-bar">
+          {authenticated ? (
+            <span className="register-login">
+              <NavLink to="/users/login">用户：{user?.userName}</NavLink>
+            </span>
+          ) : (
+            <span className="register-login">
+              <NavLink to="/users/login">注册/登录</NavLink>
+            </span>
+          )}
+          <span className="date">{date}</span>
+          <div className="search-field">
+            🔍 <input type="search" placeholder="搜索..." />
+          </div>
+        </div>
         <button
           className="menu-button"
           aria-label="打开菜单"
@@ -52,14 +71,14 @@ export default function Header() {
         </button>
 
         <nav className="nav-links">
-          <NavLink to="/blogs/mine" end>我的博客</NavLink>
-          <NavLink to="/blogs" end>博客园地</NavLink>
+          <NavLink to="/blogs/mine" end>
+            今日要闻
+          </NavLink>
+          <NavLink to="/blogs" end>
+            博客园地
+          </NavLink>
           <NavLink to="/banned-books">禁书下载</NavLink>
         </nav>
-
-        <div className="search-field">
-          🔍 <input type="search" placeholder="搜索..." />
-        </div>
       </div>
 
       {/* 侧边栏（小屏显示） */}
@@ -74,7 +93,7 @@ export default function Header() {
 
           <nav className="sidenav-links">
             <NavLink to="/blogs/mine" onClick={toggleSidebar}>
-              我的博客
+              今日要闻
             </NavLink>
             <NavLink to="/blogs" onClick={toggleSidebar}>
               博客园地

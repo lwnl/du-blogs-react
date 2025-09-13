@@ -18,7 +18,7 @@
     }
     &.delete {
       padding: 0;
-      color:rgb(0, 0, 238);
+      color: rgb(0, 0, 238);
       background-color: transparent;
     }
   }
@@ -33,15 +33,10 @@
       display: flex;
       gap: var(--size-400);
       align-items: center;
-    }
+      flex-wrap: wrap;
 
-    .update-date, .blog-info {
-      margin-left: auto;
-    }
-
-    .blog-info {
-      span {
-        margin-left: var(--size-600)
+      h5 {
+        margin-right: auto;
       }
     }
   }
