@@ -72,7 +72,10 @@ export default function Header() {
 
         <nav className="nav-links">
           <NavLink to="/blogs/mine" end>
-            今日要闻
+            世界看中国
+          </NavLink>
+          <NavLink to="/blogs/mine" end>
+            我的博客
           </NavLink>
           <NavLink to="/blogs" end>
             博客园地
