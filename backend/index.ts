@@ -9,6 +9,7 @@ import userRouter from './routers/userRouter';
 import articleRouter from './routers/articleRouter';
 import commentRouter from './routers/commentRouter';
 import bannedBookRouter from './routers/bannedBookRouter';
+import newsRouter from './routers/newsRouter';
 
 dotenv.config();
 dbConnection();
@@ -28,6 +29,7 @@ app.use('/api/users', userRouter);
 app.use('/api/comments', commentRouter);
 app.use('/api/banned-books', bannedBookRouter);
 app.use('/api/articles', articleRouter);
+app.use('/api/news', newsRouter);
 
 // 2️⃣ 前端静态文件托管
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
