@@ -35,31 +35,26 @@ function getRandomAuthor(): string {
 export async function seedArticles() {
   try {
     console.log("开始清空 Article 集合...");
-    const allArticles = await Article.find();
-    for (const articleItem of allArticles) {
-      // 清除所有 comments
-      for (const commentId of articleItem.comments) {
-        await Comment.findByIdAndDelete(commentId);
-      }
-
-      await deleteImagesFromContent(articleItem.content);
-    }
     await Article.deleteMany();
     console.log("✅ 所有文章已清空！");
 
-    // 随机生成 100 篇文章
-    // const newArticles = [];
-    // for (let i = 0; i < 100; i++) {
-    //   newArticles.push({
-    //     title: getRandomTitle(),
-    //     content: getRandomContent(),
-    //     author: getRandomAuthor(),
-    //     comments: []
-    //   });
-    // }
+    // 清空所有关于的Article的 comments
+    await Comment.deleteMany({ type: 'blog' })
+    console.log("✅ 所有相关评论已清空！");
 
-    // await Article.insertMany(newArticles);
-    // console.log("✅ 已成功创建 100 篇随机文章！");
+    // 随机生成 100 篇文章
+    const newArticles = [];
+    for (let i = 0; i < 100; i++) {
+      newArticles.push({
+        title: getRandomTitle(),
+        content: getRandomContent(),
+        author: getRandomAuthor(),
+        comments: []
+      });
+    }
+
+    await Article.insertMany(newArticles);
+    console.log("✅ 已成功创建 100 篇随机文章！");
 
   } catch (error) {
     console.error("❌ 清空文章失败:", (error as Error).message);

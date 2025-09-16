@@ -25,7 +25,7 @@ const ArticleSchema: Schema<IArticle> = new Schema({
     required: true
   },
   comments: {
-    type: [String]
+    type: [String], default: []
   }
 }, {
   timestamps: {
