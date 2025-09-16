@@ -14,7 +14,7 @@ import UserRating, {
 
 export interface IComment {
   _id: string;
-  author: string;
+  user: string;
   content: string;
   rating: number;
 }
@@ -98,14 +98,14 @@ const BookDetail = () => {
   };
 
   // 发表评论子程序
-  const postComment = async (authorOverride?: string) => {
+  const postComment = async (userOverride?: string) => {
     try {
       //用户没有手动设置，默认评分为满分
       !currentRating && _setCurrentRating(5);
       console.log("currentRatingRef.current:", currentRatingRef.current);
       console.log("currentRating is", currentRating);
       const newComment = {
-        author: authorOverride || user?.userName,
+        user: userOverride || user?.userName,
         content: newCommentContent,
         rating: currentRating ?? currentRatingRef.current, //用户没有手动设置，默认评分为满分
       };
@@ -324,7 +324,7 @@ const BookDetail = () => {
             {comments?.map((comment) => (
               <div key={comment._id} className="comment-item">
                 <div className="comment-author">
-                  <p>{comment.author}评分：</p>
+                  <p>{comment.user}评分：</p>
                   <div className="book-stars">
                     {Array(5)
                       .fill(0)
@@ -370,7 +370,7 @@ const BookDetail = () => {
                   // 查看模式 - 直接显示内容
                   <>
                     <div className="comment-content">{comment.content}</div>
-                    {user?.userName === comment.author && (
+                    {user?.userName === comment.user && (
                       <div className="button-container">
                         <button
                           type="button"

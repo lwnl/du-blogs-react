@@ -22,7 +22,7 @@ export const idChecking = async (
       return res.status(404).json({ error: "评论不存在" });
     }
 
-    if (req.user.userName !== comment.author) {
+    if (req.user.userName !== comment.user) {
       return res.status(403).json({ error: "只能操作本人的评论" });
     }
 
