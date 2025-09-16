@@ -95,6 +95,7 @@ const Blog = () => {
         {
           subjectId: blog._id,
           content: newComment,
+          type: 'blog'
         },
         { withCredentials: true }
       );

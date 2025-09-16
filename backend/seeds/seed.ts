@@ -8,6 +8,7 @@ import { seedBannedBook } from "./bannedBook.seed";
 import { seedBannedBookComments } from "./bannedBook.comments.seed";
 import { authAdmin } from "./authAdmin.seed";
 import { disAuthAdmin } from "./disAuthAdmin";
+import { seedNews } from "./news.seed";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -18,7 +19,7 @@ async function seed() {
   try {
     await dbConnection()
     rl.question(
-      "请选择初始化数据内容:\n1. 初始化用户数据\n2. 初始化评论数据\n3. 初始化文章数据\n4. 初始化禁书数据\n5. 初始化书评数据\n6. 授权管理员\n7. 取消管理员\n8. 初始化所有数据\n请输入编号: ",
+      "请选择初始化数据内容:\n1. 初始化用户数据\n2. 初始化评论数据\n3. 初始化文章数据\n4. 初始化禁书数据\n5. 初始化书评数据\n7. 授权管理员\n8. 取消管理员\n9. 初始化所有数据\n请输入编号: ",
       async (choice) => {
         try {
           switch (choice.trim()) {
@@ -43,6 +44,10 @@ async function seed() {
               await disconnection();
               break;
             case "6":
+              await seedNews() 
+              await disconnection();
+              break;
+            case "7":
               rl.question("请输入要授权为管理员的用户名: ", (username) => {
                 authAdmin(username.trim())
                   .catch(err => console.error("❌ 授权失败:", err))
@@ -50,19 +55,18 @@ async function seed() {
               });
               return;
 
-            case "7":
+            case "8":
               rl.question("请输入要取消管理员权限的用户名: ", (username) => {
                 disAuthAdmin(username.trim())
                   .catch(err => console.error("❌ 操作失败:", err))
                   .finally(() => disconnection());
               });
               return;
-            case "8":
+            case "9":
               await seedUsers();
-              await seedComments();
               await seedArticles();
               await seedBannedBook()
-              await seedBannedBookComments()
+              await seedComments()
               await disconnection();
               break;
             default:
