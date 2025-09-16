@@ -4,32 +4,34 @@ import type { AuthRequest } from '../utils/auth'
 import type { Request, Response } from 'express'
 import Comment from '../models/Comment'
 import Article from '../models/Article'
+import News from '../models/News'
 
 const commentRouter = express.Router()
 
 // 新建评论
 commentRouter.post('/new', auth, async (req: AuthRequest, res: Response) => {
   try {
-    const { subjectId, content } = req.body;
-    const author = req.user.userName;
+    const { subjectId, content, type } = req.body;
+    const user = req.user.userName;
 
     // 1. 创建评论
     const newComment = await Comment.create({
       subjectId,
       content,
-      author
+      user,
+      type
     });
 
-   // 2. 把评论 ID 插入到文章 comments 数组的最前面
+    // 2. 把评论 ID 插入到文章 comments 数组的最前面
     await Article.findByIdAndUpdate(
       subjectId,
-      { 
-        $push: { 
-          comments: { 
-            $each: [newComment._id], 
-            $position: 0 
-          } 
-        } 
+      {
+        $push: {
+          comments: {
+            $each: [newComment._id],
+            $position: 0
+          }
+        }
       }
     );
     res.status(201).json({ message: "评论成功", newComment });
@@ -54,7 +56,7 @@ commentRouter.patch('/update/:id', auth, async (req: AuthRequest, res: Response)
     })
   }
 
-  if (userName !== commentToUpdate.author) {
+  if (userName !== commentToUpdate.user) {
     return res.status(403).json({
       message: '只有评论者本人才能修改该评论！'
     })
@@ -89,18 +91,29 @@ commentRouter.delete('/delete/:id', auth, async (req: AuthRequest, res: Response
     return res.status(404).json({ error: '该评论不存在！' })
   }
 
-  if (userName !== deletedComment.author) {
+  if (userName !== deletedComment.user) {
     return res.status(403).json({ message: '只有评论者本人才能删除该评论！' })
   }
 
   try {
     await Comment.findByIdAndDelete(id)
+    const subjectId = deletedComment.subjectId
+    const type = deletedComment.type
 
-    // 从 Article 中删除该评论 id
-    await Article.findByIdAndUpdate(
-      deletedComment.subjectId,
-      { $pull: { comments: deletedComment._id } }
-    )
+    if (type === 'blog') {
+      // 从 Article 中删除该评论 id
+      await Article.findByIdAndUpdate(
+        subjectId,
+        { $pull: { comments: deletedComment._id } }
+      )
+    } else {
+      // 从 News 中删除 该评论 id
+      await News.findByIdAndUpdate(
+        subjectId,
+        {$pull: {comments: deletedComment._id}}
+      )
+    } 
+
 
     res.status(200).json({ message: '成功删除评论' })
   } catch (error) {

@@ -2,7 +2,7 @@ import mongoose, { Document, Schema, Model, Types } from 'mongoose'
 import { jsonDateTransform } from '../utils/formatDate';
 
 export interface IComment extends Document {
-  author: string;
+  user: string;
   content: string;
   rating: number;
 }
@@ -22,7 +22,7 @@ export interface IBannedBook extends Document {
 
 // 子 Schema：评论
 const CommentSchema = new Schema<IComment>({
-  author: { type: String, required: true },
+  user: { type: String, required: true },
   content: { type: String },
   rating: { type: Number, required: true }
 });

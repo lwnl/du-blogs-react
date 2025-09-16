@@ -16,8 +16,8 @@ const caculateRating = (currentBook: IBannedBook) => {
   let sum = 0;
 
   currentBook.comments.forEach((c: IComment) => {
-    if (!userSet.has(c.author)) {
-      userSet.add(c.author);
+    if (!userSet.has(c.user)) {
+      userSet.add(c.user);
       sum += c.rating;
     }
   });
@@ -64,7 +64,7 @@ bannedBookRouter.get('/:id', authOptional, async (req: AuthRequest, res: Respons
 
     if (user) {
       // 查找该用户的评论
-      const userComment = book.comments.find(c => c.author === user)
+      const userComment = book.comments.find(c => c.user === user)
       if (userComment) {
         currentRating = userComment.rating
       }
@@ -107,7 +107,7 @@ bannedBookRouter.patch('/:bookId/comments/new', auth, async (req: AuthRequest, r
     // 更新当前用户在该书下所有评论的 rating
     if (req.user?.userName) {
       updatedBook.comments = updatedBook.comments.map((c) => {
-        if (c.author === req.user?.userName) {
+        if (c.user === req.user?.userName) {
           return { ...c.toObject(), rating: newComment.rating }; // 更新rating
         }
         return c;

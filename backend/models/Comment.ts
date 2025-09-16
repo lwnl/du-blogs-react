@@ -4,7 +4,8 @@ import { jsonDateTransform } from '../utils/formatDate';
 export interface IComment extends Document {
   subjectId: string,
   content: string,
-  author: string,
+  user: string,
+  type: "news" | "blog",
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,10 +21,16 @@ const CommentSchema: Schema<IComment> = new Schema({
     required: true
   },
 
-  author: {
+  user: {
     type: String,
     required: true
   },
+
+  type: {
+    type: String,
+    required: true,
+    enum: ['news', 'blog']
+  }
 }, {
   timestamps: {
     createdAt: true,
