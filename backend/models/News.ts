@@ -29,7 +29,7 @@ const NewsSchema: Schema<INews> = new Schema({
     required: true
   },
   comments: {
-    type: [String]
+    type: [String], default: []
   },
 }, {
   timestamps: {
