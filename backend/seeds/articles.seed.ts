@@ -38,7 +38,9 @@ export async function seedArticles() {
     await Article.deleteMany();
     console.log("✅ 所有文章已清空！");
 
-    //清空所有blog目录下的文件
+    //清空所有blog目录下的所有图片
+    const inBlogs = `projects/my-blog/images/in-blogs`;
+    await deleteFolder(inBlogs);
 
     // 清空所有关于的Article的 comments
     await Comment.deleteMany({ type: 'blog' })
