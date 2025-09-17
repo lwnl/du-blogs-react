@@ -138,7 +138,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
 
       try {
         const res = await axios.post(
-          `${HOST}/api/articles/image/upload`,
+          `${HOST}/api/articles/image/upload/temp`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -152,7 +152,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
           editor?.chain().focus().setImage({ src: res.data.url }).run();
 
           // ✅ 只保存 GCS 上传的图片
-          const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-blogs/";
+          const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/";
           if (res.data.url.startsWith(gcsPrefix)) {
             const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
             storedImages.push(res.data.url);
@@ -170,7 +170,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   const removeUnusedImages = useCallback(
     async (currentImages: string[]) => {
       const storedImages: string[] = JSON.parse(localStorage.getItem(imagesKey) || "[]");
-      const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-blogs/";
+      const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/";
 
       const removedImages = storedImages.filter(
         (url) => url.startsWith(gcsPrefix) && !currentImages.includes(url)
@@ -233,10 +233,6 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     }
     e.preventDefault();
     setIsSubmitting(true);
-    const currentImages = getCurrentImages();
-
-    const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
-    console.log("localStorage中存储的图片:", storedImages);
 
     if (!title.trim() || editor?.isEmpty) {
       setFeedback("请填写所有字段！");
@@ -244,7 +240,12 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       return;
     }
 
+
+
     try {
+      // 清理未使用的图片
+      const currentImages = getCurrentImages();
+      await removeUnusedImages(currentImages);
       // 根据类型执行不同的请求
       if (type === "update" && id) {
         // 更新博客
@@ -261,10 +262,6 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
           { withCredentials: true }
         );
       }
-
-      // 清理未使用的图片
-      const currentImages = getCurrentImages();
-      await removeUnusedImages(currentImages);
 
       // 清除草稿
       if (type === "update" && id) {

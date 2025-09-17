@@ -4,7 +4,7 @@ import { type AuthRequest } from '../utils/auth'
 import multer from 'multer'
 import News from '../models/News'
 import Comment from '../models/Comment'
-import { bucket, deleteImagesFromContent, uploadFileToGCS } from '../utils/gcsOperating'
+import { bucket, deleteFolder, uploadFileToGCS } from '../utils/gcsOperating'
 import { authAdmin } from '../utils/authAdmin'
 
 const newsRouter = express.Router()
@@ -185,7 +185,7 @@ newsRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Respon
     }
 
     // 删除文章中的所有保存在gcs中的图片
-    await deleteImagesFromContent(deletedNews.content);
+    await deleteFolder(deletedNews.content);
 
     res.status(200).json({
       message: '新闻删除成功'

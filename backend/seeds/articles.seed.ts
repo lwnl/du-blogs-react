@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Article from "../models/Article";
 import Comment from "../models/Comment";
-import { deleteImagesFromContent } from "../utils/gcsOperating";
+import { deleteFolder } from "../utils/gcsOperating";
 
 // 随机生成标题和内容的函数
 function getRandomTitle(): string {
@@ -37,6 +37,8 @@ export async function seedArticles() {
     console.log("开始清空 Article 集合...");
     await Article.deleteMany();
     console.log("✅ 所有文章已清空！");
+
+    //清空所有blog目录下的文件
 
     // 清空所有关于的Article的 comments
     await Comment.deleteMany({ type: 'blog' })

@@ -4,22 +4,29 @@ import { type AuthRequest } from '../utils/auth'
 import multer from 'multer'
 import Article from '../models/Article'
 import Comment from '../models/Comment'
-import { bucket, deleteImagesFromContent, uploadFileToGCS } from '../utils/gcsOperating'
+import { bucket, deleteFolder, moveFolder, uploadFileToGCS } from '../utils/gcsOperating'
 import { authAdmin } from '../utils/authAdmin'
+import type mongoose from 'mongoose'
 
 const articleRouter = express.Router()
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 //上传图片至GCS
-articleRouter.post("/image/upload", authAdmin, upload.single("image"), async (req: AuthRequest, res: Response) => {
+articleRouter.post("/image/upload/temp", authAdmin, upload.single("image"), async (req: AuthRequest, res: Response) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
-
   //将文件上传至gcs 将图片url返回给前端
   try {
-    const url = await uploadFileToGCS(req.file);
+    if (!req.user?.id) {
+      return res.status(401).json({ error: "未登录用户" });
+    }
+
+    const userId = req.user.id.toString();
+    const folder = `in-blogs/temp/${userId}`;
+
+    const url = await uploadFileToGCS(req.file, folder);
     res.status(200).json({ url });
   } catch (err) {
     console.error("Upload to GCS error:", (err as Error).message);
@@ -45,20 +52,51 @@ articleRouter.post("/image/delete", authAdmin, async (req: AuthRequest, res: Res
 });
 
 // 上传博客文章
-articleRouter.post('/upload-blog', authAdmin, async (req: AuthRequest, res: Response) => {
+articleRouter.post("/upload-blog", authAdmin, async (req: AuthRequest, res: Response) => {
   const { title, content } = req.body;
+  const userId = req.user?.id.toString();
 
   try {
-    // 保存到 MongoDB
-    await Article.create({
+    // 1. 创建文章
+    const newBlog = await Article.create({
       title,
       content,
-      author: req.user?.userName || 'unknown', // 假设 auth 中挂载了 req.user
-    })
-    res.status(201).json({ message: 'Blog created successfully' });
+      author: req.user?.userName || "unknown",
+    });
+
+
+    const blogId = (newBlog._id as mongoose.Types.ObjectId).toString();
+
+
+    // 2. 移动 temp 文件夹里的图片到 in-blogs/<blogId>
+    const tempPrefix = `projects/my-blog/images/in-blogs/temp/${userId}/`;
+    const destPrefix = `projects/my-blog/images/in-blogs/${blogId}/`;
+    await moveFolder(tempPrefix, destPrefix);
+
+    // 3. 替换文章内容中的图片路径为公开 URL
+    const imgRegex = new RegExp(
+      `https://storage\\.googleapis\\.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-blogs/temp/${userId}/([^"?]+)`,
+      "g"
+    );
+
+    const updatedContent = content.replace(imgRegex, (_: string, filename:string) => {
+      return `https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-blogs/${blogId}/${filename}`;
+    });
+
+    // 4. 保存更新后的文章内容
+    newBlog.content = updatedContent;
+    await newBlog.save();
+
+    // 5. 清理 temp 文件夹（可选）
+    await deleteFolder(tempPrefix);
+
+    res.status(201).json({ message: "Blog created successfully", newBlog });
   } catch (err) {
-    console.error('Finalize blog error:', (err as Error).message);
-    res.status(500).json({ error: 'Failed to save blog' });
+    console.error("Finalize blog error:", (err as Error).message);
+
+    // 提交失败 → 清理 temp 文件
+    await deleteFolder(`projects/my-blog/images/in-blogs/temp/${userId}/`);
+    res.status(500).json({ error: "Failed to save blog" });
   }
 });
 
@@ -142,23 +180,51 @@ articleRouter.get('/:id', async (req: Request, res: Response) => {
 // 作者本人更新文章
 articleRouter.patch('/update/:id', authAdmin, async (req: AuthRequest, res: Response) => {
   const { title, content } = req.body; // tempFiles 是前端传来的文件名数组
+  const { id } = req.params;
+  const userId = req.user.id.toString();
+
   try {
-    // 保存到 MongoDB
-    const updatedBlog = await Article.findOneAndUpdate(
-      { _id: req.params.id, author: req.user.userName }, //只能更新自己的文章
-      {
-        title,
-        content,
-      },
-      { new: true }// 返回更新后的文档
-    )
-    if (!updatedBlog) {
-      return res.status(404).json({ error: '文章不存在或无权限更新' });
+    // 1. 查找文章
+    const blog = await Article.findById(id);
+
+    if (!blog) {
+      return res.status(404).json({ error: "文章不存在" });
     }
+
+    // ✅ 确保是作者本人
+    if (blog.author !== req.user.userName) {
+      return res.status(403).json({ error: "无权限更新此文章" });
+    }
+
+    // 2. 移动图片：temp/<userId> → in-blogs/<id>
+    await moveFolder(
+      `projects/my-blog/images/in-blogs/temp/${userId}/`,
+      `projects/my-blog/images/in-blogs/${id}/`
+    );
+
+    // 3. 替换文章内容中的路径
+    const updatedContent = content.replace(
+      new RegExp(`projects/my-blog/images/in-blogs/temp/${userId}/`, "g"),
+      `projects/my-blog/images/in-blogs/${id}/`
+    );
+
+    // 4. 更新文章数据
+    blog.title = title;
+    blog.content = updatedContent;
+    const updatedBlog = await blog.save();
+
     res.status(200).json({ message: '文章更新成功！', blog: updatedBlog });
   } catch (err) {
     console.error('Finalize blog error:', (err as Error).message);
-    res.status(500).json({ error: 'Failed to save blog' });
+
+
+    // 更新失败 → 清理当前用户的 temp
+    if (req.user?.id) {
+      await deleteFolder(
+        `projects/my-blog/images/in-blogs/temp/${req.user.id.toString()}/`
+      );
+    }
+    res.status(500).json({ error: '更新文章失败' });
   }
 });
 
@@ -170,6 +236,7 @@ articleRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Res
       error: '文章编号缺失'
     })
   }
+  const folder = `projects/my-blog/images/in-blogs/${id}`;
 
   try {
     const deletedBlog = await Article.findOneAndDelete({ _id: id, author: req.user.userName }) //只有作者本人可以删除自己的文章
@@ -185,7 +252,7 @@ articleRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Res
     }
 
     // 删除文章中的所有保存在gcs中的图片
-    await deleteImagesFromContent(deletedBlog.content);
+    await deleteFolder(folder);
 
     res.status(200).json({
       message: '文章删除成功'
