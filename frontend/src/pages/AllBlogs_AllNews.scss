@@ -35,6 +35,13 @@
       align-items: center;
       flex-wrap: wrap;
 
+      div {
+        margin-left:auto;
+        span {
+          padding-left: var(--size-400)
+        }
+      }
+
       h5 {
         margin-right: auto;
       }

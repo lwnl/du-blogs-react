@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./AllBlogs.scss";
+import "./AllBlogs_AllNews.scss";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -30,7 +30,6 @@ const MyBlogs = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const pageSize = 10;
-  const ulHeight = 28.8 * pageSize + 16 * (pageSize - 1); //高度根据pageSize设置为固定值
 
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber > totalPages || pageNumber < 1) return;
@@ -98,7 +97,7 @@ const MyBlogs = () => {
 
   return (
     <div className="Blogs-container">
-      <ul className="blogs" style={{ height: `${ulHeight}px` }}>
+      <ul className="blogs" >
         {blogs.map((blog) => (
           <li key={blog._id}>
             <h5>

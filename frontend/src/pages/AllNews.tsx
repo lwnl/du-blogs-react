@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./AllBlogs.scss";
+import "./AllBlogs_AllNews.scss";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -22,7 +22,6 @@ const AllNews = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const pageSize = 10; // 每页显示条数，可改成参数或配置
-  const ulHeight = 28.8 * pageSize + 16 * (pageSize - 1); //高度根据pageSize设置为固定值
 
   // 处理翻页
   const handlePageChange = (pageNumber: number) => {
@@ -52,20 +51,22 @@ const AllNews = () => {
 
   return (
     <div className="newsList-container">
-      <ul className="news-list" style={{ height: `${ulHeight}px` }}>
+      <ul className="news-list">
         {newsList.map((news) => (
           <li key={news._id}>
             <h5>
               <Link to={`/blogs/${news._id}`}>{news.title}</Link>
             </h5>
-            <span>用户：{news.author}</span>
-            <span>更新： {news.updatedAt}</span>
+            <div>
+              <span>用户：{news.author}</span>
+              <span>更新：{news.updatedAt}</span>
+            </div>
           </li>
         ))}
         {authenticated && user?.role === "Administrator" ? (
           <li className="add-blog">
             <Link to="/news-list/new">
-              <button>新建博客</button>
+              <button>添加新闻</button>
             </Link>
           </li>
         ) : (

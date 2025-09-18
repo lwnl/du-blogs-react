@@ -17,7 +17,7 @@ export async function seedNews() {
     const newsList = Array.from({ length: 100 }).map(() => ({
       title: faker.lorem.sentence(),
       content: faker.lorem.paragraphs({ min: 2, max: 5 }),
-      user: faker.person.fullName(),
+      author: faker.person.fullName(),
       source: faker.company.name(),
     }));
 
