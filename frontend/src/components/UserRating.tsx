@@ -7,11 +7,11 @@ interface UserRatingProps {
 }
 
 export const starNull =
-  "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_null.gif";
+  "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/in-books/star_null.gif";
 export const starOne =
-  "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_one.gif";
+  "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/in-books/star_one.gif";
 export const starHalf =
-  "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/star_half.gif";
+  "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/in-books/star_half.gif";
 
 const UserRating: React.FC<UserRatingProps> = ({
   submitRating,

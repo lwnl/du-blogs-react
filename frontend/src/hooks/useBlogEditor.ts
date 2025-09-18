@@ -152,7 +152,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
           editor?.chain().focus().setImage({ src: res.data.url }).run();
 
           // ✅ 只保存 GCS 上传的图片
-          const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/";
+          const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/";
           if (res.data.url.startsWith(gcsPrefix)) {
             const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
             storedImages.push(res.data.url);
@@ -170,7 +170,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   const removeUnusedImages = useCallback(
     async (currentImages: string[]) => {
       const storedImages: string[] = JSON.parse(localStorage.getItem(imagesKey) || "[]");
-      const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/";
+      const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/";
 
       const removedImages = storedImages.filter(
         (url) => url.startsWith(gcsPrefix) && !currentImages.includes(url)

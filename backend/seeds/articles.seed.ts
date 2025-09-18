@@ -39,7 +39,7 @@ export async function seedArticles() {
     console.log("✅ 所有文章已清空！");
 
     //清空所有blog目录下的所有图片
-    const inBlogs = `projects/my-blog/images/in-blogs`;
+    const inBlogs = `projects/free-talk/images/in-blogs`;
     await deleteFolder(inBlogs);
 
     // 清空所有关于的Article的 comments

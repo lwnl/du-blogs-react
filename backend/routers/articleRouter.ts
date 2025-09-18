@@ -69,18 +69,18 @@ articleRouter.post("/upload-blog", authAdmin, async (req: AuthRequest, res: Resp
 
 
     // 2. 移动 temp 文件夹里的图片到 in-blogs/<blogId>
-    const tempPrefix = `projects/my-blog/images/in-blogs/temp/${userId}/`;
-    const destPrefix = `projects/my-blog/images/in-blogs/${blogId}/`;
+    const tempPrefix = `projects/free-talk/images/in-blogs/temp/${userId}/`;
+    const destPrefix = `projects/free-talk/images/in-blogs/${blogId}/`;
     await moveFolder(tempPrefix, destPrefix);
 
     // 3. 替换文章内容中的图片路径为公开 URL
     const imgRegex = new RegExp(
-      `https://storage\\.googleapis\\.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-blogs/temp/${userId}/([^"?]+)`,
+      `https://storage\\.googleapis\\.com/daniel-jansen7879-bucket-1/projects/free-talk/images/in-blogs/temp/${userId}/([^"?]+)`,
       "g"
     );
 
     const updatedContent = content.replace(imgRegex, (_: string, filename:string) => {
-      return `https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-blogs/${blogId}/${filename}`;
+      return `https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/in-blogs/${blogId}/${filename}`;
     });
 
     // 4. 保存更新后的文章内容
@@ -95,7 +95,7 @@ articleRouter.post("/upload-blog", authAdmin, async (req: AuthRequest, res: Resp
     console.error("Finalize blog error:", (err as Error).message);
 
     // 提交失败 → 清理 temp 文件
-    await deleteFolder(`projects/my-blog/images/in-blogs/temp/${userId}/`);
+    await deleteFolder(`projects/free-talk/images/in-blogs/temp/${userId}/`);
     res.status(500).json({ error: "Failed to save blog" });
   }
 });
@@ -198,14 +198,14 @@ articleRouter.patch('/update/:id', authAdmin, async (req: AuthRequest, res: Resp
 
     // 2. 移动图片：temp/<userId> → in-blogs/<id>
     await moveFolder(
-      `projects/my-blog/images/in-blogs/temp/${userId}/`,
-      `projects/my-blog/images/in-blogs/${id}/`
+      `projects/free-talk/images/in-blogs/temp/${userId}/`,
+      `projects/free-talk/images/in-blogs/${id}/`
     );
 
     // 3. 替换文章内容中的路径
     const updatedContent = content.replace(
-      new RegExp(`projects/my-blog/images/in-blogs/temp/${userId}/`, "g"),
-      `projects/my-blog/images/in-blogs/${id}/`
+      new RegExp(`projects/free-talk/images/in-blogs/temp/${userId}/`, "g"),
+      `projects/free-talk/images/in-blogs/${id}/`
     );
 
     // 4. 更新文章数据
@@ -221,7 +221,7 @@ articleRouter.patch('/update/:id', authAdmin, async (req: AuthRequest, res: Resp
     // 更新失败 → 清理当前用户的 temp
     if (req.user?.id) {
       await deleteFolder(
-        `projects/my-blog/images/in-blogs/temp/${req.user.id.toString()}/`
+        `projects/free-talk/images/in-blogs/temp/${req.user.id.toString()}/`
       );
     }
     res.status(500).json({ error: '更新文章失败' });
@@ -236,7 +236,7 @@ articleRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Res
       error: '文章编号缺失'
     })
   }
-  const folder = `projects/my-blog/images/in-blogs/${id}`;
+  const folder = `projects/free-talk/images/in-blogs/${id}`;
 
   try {
     const deletedBlog = await Article.findOneAndDelete({ _id: id, author: req.user.userName }) //只有作者本人可以删除自己的文章

@@ -4,7 +4,7 @@ import { jsonDateTransform } from '../utils/formatDate';
 export interface INews extends Document {
   title: string,
   content: string,
-  user: string,
+  author: string,
   source: string,
   comments: string[],
   createdAt: Date,
@@ -20,7 +20,7 @@ const NewsSchema: Schema<INews> = new Schema({
     type: String,
     required: true
   },
-  user: {
+  author: {
     type: String,
     required: true
   },

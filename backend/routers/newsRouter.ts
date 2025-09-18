@@ -4,22 +4,30 @@ import { type AuthRequest } from '../utils/auth'
 import multer from 'multer'
 import News from '../models/News'
 import Comment from '../models/Comment'
-import { bucket, deleteFolder, uploadFileToGCS } from '../utils/gcsOperating'
+import { bucket, deleteFolder, moveFolder, uploadFileToGCS } from '../utils/gcsOperating'
 import { authAdmin } from '../utils/authAdmin'
+import type mongoose from 'mongoose'
 
 const newsRouter = express.Router()
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 //上传图片至GCS
-newsRouter.post("/image/upload", authAdmin, upload.single("image"), async (req: AuthRequest, res: Response) => {
+newsRouter.post("/image/upload/temp", authAdmin, upload.single("image"), async (req: AuthRequest, res: Response) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
 
   //将文件上传至gcs 将图片url返回给前端
   try {
-    const url = await uploadFileToGCS(req.file);
+    if (!req.user?.id) {
+      return res.status(401).json({ error: "未登录用户" });
+    }
+
+    const userId = req.user.id.toString();
+    const folder = `in-news/temp/${userId}`;
+
+    const url = await uploadFileToGCS(req.file, folder);
     res.status(200).json({ url });
   } catch (err) {
     console.error("Upload to GCS error:", (err as Error).message);
@@ -46,20 +54,50 @@ newsRouter.post("/image/delete", authAdmin, async (req: AuthRequest, res: Respon
 
 // 上传新闻文章
 newsRouter.post('/upload-news', authAdmin, async (req: AuthRequest, res: Response) => {
-  const { title, content, source} = req.body;
+  const { title, content, source } = req.body;
+  const userId = req.user?.id.toString();
 
   try {
-    // 保存到 MongoDB
-    await News.create({
+    // 1. 创建文章
+    const news = await News.create({
       title,
       content,
-      user: req.user?.userName || 'unknown', // 假设 auth 中挂载了 req.user
-      source,
-    })
-    res.status(201).json({ message: 'Blog created successfully' });
+      author: req.user?.userName || "unknown",
+    });
+
+
+    const newsId = (news._id as mongoose.Types.ObjectId).toString();
+
+
+    // 2. 移动 temp 文件夹里的图片到 in-news/<newsId>
+    const tempPrefix = `projects/free-talk/images/in-news/temp/${userId}/`;
+    const destPrefix = `projects/free-talk/images/in-news/${newsId}/`;
+    await moveFolder(tempPrefix, destPrefix);
+
+    // 3. 替换文章内容中的图片路径为公开 URL
+    const imgRegex = new RegExp(
+      `https://storage\\.googleapis\\.com/daniel-jansen7879-bucket-1/projects/free-talk/images/in-news/temp/${userId}/([^"?]+)`,
+      "g"
+    );
+
+    const updatedContent = content.replace(imgRegex, (_: string, filename: string) => {
+      return `https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/in-news/${newsId}/${filename}`;
+    });
+
+    // 4. 保存更新后的文章内容
+    news.content = updatedContent;
+    await news.save();
+
+    // 5. 清理 temp 文件夹（可选）
+    await deleteFolder(tempPrefix);
+
+    res.status(201).json({ message: "Blog created successfully", news });
   } catch (err) {
-    console.error('Finalize blog error:', (err as Error).message);
-    res.status(500).json({ error: 'Failed to save blog' });
+    console.error("Finalize blog error:", (err as Error).message);
+
+    // 提交失败 → 清理 temp 文件
+    await deleteFolder(`projects/free-talk/images/in-news/temp/${userId}/`);
+    res.status(500).json({ error: "创建新闻出错！" });
   }
 });
 
@@ -140,25 +178,52 @@ newsRouter.get('/:id', async (req: Request, res: Response) => {
 
 // 作者本人更新新闻
 newsRouter.patch('/update/:id', authAdmin, async (req: AuthRequest, res: Response) => {
-  const { title, content, source } = req.body; 
+  const { title, content, source } = req.body;
+  const { id } = req.params;
+  const userId = req.user.id.toString();
+
   try {
-    // 保存到 MongoDB
-    const updatedNews = await News.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.userName }, //只能更新自己的文章
-      {
-        title,
-        content,
-        source,
-      },
-      { new: true }// 返回更新后的文档
-    )
-    if (!updatedNews) {
-      return res.status(404).json({ error: '新闻不存在或无权限更新' });
+    // 1. 查找文章
+    const news = await News.findById(id);
+
+    if (!news) {
+      return res.status(404).json({ error: "新闻不存在" });
     }
-    res.status(200).json({ message: '新闻更新成功！', news: updatedNews });
+
+    // ✅ 确保是作者本人
+    if (news.author !== req.user.userName) {
+      return res.status(403).json({ error: "无权限更新此文章" });
+    }
+
+    // 2. 移动图片：temp/<userId> → in-news/<id>
+    await moveFolder(
+      `projects/free-talk/images/in-news/temp/${userId}/`,
+      `projects/free-talk/images/in-news/${id}/`
+    );
+
+    // 3. 替换文章内容中的路径
+    const updatedContent = content.replace(
+      new RegExp(`projects/free-talk/images/in-news/temp/${userId}/`, "g"),
+      `projects/free-talk/images/in-news/${id}/`
+    );
+
+    // 4. 更新文章数据
+    news.title = title;
+    news.content = updatedContent;
+    const updatedNews = await news.save();
+
+    res.status(200).json({ message: '文章更新成功！', updatedNews });
   } catch (err) {
-    console.error('Finalize news error:', (err as Error).message);
-    res.status(500).json({ error: '新闻更新失败' });
+    console.error('更新新闻失败:', (err as Error).message);
+
+
+    // 更新失败 → 清理当前用户的 temp
+    if (req.user?.id) {
+      await deleteFolder(
+        `projects/free-talk/images/in-news/temp/${req.user.id.toString()}/`
+      );
+    }
+    res.status(500).json({ error: '更新文章失败' });
   }
 });
 
@@ -167,12 +232,15 @@ newsRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Respon
   const id = req.params.id
   if (!id) {
     return res.status(400).json({
-      error: '文章编号缺失'
+      error: '新闻编号缺失'
     })
   }
 
+  const folder = `projects/free-talk/images/in-news/${id}`;
+
+
   try {
-    const deletedNews = await News.findOneAndDelete({ _id: id, user: req.user.userName }) //只有作者本人可以删除自己的文章
+    const deletedNews = await News.findOneAndDelete({ _id: id, author: req.user.userName }) //只有作者本人可以删除自己的文章
     if (!deletedNews) {
       return res.status(404).json({ error: '新闻不存在或无权限删除' });
     }
@@ -185,7 +253,7 @@ newsRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Respon
     }
 
     // 删除文章中的所有保存在gcs中的图片
-    await deleteFolder(deletedNews.content);
+    await deleteFolder(folder);
 
     res.status(200).json({
       message: '新闻删除成功'

@@ -13,7 +13,7 @@ const bucket = storage.bucket(bucketName);
 const uploadFileToGCS = async (file: Express.Multer.File, folder: string) => {
   return new Promise<string>(async (resolve, reject) => {
     try {
-      const filePath = `projects/my-blog/images/${folder}/${Date.now()}-${file.originalname}`;
+      const filePath = `projects/free-talk/images/${folder}/${Date.now()}-${file.originalname}`;
       const blob = bucket.file(filePath);
 
       const blobStream = blob.createWriteStream({
