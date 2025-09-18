@@ -29,7 +29,7 @@ app.use('/api/users', userRouter);
 app.use('/api/comments', commentRouter);
 app.use('/api/banned-books', bannedBookRouter);
 app.use('/api/articles', articleRouter);
-app.use('/api/news', newsRouter);
+app.use('/api/news-list', newsRouter);
 
 // 2️⃣ 前端静态文件托管
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

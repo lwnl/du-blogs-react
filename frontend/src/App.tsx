@@ -10,6 +10,7 @@ import AllBlogs from "./pages/AllBlogs";
 import BannedBooks from "./pages/BannedBooks";
 import NotFound from "./pages/NotFound";
 import BookDetail from "./pages/BookDetail";
+import AllNews from "./pages/AllNews";
 
 
 export default function App() {
@@ -19,7 +20,14 @@ export default function App() {
         <Route index element={<AllBlogs />} />{/* 默认首页 */}
         <Route path="/users/register" element={<Register />} />
         <Route path="/users/login" element={<Login />} />
+        {/* 博客 */}
         <Route path="/blogs" element={<AllBlogs />} />
+        <Route path="/blogs/mine" element={<MyBlogs />} />
+        <Route path="/blogs/:id" element={<Blog />} />
+        <Route path="/blogs/new" element={<NewBlog />} />
+        <Route path="/blogs/update/:id" element={<UpdateBlog />} />
+        {/* 新闻 */}
+        <Route path="/news-list" element={<AllNews />} />
         <Route path="/blogs/:id" element={<Blog />} />
         <Route path="/blogs/new" element={<NewBlog />} />
         <Route path="/blogs/update/:id" element={<UpdateBlog />} />

@@ -71,7 +71,7 @@ export default function Header() {
         </button>
 
         <nav className="nav-links">
-          <NavLink to="/blogs/mine" end>
+          <NavLink to="/news-list" end>
             世界看中国
           </NavLink>
           <NavLink to="/blogs/mine" end>
