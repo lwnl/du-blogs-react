@@ -317,7 +317,7 @@ const News = () => {
 
       <div className="back-to">
         <p>
-          <Link to="/news-list">返回“世界看中国”</Link>
+          <Link to="/news-list">返回</Link>
         </p>
       </div>
     </div>

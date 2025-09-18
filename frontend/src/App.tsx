@@ -13,34 +13,36 @@ import BookDetail from "./pages/BookDetail";
 import AllNews from "./pages/AllNews";
 import News from "./pages/News";
 
-
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<AllBlogs />} />{/* 默认首页 */}
+        <Route index element={<AllBlogs />} />
+        {/* 默认首页 */}
         <Route path="/users/register" element={<Register />} />
         <Route path="/users/login" element={<Login />} />
+
         {/* 博客 */}
         <Route path="/blogs" element={<AllBlogs />} />
         <Route path="/blogs/mine" element={<MyBlogs />} />
         <Route path="/blogs/:id" element={<Blog />} />
         <Route path="/blogs/new" element={<NewBlog />} />
         <Route path="/blogs/update/:id" element={<UpdateBlog />} />
+
         {/* 新闻 */}
         <Route path="/news-list" element={<AllNews />} />
         <Route path="/news-list/:id" element={<News />} />
-        <Route path="/blogs/new" element={<NewBlog />} />
+        <Route path="/news-list/new" element={<NewBlog />} />
         <Route path="/blogs/update/:id" element={<UpdateBlog />} />
-        <Route path="/blogs/mine" element={<MyBlogs />} />
+
+        {/* 禁书 */}
         <Route path="/banned-books" element={<BannedBooks />} />
         <Route path="/banned-books/:id" element={<BookDetail />} />
         {/* <Route path="/bannedBooks/:id" element={<BannedBook/>} /> */}
 
-         {/* 404 页面通配符路由 */}
+        {/* 404 页面通配符路由 */}
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );
 }
-

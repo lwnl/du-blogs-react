@@ -36,11 +36,10 @@ const BannedBooks = () => {
     return false;
   };
 
- 
-  console.log('HOST is:', HOST)
+  console.log("HOST is:", HOST);
 
   useEffect(() => {
-    console.log('HOST is:', HOST)
+    console.log("HOST is:", HOST);
     axios
       .get(`${HOST}/api/banned-books`)
       .then((res) => {
@@ -87,13 +86,15 @@ const BannedBooks = () => {
         {bannedBooks?.map((book) => {
           const isExpanded = currentBookId === book._id;
           const isOverflow = overflowMap[book._id];
-          const rating = book.ratingResult
+          const rating = book.ratingResult;
 
           return (
             <li key={book._id} className="book-item">
               <div className="book-cover">
                 <div>
-                  <img src={book.coverLink} alt={book.bookName} />
+                  <Link to={`/banned-books/${book._id}`}>
+                    <img src={book.coverLink} alt={book.bookName} />
+                  </Link>
                 </div>
                 <p className="book-intro flex-column">
                   <span className="book-name" title={book.bookName}>
@@ -114,10 +115,7 @@ const BannedBooks = () => {
                         let starIcon;
                         if (i + 1 <= rating) {
                           starIcon = starOne; // 满星
-                        } else if (
-                          i < rating &&
-                          rating < i + 1
-                        ) {
+                        } else if (i < rating && rating < i + 1) {
                           starIcon = starHalf; // 半星
                         } else {
                           starIcon = starNull; // 空星
