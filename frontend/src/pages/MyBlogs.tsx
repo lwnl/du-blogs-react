@@ -101,7 +101,7 @@ const MyBlogs = () => {
         {blogs.map((blog) => (
           <li key={blog._id}>
             <h5>
-              <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
+              <Link to={`/blogs/${blog._id}`} target="_blank">{blog.title}</Link>
             </h5>
             <p className="update-date">更新：{blog.updatedAt}</p>
             <Link to={`/blogs/update/${blog._id}`}>编辑</Link>

@@ -56,7 +56,7 @@ const AllBlogs = () => {
         {blogs.map((blog) => (
           <li key={blog._id}>
             <h5>
-              <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
+              <Link to={`/blogs/${blog._id}`} target="_blank">{blog.title}</Link>
             </h5>
             <span>用户：{blog.author}</span>
             <span>更新： {blog.updatedAt}</span>

@@ -55,7 +55,7 @@ const AllNews = () => {
         {newsList.map((news) => (
           <li key={news._id}>
             <h5>
-              <Link to={`/blogs/${news._id}`}>{news.title}</Link>
+              <Link to={`/news-list/${news._id}`} target="_blank">{news.title}</Link>
             </h5>
             <div>
               <span>用户：{news.author}</span>

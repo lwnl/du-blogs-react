@@ -11,6 +11,7 @@ import BannedBooks from "./pages/BannedBooks";
 import NotFound from "./pages/NotFound";
 import BookDetail from "./pages/BookDetail";
 import AllNews from "./pages/AllNews";
+import News from "./pages/News";
 
 
 export default function App() {
@@ -28,7 +29,7 @@ export default function App() {
         <Route path="/blogs/update/:id" element={<UpdateBlog />} />
         {/* 新闻 */}
         <Route path="/news-list" element={<AllNews />} />
-        <Route path="/blogs/:id" element={<Blog />} />
+        <Route path="/news-list/:id" element={<News />} />
         <Route path="/blogs/new" element={<NewBlog />} />
         <Route path="/blogs/update/:id" element={<UpdateBlog />} />
         <Route path="/blogs/mine" element={<MyBlogs />} />
