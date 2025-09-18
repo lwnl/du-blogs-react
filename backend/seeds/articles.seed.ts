@@ -47,18 +47,18 @@ export async function seedArticles() {
     console.log("✅ 所有相关评论已清空！");
 
     // 随机生成 100 篇文章
-    const newArticles = [];
-    for (let i = 0; i < 100; i++) {
-      newArticles.push({
-        title: getRandomTitle(),
-        content: getRandomContent(),
-        author: getRandomAuthor(),
-        comments: []
-      });
-    }
+    // const newArticles = [];
+    // for (let i = 0; i < 100; i++) {
+    //   newArticles.push({
+    //     title: getRandomTitle(),
+    //     content: getRandomContent(),
+    //     author: getRandomAuthor(),
+    //     comments: []
+    //   });
+    // }
 
-    await Article.insertMany(newArticles);
-    console.log("✅ 已成功创建 100 篇随机文章！");
+    // await Article.insertMany(newArticles);
+    // console.log("✅ 已成功创建 100 篇随机文章！");
 
   } catch (error) {
     console.error("❌ 清空文章失败:", (error as Error).message);
