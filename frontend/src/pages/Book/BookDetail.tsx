@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import "./BookDetail.scss";
 import type { IBannedBook } from "./BannedBooks";
 import { useEffect, useRef, useState } from "react";
-import { useAuthCheck } from "../hooks/useAuthCheck";
+import { useAuthCheck } from "../../hooks/useAuthCheck";
 import axios from "axios";
 import TextareaAutosize from "react-textarea-autosize";
 import Swal from "sweetalert2";
@@ -10,7 +10,7 @@ import UserRating, {
   starNull,
   starOne,
   starHalf,
-} from "../components/UserRating";
+} from "../../components/UserRating";
 
 export interface IComment {
   _id: string;

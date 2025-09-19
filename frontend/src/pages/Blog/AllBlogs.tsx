@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import "./AllBlogs_AllNews.scss";
-import { useAuthCheck } from "../hooks/useAuthCheck";
+import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Pagination from "../components/Pagination";
+import Pagination from "../../components/Pagination";
+import Swal from "sweetalert2";
 
-export interface INews extends Document {
+export interface IArticle extends Document {
   _id: string;
   title: string;
   content: string;
@@ -14,10 +15,10 @@ export interface INews extends Document {
   updatedAt: string;
 }
 
-const AllNews = () => {
+const AllBlogs = () => {
   const { HOST, user, authenticated, refetchAuth } = useAuthCheck();
 
-  const [newsList, setNewsList] = useState<INews[]>([]);
+  const [blogs, setBlogs] = useState<IArticle[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
@@ -32,10 +33,10 @@ const AllNews = () => {
   useEffect(() => {
     axios
       .get(
-        `${HOST}/api/news-list?pageNumber=${currentPage}&pageSize=${pageSize}`
+        `${HOST}/api/articles?pageNumber=${currentPage}&pageSize=${pageSize}`
       )
       .then((res) => {
-        setNewsList(res.data.newsList || []);
+        setBlogs(res.data.blogs);
         setTotalPages(Math.ceil(res.data.total / pageSize) || 1);
       })
       .catch((error: any) => {
@@ -50,23 +51,21 @@ const AllNews = () => {
   }, [currentPage]);
 
   return (
-    <div className="newsList-container">
-      <ul className="news-list">
-        {newsList.map((news) => (
-          <li key={news._id}>
+    <div className="Blogs-container">
+      <ul className="blogs" >
+        {blogs.map((blog) => (
+          <li key={blog._id}>
             <h5>
-              <Link to={`/news-list/${news._id}`} target="_blank">{news.title}</Link>
+              <Link to={`/blogs/${blog._id}`} target="_blank">{blog.title}</Link>
             </h5>
-            <div>
-              <span>用户：{news.author}</span>
-              <span>更新：{news.updatedAt}</span>
-            </div>
+            <span>用户：{blog.author}</span>
+            <span>更新： {blog.updatedAt}</span>
           </li>
         ))}
         {authenticated && user?.role === "Administrator" ? (
           <li className="add-blog">
-            <Link to="/news-list/new">
-              <button>添加新闻</button>
+            <Link to="/blogs/new">
+              <button>新建博客</button>
             </Link>
           </li>
         ) : (
@@ -84,4 +83,4 @@ const AllNews = () => {
   );
 };
 
-export default AllNews;
+export default AllBlogs;

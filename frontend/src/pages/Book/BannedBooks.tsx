@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import "./BannedBooks.scss";
 import axios from "axios";
-import { useAuthCheck } from "../hooks/useAuthCheck";
+import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { Link } from "react-router-dom";
-import { starHalf, starNull, starOne } from "../components/UserRating";
+import { starHalf, starNull, starOne } from "../../components/UserRating";
 
 export interface IBannedBook {
   _id: string;

@@ -2,24 +2,24 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import type { IArticle } from "./MyBlogs";
-import { useAuthCheck } from "../hooks/useAuthCheck";
-import "./Blog_News.scss";
+import { useAuthCheck } from "../../hooks/useAuthCheck";
+import "../Blog/Blog_News.scss";
 import Swal from "sweetalert2";
 import TextareaAutosize from "react-textarea-autosize";
+import type { IComment } from "../Blog/Bolg";
 
-export interface IComment {
+export interface INews {
   _id: string;
-  subjectId: string;
+  title: string;
   content: string;
-  user: string;
+  author: string;
   createdAt: string;
   updatedAt: string;
 }
 
-const Blog = () => {
+const News = () => {
   const { id } = useParams<{ id: string }>();
-  const [blog, setBlog] = useState<IArticle | null>(null);
+  const [news, setNews] = useState<INews | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
@@ -87,15 +87,15 @@ const Blog = () => {
 
   // 发表评论子程序
   const postComment = async () => {
-    if (!blog?._id || !newComment.trim()) return;
+    if (!news?._id || !newComment.trim()) return;
 
     try {
       const res = await axios.post(
         `${HOST}/api/comments/new`,
         {
-          subjectId: blog._id,
+          subjectId: news._id,
           content: newComment,
-          type: 'blog'
+          type: 'news'
         },
         { withCredentials: true }
       );
@@ -193,9 +193,9 @@ const Blog = () => {
     setLoading(true);
 
     axios
-      .get(`${HOST}/api/articles/${id}`)
+      .get(`${HOST}/api/news-list/${id}`)
       .then((res) => {
-        setBlog(res.data.blog);
+        setNews(res.data.news);
         setComments(res.data.comments);
         setError(null);
       })
@@ -208,40 +208,34 @@ const Blog = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!loading && !blog) {
+    if (!loading && !news) {
       Swal.fire({
         title: "",
-        text: "该文章不存在！",
+        text: "该新闻不存在！",
         icon: "error",
         timer: 1500, // 1.5秒后自动关闭
         showConfirmButton: false,
-      }).then(() => {
-        if (user?.role === "Registered User") {
-          navigate("/blogs/mine");
-        } else {
-          navigate("/blogs");
-        }
-      });
+      }).then(() => navigate("/news-list"));
     }
-  }, [loading, blog, user, navigate]);
+  }, [loading, news, user, navigate]);
 
   if (loading) return <div>加载中...</div>;
-  if (!blog) return null;
+  if (!news) return null;
 
   return (
     <div className="Blog">
       <div className="title-container">
-        <h3 className="title">{blog.title}</h3>
+        <h3 className="title">{news.title}</h3>
         <div>
-          <span className="author">用户： {blog.author}</span>
-          <span>更新： {blog.updatedAt}</span>
+          <span className="author">用户： {news.author}</span>
+          <span>更新： {news.updatedAt}</span>
         </div>
       </div>
 
       {/* 将 blog.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
       <article
         className="article-content"
-        dangerouslySetInnerHTML={{ __html: blog.content }}
+        dangerouslySetInnerHTML={{ __html: news.content }}
       ></article>
 
       {/* 评论留言 */}
@@ -322,17 +316,12 @@ const Blog = () => {
       </div>
 
       <div className="back-to">
-        {user?.role === "Registered User" && (
-          <p>
-            <Link to="/blogs/mine">返回我的博客</Link>
-          </p>
-        )}
         <p>
-          <Link to="/blogs">返回博客园地</Link>
+          <Link to="/news-list">返回</Link>
         </p>
       </div>
     </div>
   );
 };
 
-export default Blog;
+export default News;

@@ -1,17 +1,17 @@
 import { Route, Routes } from "react-router-dom";
 import Layout from "./Layout";
-import MyBlogs from "./pages/MyBlogs";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import NewBlog from "./pages/NewBlog";
-import Blog from "./pages/Bolg";
-import UpdateBlog from "./pages/UpdateBlog";
-import AllBlogs from "./pages/AllBlogs";
-import BannedBooks from "./pages/BannedBooks";
+import MyBlogs from "./pages/Blog/MyBlogs";
+import Register from "./pages/LoginRegiser/Register";
+import Login from "./pages/LoginRegiser/Login";
+import NewBlog from "./pages/Blog/NewBlog";
+import Blog from "./pages/Blog/Bolg";
+import UpdateBlog from "./pages/Blog/UpdateBlog";
+import AllBlogs from "./pages/Blog/AllBlogs";
+import BannedBooks from "./pages/Book/BannedBooks";
 import NotFound from "./pages/NotFound";
-import BookDetail from "./pages/BookDetail";
-import AllNews from "./pages/AllNews";
-import News from "./pages/News";
+import BookDetail from "./pages/Book/BookDetail";
+import AllNews from "./pages/News/AllNews";
+import News from "./pages/News/News";
 
 export default function App() {
   return (

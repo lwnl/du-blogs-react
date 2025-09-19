@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Register-Login.scss";
-import { useAuthCheck } from "../hooks/useAuthCheck";
+import { useAuthCheck } from "../../hooks/useAuthCheck";
 
 const Login = () => {
   const [userName, setUserName] = useState<string>("");

@@ -1,15 +1,12 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useAuthCheck } from "../hooks/useAuthCheck";
+import { useNavigate } from "react-router-dom";
+import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { EditorContent } from "@tiptap/react";
-import EditorToolbar from "../components/EditorToolbar";
+import EditorToolbar from "../../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
 import "./NewBlog.scss";
-import { useBlogEditor } from "../hooks/useBlogEditor";
-import Swal from "sweetalert2";
-import { useEffect } from "react";
+import { useBlogEditor } from "../../hooks/useBlogEditor";
 
-const UpdateBlog = () => {
-  const { id } = useParams<{ id: string }>();
+const NewBlog = () => {
   const { authenticated, isLoading: authLoading, HOST, user } = useAuthCheck();
   const navigate = useNavigate();
 
@@ -18,55 +15,38 @@ const UpdateBlog = () => {
     setTitle,
     feedback,
     editor,
-    isLoading: editorLoading,
     setLink,
     addImage,
-    isSubmitting,
     handleSubmit,
-    noExistingBlog,
+    isSubmitting,
   } = useBlogEditor({
-    id,
     HOST,
-    type: "update",
+    type: "new",
     navigate,
   });
 
-  useEffect(() => {
-    if (noExistingBlog) {
-      Swal.fire({
-        title: "",
-        text: "该文章不存在！",
-        icon: "error",
-        timer: 1500,
-        showConfirmButton: false,
-      }).then(() => {
-        if (user?.role === "Registered User") {
-          navigate("/blogs/mine");
-        } else {
-          navigate("/blogs");
-        }
-      });
-    }
-  }, [noExistingBlog, user, navigate]);
-
-  if (authLoading || editorLoading) return <p>检测权限...</p>;
+  if (authLoading) return <div className="loading">检测权限...</div>;
   if (!authenticated) {
     navigate("/users/login");
     return null;
   }
 
-  // 渲染前就 return null，避免访问不存在的数据
-  if (noExistingBlog) return null;
+  if (authLoading) return <div className="loading">检测权限...</div>;
+  if (!authenticated || authenticated && user?.role !== "Administrator") {
+    navigate("/users/login");
+    return null;
+  }
 
   return (
     <form className="NewBlog" onSubmit={handleSubmit}>
-      <h4>更新博客</h4>
+      <h4>创建新博客</h4>
       <input
         type="text"
         placeholder="标题"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
+        disabled={isSubmitting}
       />
 
       <div className="editor">
@@ -108,4 +88,4 @@ const UpdateBlog = () => {
   );
 };
 
-export default UpdateBlog;
+export default NewBlog;

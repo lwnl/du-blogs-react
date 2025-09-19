@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import "./AllBlogs_AllNews.scss";
-import { useAuthCheck } from "../hooks/useAuthCheck";
+import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useBlogEditor } from "../hooks/useBlogEditor";
+import { useBlogEditor } from "../../hooks/useBlogEditor";
 import Swal from "sweetalert2";
-import Pagination from "../components/Pagination";
+import Pagination from "../../components/Pagination";
 
 export interface IArticle {
   _id: string;
