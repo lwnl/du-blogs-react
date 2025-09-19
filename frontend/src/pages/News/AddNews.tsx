@@ -25,11 +25,6 @@ const AddNews = () => {
     navigate,
   });
 
-  if (authLoading) return <div className="loading">检测权限...</div>;
-  if (!authenticated) {
-    navigate("/users/login");
-    return null;
-  }
 
   if (authLoading) return <div className="loading">检测权限...</div>;
   if (!authenticated || authenticated && user?.role !== "Administrator") {
@@ -39,7 +34,7 @@ const AddNews = () => {
 
   return (
     <form className="NewArticle" onSubmit={handleSubmit}>
-      <h4>创建新博客</h4>
+      <h4>添加新闻</h4>
       <input
         type="text"
         placeholder="标题"

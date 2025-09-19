@@ -199,15 +199,6 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     localStorage.removeItem(imagesKey);
   }, [contentKey, imagesKey, titleKey, editor]);
 
-  /**
-  * 根据文章ID清理localStorage草稿
-  * 用于删除文章时调用
-  */
-  const clearDraftById = useCallback((articleId: string) => {
-    localStorage.removeItem(`draft_${articleId}_title`);
-    localStorage.removeItem(`draft_${articleId}_content`);
-    localStorage.removeItem(`blogImages_${articleId}`);
-  }, []);
 
   // 提取当前编辑器中的图片
   const getCurrentImages = useCallback((): string[] => {
@@ -264,11 +255,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       }
 
       // 清除草稿
-      if (type === "update" && id) {
-        clearDraftById(id);
-      } else {
-        clearDraft();
-      }
+      clearDraft();
 
       // 设置成功反馈
       setFeedback(type === "update" ? "✅ 更新成功!" : "✅ 创建成功!");
@@ -295,9 +282,13 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   ]);
 
   // 实时保存标题
-  useEffect(() => {
+useEffect(() => {
+  if (title.trim()) {
     localStorage.setItem(titleKey, title);
-  }, [title, titleKey]);
+  } else {
+    localStorage.removeItem(titleKey);
+  }
+}, [title, titleKey]);
 
   // 实时保存内容
   useEffect(() => {
@@ -362,7 +353,6 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     isSubmitting,
     handleSubmit,
     clearDraft,
-    clearDraftById,
     noExistingBlog
   };
 };

@@ -26,12 +26,6 @@ const NewBlog = () => {
   });
 
   if (authLoading) return <div className="loading">检测权限...</div>;
-  if (!authenticated) {
-    navigate("/users/login");
-    return null;
-  }
-
-  if (authLoading) return <div className="loading">检测权限...</div>;
   if (!authenticated || authenticated && user?.role !== "Administrator") {
     navigate("/users/login");
     return null;
