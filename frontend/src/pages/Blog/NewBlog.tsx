@@ -4,7 +4,7 @@ import { EditorContent } from "@tiptap/react";
 import EditorToolbar from "../../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
 import "./AddArticle.scss";
-import { useBlogEditor } from "../../hooks/useBlogEditor";
+import { useArticleEditor } from "../../hooks/useArticleEditor";
 
 const NewBlog = () => {
   const { authenticated, isLoading: authLoading, HOST, user } = useAuthCheck();
@@ -19,9 +19,10 @@ const NewBlog = () => {
     addImage,
     handleSubmit,
     isSubmitting,
-  } = useBlogEditor({
+  } = useArticleEditor({
     HOST,
     type: "new",
+    path: 'articles',
     navigate,
   });
 

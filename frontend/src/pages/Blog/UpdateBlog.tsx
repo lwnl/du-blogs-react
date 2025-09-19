@@ -4,7 +4,7 @@ import { EditorContent } from "@tiptap/react";
 import EditorToolbar from "../../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
 import "./AddArticle.scss";
-import { useBlogEditor } from "../../hooks/useBlogEditor";
+import { useArticleEditor } from "../../hooks/useArticleEditor";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 
@@ -24,10 +24,11 @@ const UpdateBlog = () => {
     isSubmitting,
     handleSubmit,
     noExistingBlog,
-  } = useBlogEditor({
+  } = useArticleEditor({
     id,
     HOST,
     type: "update",
+    path: 'articles',
     navigate,
   });
 
@@ -59,7 +60,7 @@ const UpdateBlog = () => {
   if (noExistingBlog) return null;
 
   return (
-    <form className="NewBlog" onSubmit={handleSubmit}>
+    <form className="NewArticle" onSubmit={handleSubmit}>
       <h4>更新博客</h4>
       <input
         type="text"

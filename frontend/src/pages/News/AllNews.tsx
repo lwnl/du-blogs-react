@@ -4,6 +4,7 @@ import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Pagination from "../../components/Pagination";
+import { useArticleEditor } from "../../hooks/useArticleEditor";
 
 export interface INews extends Document {
   _id: string;
@@ -16,6 +17,15 @@ export interface INews extends Document {
 
 const AllNews = () => {
   const { HOST, user, authenticated, refetchAuth } = useAuthCheck();
+
+  const { handleDelete } = useArticleEditor({
+    HOST,
+    type: "update",
+    path: "news-list",
+    onDeleted: (id) =>
+      setNewsList((prev) => prev.filter((news) => news._id !== id)),
+    navigate: () => {},
+  });
 
   const [newsList, setNewsList] = useState<INews[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -55,12 +65,27 @@ const AllNews = () => {
         {newsList.map((news) => (
           <li key={news._id}>
             <h5>
-              <Link to={`/news-list/${news._id}`} target="_blank">{news.title}</Link>
+              <Link to={`/news-list/${news._id}`} target="_blank">
+                {news.title}
+              </Link>
             </h5>
-            <div>
-              <span>用户：{news.author}</span>
-              <span>更新：{news.updatedAt}</span>
-            </div>
+            {news.author === user?.userName ? (
+              <div>
+                <Link to={`/news-list/update/${news._id}`}>编辑</Link>
+                <button
+                  className="delete"
+                  onClick={() => handleDelete(news._id)}
+                >
+                  删除
+                </button>
+                <span className="update-date">更新：{news.updatedAt}</span>
+              </div>
+            ) : (
+              <div>
+                <span>用户：{news.author}</span>
+                <span>更新：{news.updatedAt}</span>
+              </div>
+            )}
           </li>
         ))}
         {authenticated && user?.role === "Administrator" ? (

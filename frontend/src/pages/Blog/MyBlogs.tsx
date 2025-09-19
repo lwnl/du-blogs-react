@@ -3,8 +3,7 @@ import "./AllBlogs_AllNews.scss";
 import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useBlogEditor } from "../../hooks/useBlogEditor";
-import Swal from "sweetalert2";
+import { useArticleEditor } from "../../hooks/useArticleEditor";
 import Pagination from "../../components/Pagination";
 
 export interface IArticle {
@@ -19,9 +18,12 @@ export interface IArticle {
 const MyBlogs = () => {
   const { HOST, user, authenticated, refetchAuth } = useAuthCheck();
 
-  const { clearDraft } = useBlogEditor({
+  const { handleDelete } = useArticleEditor({
     HOST,
     type: "update",
+    path: "articles",
+    onDeleted: (id) =>
+      setBlogs((prev) => prev.filter((blog) => blog._id !== id)),
     navigate: () => {},
   });
 
@@ -36,39 +38,6 @@ const MyBlogs = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleDelete = (id: string) => {
-    Swal.fire({
-      title: "确定删除吗？",
-      text: "此操作不可撤销！",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios
-          .delete(`${HOST}/api/articles/delete/${id}`, {
-            withCredentials: true,
-          })
-          .then(() => {
-            console.log("文章删除成功");
-            // 清理 localStorage 草稿
-            clearDraft();
-            setBlogs((prev) => prev.filter((blog) => blog._id !== id));
-            //删除成功提示
-            Swal.fire("已删除!", "文章已成功删除。", "success");
-          })
-          .catch((error: any) => {
-            if (error.response) {
-              console.error("服务器错误", error.response.data.error);
-            }
-            console.error("请求失败", (error as Error).message);
-            // 删除失败提示
-            Swal.fire("删除失败", "请稍后重试。", "error");
-          });
-      }
-    });
-  };
 
   useEffect(() => {
     if (authenticated && user?.role === "Administrator") {
@@ -97,13 +66,15 @@ const MyBlogs = () => {
 
   return (
     <div className="Blogs-container">
-      <ul className="blogs" >
+      <ul className="blogs">
         {blogs.map((blog) => (
           <li key={blog._id}>
             <h5>
-              <Link to={`/blogs/${blog._id}`} target="_blank">{blog.title}</Link>
+              <Link to={`/blogs/${blog._id}`} target="_blank">
+                {blog.title}
+              </Link>
             </h5>
-            <p className="update-date">更新：{blog.updatedAt}</p>
+            
             <Link to={`/blogs/update/${blog._id}`}>编辑</Link>
             <button
               className="delete"
@@ -113,6 +84,7 @@ const MyBlogs = () => {
             >
               删除
             </button>
+            <p className="update-date">更新：{blog.updatedAt}</p>
           </li>
         ))}
         {authenticated && user?.role === "Administrator" ? (

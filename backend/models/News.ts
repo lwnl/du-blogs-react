@@ -26,7 +26,6 @@ const NewsSchema: Schema<INews> = new Schema({
   },
   source: {
     type: String,
-    required: true
   },
   comments: {
     type: [String], default: []

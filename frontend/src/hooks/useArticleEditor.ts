@@ -1,4 +1,4 @@
-// src/hooks/useBlogEditor.ts
+// src/hooks/useArticleEditor.ts
 import { useState, useEffect, useCallback } from "react";
 import { Editor, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -11,13 +11,16 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-interface UseBlogEditorOptions {
+interface useArticleEditorOptions {
   id?: string;
+  onDeleted?: (id: string) => void; 
   HOST: string;
   type: "new" | "update";
+  path: 'articles' | 'news-list';
   navigate: ReturnType<typeof useNavigate>;
 }
 
+//让编辑器具备客户自定义class
 const CustomParagraph = Paragraph.extend({
   addAttributes() {
     return {
@@ -36,12 +39,12 @@ const CustomParagraph = Paragraph.extend({
   },
 });
 
-export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions) => {
+export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: useArticleEditorOptions) => {
   // 根据类型确定localStorage的键名
   const prefix = type === "update" && id ? `draft_${id}_` : "draft_";
   const titleKey = `${prefix}title`;
   const contentKey = `${prefix}content`;
-  const imagesKey = `blogImages${id ? `_${id}` : ""}`;
+  const imagesKey = `Images${id ? `_${id}` : ""}`;
 
   const [title, setTitle] = useState<string>(
     localStorage.getItem(titleKey) || ""
@@ -51,7 +54,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [noExistingBlog, setNoExistingBlog] = useState<boolean>(false);
 
-
+  // 配置编辑器
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ paragraph: false }),
@@ -138,7 +141,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
 
       try {
         const res = await axios.post(
-          `${HOST}/api/articles/image/upload/temp`,
+          `${HOST}/api/${path}/image/upload/temp`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -182,7 +185,7 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
         await Promise.all(
           removedImages.map((url) =>
             axios
-              .post(`${HOST}/api/articles/image/delete`, { url }, { withCredentials: true })
+              .post(`${HOST}/api/${path}/image/delete`, { url }, { withCredentials: true })
               .catch((err) => console.error("图片删除失败:", url, err))
           )
         );
@@ -241,14 +244,17 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       if (type === "update" && id) {
         // 更新博客
         await axios.patch(
-          `${HOST}/api/articles/update/${id}`,
+          `${HOST}/api/${path}/update/${id}`,
           { title, content: editor.getHTML() },
           { withCredentials: true }
         );
       } else {
         // 创建新博客
+        const postPath = path === 'articles'
+          ? `${HOST}/api/${path}/upload-blog`
+          : `${HOST}/api/${path}/upload-news`
         await axios.post(
-          `${HOST}/api/articles/upload-blog`,
+          postPath,
           { title, content: editor.getHTML() },
           { withCredentials: true }
         );
@@ -261,7 +267,11 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
       setFeedback(type === "update" ? "✅ 更新成功!" : "✅ 创建成功!");
 
       // 1.5秒后导航到我的博客页面
-      setTimeout(() => navigate("/blogs/mine"), 1500);
+      setTimeout(() => {
+        path === 'articles'
+          ? navigate("/blogs/mine")
+          : navigate('/news-list')
+      }, 1500);
     } catch (error) {
       console.error("操作失败:", error);
       setFeedback(type === "update" ? "❌ 更新失败" : "❌ 创建失败");
@@ -281,14 +291,48 @@ export const useBlogEditor = ({ id, HOST, type, navigate }: UseBlogEditorOptions
     imagesKey
   ]);
 
+  // 删除文章
+const handleDelete = useCallback(
+  (id: string) => {
+    Swal.fire({
+      title: "确定删除吗？",
+      text: "此操作不可撤销！",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`${HOST}/api/${path}/delete/${id}`, {
+            withCredentials: true,
+          })
+          .then(() => {
+            console.log("删除成功");
+            clearDraft();
+            // ✅ 执行外部传入的回调
+            onDeleted?.(id);
+
+            Swal.fire("已删除!", "文章已成功删除。", "success");
+          })
+          .catch((error) => {
+            console.error("删除失败:", error);
+            Swal.fire("删除失败", "请稍后重试。", "error");
+          });
+      }
+    });
+  },
+  [HOST, path, clearDraft, onDeleted]
+);
+
   // 实时保存标题
-useEffect(() => {
-  if (title.trim()) {
-    localStorage.setItem(titleKey, title);
-  } else {
-    localStorage.removeItem(titleKey);
-  }
-}, [title, titleKey]);
+  useEffect(() => {
+    if (title.trim()) {
+      localStorage.setItem(titleKey, title);
+    } else {
+      localStorage.removeItem(titleKey);
+    }
+  }, [title, titleKey]);
 
   // 实时保存内容
   useEffect(() => {
@@ -307,7 +351,7 @@ useEffect(() => {
 
   const decodeUrl = (url: string) => url.replace(/&amp;/g, "&");
 
-  // 初始化数据（仅用于更新博客）
+  // 初始化数据（仅用于更新）
   useEffect(() => {
     if (type === "update" && id && editor) {
       const hasLocalDraft =
@@ -315,7 +359,7 @@ useEffect(() => {
 
       if (!hasLocalDraft) {
         axios
-          .get(`${HOST}/api/articles/${id}`)
+          .get(`${HOST}/api/${path}/${id}`)
           .then((res) => {
             const { blog } = res.data;
             console.log('blog is', blog)
@@ -353,6 +397,7 @@ useEffect(() => {
     isSubmitting,
     handleSubmit,
     clearDraft,
+    handleDelete,
     noExistingBlog
   };
 };
