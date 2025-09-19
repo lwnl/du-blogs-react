@@ -17,7 +17,7 @@ export interface IComment {
   updatedAt: string;
 }
 
-const Blog = () => {
+const BolgDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [blog, setBlog] = useState<IArticle | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -335,4 +335,4 @@ const Blog = () => {
   );
 };
 
-export default Blog;
+export default BolgDetail;

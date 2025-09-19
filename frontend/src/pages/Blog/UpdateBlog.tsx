@@ -3,7 +3,7 @@ import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { EditorContent } from "@tiptap/react";
 import EditorToolbar from "../../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
-import "./NewBlog.scss";
+import "./AddArticle.scss";
 import { useBlogEditor } from "../../hooks/useBlogEditor";
 import Swal from "sweetalert2";
 import { useEffect } from "react";

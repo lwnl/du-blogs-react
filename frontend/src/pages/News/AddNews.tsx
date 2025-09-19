@@ -3,10 +3,10 @@ import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { EditorContent } from "@tiptap/react";
 import EditorToolbar from "../../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
-import "./AddArticle.scss";
+import "../Blog/AddArticle.scss";
 import { useBlogEditor } from "../../hooks/useBlogEditor";
 
-const NewBlog = () => {
+const AddNews = () => {
   const { authenticated, isLoading: authLoading, HOST, user } = useAuthCheck();
   const navigate = useNavigate();
 
@@ -88,4 +88,4 @@ const NewBlog = () => {
   );
 };
 
-export default NewBlog;
+export default AddNews;

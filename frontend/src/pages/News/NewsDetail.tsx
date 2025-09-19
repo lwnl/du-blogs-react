@@ -6,7 +6,7 @@ import { useAuthCheck } from "../../hooks/useAuthCheck";
 import "../Blog/Blog_News.scss";
 import Swal from "sweetalert2";
 import TextareaAutosize from "react-textarea-autosize";
-import type { IComment } from "../Blog/Bolg";
+import type { IComment } from "../Blog/BolgDetail";
 
 export interface INews {
   _id: string;
@@ -17,7 +17,7 @@ export interface INews {
   updatedAt: string;
 }
 
-const News = () => {
+const NewsDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [news, setNews] = useState<INews | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -324,4 +324,4 @@ const News = () => {
   );
 };
 
-export default News;
+export default NewsDetail;
