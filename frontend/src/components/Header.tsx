@@ -95,8 +95,8 @@ export default function Header() {
           </div>
 
           <nav className="sidenav-links">
-            <NavLink to="/articles/mine" onClick={toggleSidebar}>
-              今日要闻
+            <NavLink to="/news-list" onClick={toggleSidebar}>
+              世界看中国
             </NavLink>
             <NavLink to="/articles" onClick={toggleSidebar}>
               博客园地
