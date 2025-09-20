@@ -1,15 +1,16 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { EditorContent } from "@tiptap/react";
 import EditorToolbar from "../../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
 import "./Add_Update_Article.scss";
 import { useArticleEditor } from "../../hooks/useArticleEditor";
-import Swal from "sweetalert2";
-import { useEffect } from "react";
 
-const UpdateBlog = () => {
-  const { id } = useParams<{ id: string }>();
+type AddNewProps = {
+  path: 'news-list' | 'articles'
+}
+
+const AddNew = ({path}: AddNewProps) => {
   const { authenticated, isLoading: authLoading, HOST, user } = useAuthCheck();
   const navigate = useNavigate();
 
@@ -18,56 +19,37 @@ const UpdateBlog = () => {
     setTitle,
     feedback,
     editor,
-    isLoading: editorLoading,
     setLink,
     addImage,
-    isSubmitting,
     handleSubmit,
-    noExistingArticle,
+    isSubmitting,
   } = useArticleEditor({
-    id,
     HOST,
-    type: "update",
-    path: 'articles',
+    type: "new",
+    path,
     navigate,
   });
 
-  useEffect(() => {
-    if (noExistingArticle) {
-      Swal.fire({
-        title: "",
-        text: "该文章不存在！",
-        icon: "error",
-        timer: 1500,
-        showConfirmButton: false,
-      }).then(() => {
-        if (user?.role === "Registered User") {
-          navigate("/blogs/mine");
-        } else {
-          navigate("/blogs");
-        }
-      });
-    }
-  }, [noExistingArticle, user, navigate]);
-
-  if (authLoading || editorLoading) return <p>检测权限...</p>;
-  if (!authenticated) {
+  if (authLoading) return <div className="loading">检测权限...</div>;
+  if (!authenticated || authenticated && user?.role !== "Administrator") {
     navigate("/users/login");
     return null;
   }
 
-  // 渲染前就 return null，避免访问不存在的数据
-  if (noExistingArticle) return null;
-
   return (
     <form className="NewArticle" onSubmit={handleSubmit}>
-      <h4>更新文章</h4>
+      {
+        path === 'articles' 
+        ? <h4>创建新博客</h4>
+        : <h4>添加新闻</h4>
+      }
       <input
         type="text"
         placeholder="标题"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
+        disabled={isSubmitting}
       />
 
       <div className="editor">
@@ -109,4 +91,4 @@ const UpdateBlog = () => {
   );
 };
 
-export default UpdateBlog;
+export default AddNew;

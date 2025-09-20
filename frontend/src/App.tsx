@@ -3,17 +3,15 @@ import Layout from "./Layout";
 import MyBlogs from "./pages/Blog/MyBlogs";
 import Register from "./pages/LoginRegiser/Register";
 import Login from "./pages/LoginRegiser/Login";
-import NewBlog from "./pages/Blog/NewBlog";
 import AllBlogs from "./pages/Blog/AllBlogs";
 import BannedBooks from "./pages/Book/BannedBooks";
 import NotFound from "./pages/NotFound";
 import BookDetail from "./pages/Book/BookDetail";
 import AllNews from "./pages/News/AllNews";
-import AddNews from "./pages/News/AddNews";
 import BolgDetail from "./pages/Blog/BolgDetail";
 import NewsDetail from "./pages/News/NewsDetail";
-import UpdateBlog from "./pages/Blog/UpdateBlog";
-import UpdateNews from "./pages/News/UpdateNews";
+import UpdateArticle from "./pages/Blog/UpdateArticle";
+import AddNew from "./pages/Blog/AddNew";
 
 export default function App() {
   return (
@@ -28,14 +26,17 @@ export default function App() {
         <Route path="/blogs" element={<AllBlogs />} />
         <Route path="/blogs/mine" element={<MyBlogs />} />
         <Route path="/blogs/:id" element={<BolgDetail />} />
-        <Route path="/blogs/new" element={<NewBlog />} />
-        <Route path="/blogs/update/:id" element={<UpdateBlog />} />
+        <Route path="/blogs/new" element={<AddNew path="articles"/>} />
+        <Route path="/blogs/update/:id" element={<UpdateArticle path="articles"/>} />
 
         {/* 新闻 */}
         <Route path="/news-list" element={<AllNews />} />
         <Route path="/news-list/:id" element={<NewsDetail />} />
-        <Route path="/news-list/new" element={<AddNews />} />
-        <Route path="/news-list/update/:id" element={<UpdateNews />} />
+        <Route path="/news-list/new" element={<AddNew path="news-list"/>} />
+        <Route
+          path="/news-list/update/:id"
+          element={<UpdateArticle path="news-list"  />}
+        />
 
         {/* 禁书 */}
         <Route path="/banned-books" element={<BannedBooks />} />
