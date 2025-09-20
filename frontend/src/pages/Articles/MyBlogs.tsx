@@ -66,7 +66,7 @@ const MyBlogs = () => {
 
   return (
     <div className="Articles-container">
-      <ul className="blogs">
+      <ul className="articles">
         {blogs.map((blog) => (
           <li key={blog._id}>
             <h5>
@@ -88,9 +88,9 @@ const MyBlogs = () => {
           </li>
         ))}
         {authenticated && user?.role === "Administrator" ? (
-          <li className="add-blog">
+          <li className="add-new">
             <Link to="/articles/new">
-              <button>新建博客</button>
+              <button>新建</button>
             </Link>
           </li>
         ) : (
