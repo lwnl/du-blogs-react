@@ -4,6 +4,7 @@ import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Pagination from "../../components/Pagination";
+import { useArticleEditor } from "../../hooks/useArticleEditor";
 
 export interface IArticle extends Document {
   _id: string;
@@ -32,6 +33,16 @@ const AllArticles = ({ path }: AllArticlesProps) => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
     setCurrentPage(pageNumber);
   };
+
+  // 删除文章
+  const { handleDelete } = useArticleEditor({
+    HOST,
+    type: "update",
+    path,
+    onDeleted: (id) =>
+      setArticles((prev) => prev.filter((article) => article._id !== id)),
+    navigate: () => {},
+  });
 
   useEffect(() => {
     axios
@@ -62,8 +73,26 @@ const AllArticles = ({ path }: AllArticlesProps) => {
               </Link>
             </h5>
             <div>
-              <span>用户：{article.author}</span>
-              <span>更新： {article.updatedAt}</span>
+              {article.author === user?.userName ? (
+                <div>
+                  <Link to={`/${path}/update/${article._id}`}>
+                    <span>更新</span>
+                  </Link>
+                  <button
+                    className="delete"
+                    onClick={() => {
+                      handleDelete(article._id);
+                    }}
+                  >
+                    删除
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <span>{article.author}</span>
+                  <span>{article.updatedAt}</span>
+                </div>
+              )}
             </div>
           </li>
         ))}

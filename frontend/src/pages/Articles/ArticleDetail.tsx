@@ -244,8 +244,8 @@ const ArticleDetail = ({ commentType, path }: ArticleProps) => {
       <div className="title-container">
         <h3 className="title">{article.title}</h3>
         <div>
-          <span className="author">用户： {article.author}</span>
-          <span>更新： {article.updatedAt}</span>
+          <span className="author">{article.author}</span>
+          <span>{article.updatedAt}</span>
         </div>
       </div>
 

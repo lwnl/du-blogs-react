@@ -84,7 +84,7 @@ const MyBlogs = () => {
             >
               删除
             </button>
-            <p className="update-date">更新：{blog.updatedAt}</p>
+            <p className="update-date">{blog.updatedAt}</p>
           </li>
         ))}
         {authenticated && user?.role === "Administrator" ? (
