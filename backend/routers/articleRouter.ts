@@ -79,7 +79,7 @@ articleRouter.post("/upload-blog", authAdmin, async (req: AuthRequest, res: Resp
       "g"
     );
 
-    const updatedContent = content.replace(imgRegex, (_: string, filename:string) => {
+    const updatedContent = content.replace(imgRegex, (_: string, filename: string) => {
       return `https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/in-blogs/${blogId}/${filename}`;
     });
 
@@ -114,7 +114,7 @@ articleRouter.get('/', async (req: AuthRequest, res: Response) => {
       .limit(pageSize)
 
     res.status(200).json({
-      blogs,
+      articles: blogs,
       total,
     })
   } catch (error) {

@@ -79,9 +79,9 @@ useEffect(() => {
         showConfirmButton: false,
       }).then(() => {
         if (user?.role === "Registered User") {
-          navigate("/blogs/mine");
+          navigate("/articles/mine");
         } else {
-          navigate("/blogs");
+          navigate("/articles");
         }
       });
     }

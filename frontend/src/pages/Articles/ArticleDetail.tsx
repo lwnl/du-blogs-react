@@ -223,9 +223,9 @@ const ArticleDetail = ({ commentType, path }: ArticleProps) => {
       }).then(() => {
         if (path === "articles") {
           if (user?.role === "Registered User") {
-            navigate("/blogs/mine");
+            navigate("/articles/mine");
           } else {
-            navigate("/blogs");
+            navigate("/articles");
           }
         } else {
           navigate("/news-list");
@@ -334,11 +334,11 @@ const ArticleDetail = ({ commentType, path }: ArticleProps) => {
         {path === "articles" ? (
           user?.role === "Registered User" ? (
             <p>
-              <Link to="/blogs/mine">返回我的博客</Link>
+              <Link to="/articles/mine">返回我的博客</Link>
             </p>
           ) : (
             <p>
-              <Link to="/blogs">返回博客园地</Link>
+              <Link to="/articles">返回博客园地</Link>
             </p>
           )
         ) : (

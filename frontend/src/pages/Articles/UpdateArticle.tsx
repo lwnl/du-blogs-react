@@ -47,9 +47,9 @@ const UpdateArticle = ({ path }: UpdateArticleProps) => {
       }).then(() => {
         if (path === "articles") {
           if (user?.role === "Registered User") {
-            navigate("/blogs/mine");
+            navigate("/articles/mine");
           } else {
-            navigate("/blogs");
+            navigate("/articles");
           }
         } else {
           navigate("/news-list");

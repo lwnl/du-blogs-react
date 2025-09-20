@@ -74,10 +74,10 @@ export default function Header() {
           <NavLink to="/news-list" end>
             世界看中国
           </NavLink>
-          <NavLink to="/blogs/mine" end>
+          <NavLink to="/articles/mine" end>
             我的博客
           </NavLink>
-          <NavLink to="/blogs" end>
+          <NavLink to="/articles" end>
             博客园地
           </NavLink>
           <NavLink to="/banned-books">禁书下载</NavLink>
@@ -95,10 +95,10 @@ export default function Header() {
           </div>
 
           <nav className="sidenav-links">
-            <NavLink to="/blogs/mine" onClick={toggleSidebar}>
+            <NavLink to="/articles/mine" onClick={toggleSidebar}>
               今日要闻
             </NavLink>
-            <NavLink to="/blogs" onClick={toggleSidebar}>
+            <NavLink to="/articles" onClick={toggleSidebar}>
               博客园地
             </NavLink>
             <NavLink to="/banned-books" onClick={toggleSidebar}>

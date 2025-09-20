@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
-import "./AllBlogs_AllNews.scss";
+import "./AllArticles.scss";
 import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Pagination from "../../components/Pagination";
-import Swal from "sweetalert2";
 
 export interface IArticle extends Document {
   _id: string;
@@ -15,10 +14,14 @@ export interface IArticle extends Document {
   updatedAt: string;
 }
 
-const AllBlogs = () => {
+type AllArticlesProps = {
+  path: 'articles' | 'news-list'
+}
+
+const AllArticles = ({path}: AllArticlesProps) => {
   const { HOST, user, authenticated, refetchAuth } = useAuthCheck();
 
-  const [blogs, setBlogs] = useState<IArticle[]>([]);
+  const [articles, setArticles] = useState<IArticle[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
@@ -33,10 +36,10 @@ const AllBlogs = () => {
   useEffect(() => {
     axios
       .get(
-        `${HOST}/api/articles?pageNumber=${currentPage}&pageSize=${pageSize}`
+        `${HOST}/api/${path}?pageNumber=${currentPage}&pageSize=${pageSize}`
       )
       .then((res) => {
-        setBlogs(res.data.blogs);
+        setArticles(res.data.articles);
         setTotalPages(Math.ceil(res.data.total / pageSize) || 1);
       })
       .catch((error: any) => {
@@ -51,21 +54,21 @@ const AllBlogs = () => {
   }, [currentPage]);
 
   return (
-    <div className="Blogs-container">
-      <ul className="blogs" >
-        {blogs.map((blog) => (
-          <li key={blog._id}>
+    <div className="Articles-container">
+      <ul className="articles" >
+        {articles.map((article) => (
+          <li key={article._id}>
             <h5>
-              <Link to={`/blogs/${blog._id}`} target="_blank">{blog.title}</Link>
+              <Link to={`/${path}/${article._id}`} target="_blank">{article.title}</Link>
             </h5>
-            <span>用户：{blog.author}</span>
-            <span>更新： {blog.updatedAt}</span>
+            <span>用户：{article.author}</span>
+            <span>更新： {article.updatedAt}</span>
           </li>
         ))}
         {authenticated && user?.role === "Administrator" ? (
-          <li className="add-blog">
-            <Link to="/blogs/new">
-              <button>新建博客</button>
+          <li className="add-new">
+            <Link to={`/${path}/new`}>
+              <button>新建</button>
             </Link>
           </li>
         ) : (
@@ -83,4 +86,4 @@ const AllBlogs = () => {
   );
 };
 
-export default AllBlogs;
+export default AllArticles;

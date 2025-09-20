@@ -1,41 +1,40 @@
 import { Route, Routes } from "react-router-dom";
 import Layout from "./Layout";
-import MyBlogs from "./pages/Blog/MyBlogs";
+import MyBlogs from "./pages/Articles/MyBlogs";
 import Register from "./pages/LoginRegiser/Register";
 import Login from "./pages/LoginRegiser/Login";
-import AllBlogs from "./pages/Blog/AllBlogs";
 import BannedBooks from "./pages/Book/BannedBooks";
 import NotFound from "./pages/NotFound";
 import BookDetail from "./pages/Book/BookDetail";
-import AllNews from "./pages/News/AllNews";
-import UpdateArticle from "./pages/Blog/UpdateArticle";
-import AddNew from "./pages/Blog/AddNew";
-import ArticleDetail from "./pages/Blog/ArticleDetail";
+import UpdateArticle from "./pages/Articles/UpdateArticle";
+import AddNew from "./pages/Articles/AddNew";
+import ArticleDetail from "./pages/Articles/ArticleDetail";
+import AllArticles from "./pages/Articles/AllArticles";
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<AllBlogs />} />
+        <Route index element={<AllArticles path='news-list'/>} />
         {/* 默认首页 */}
         <Route path="/users/register" element={<Register />} />
         <Route path="/users/login" element={<Login />} />
 
         {/* 博客 */}
-        <Route path="/blogs" element={<AllBlogs />} />
-        <Route path="/blogs/mine" element={<MyBlogs />} />
+        <Route path="/articles" element={<AllArticles path='articles'/>} />
+        <Route path="/articles/mine" element={<MyBlogs />} />
         <Route
-          path="/blogs/:id"
+          path="/articles/:id"
           element={<ArticleDetail commentType="blog" path="articles" />}
         />
-        <Route path="/blogs/new" element={<AddNew path="articles" />} />
+        <Route path="/articles/new" element={<AddNew path="articles" />} />
         <Route
-          path="/blogs/update/:id"
+          path="/articles/update/:id"
           element={<UpdateArticle path="articles" />}
         />
 
         {/* 新闻 */}
-        <Route path="/news-list" element={<AllNews />} />
+        <Route path="/news-list" element={<AllArticles path='news-list'/>} />
         <Route
           path="/news-list/:id"
           element={<ArticleDetail commentType="news" path="news-list" />}

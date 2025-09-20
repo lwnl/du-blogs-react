@@ -269,7 +269,7 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
       // 1.5秒后导航到我的博客页面
       setTimeout(() => {
         path === 'articles'
-          ? navigate("/blogs/mine")
+          ? navigate("/articles/mine")
           : navigate('/news-list')
       }, 1500);
     } catch (error) {

@@ -1,4 +1,4 @@
-.Blogs-container, .newsList-container {
+.Articles-container {
   a {
     text-decoration: none;
   }
@@ -23,7 +23,7 @@
     }
   }
 
-  ul.blogs, ul.news-list {
+  ul.articles {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -48,7 +48,7 @@
     }
   }
 
-  div.add-blog {
+  .add-new {
     margin-top: var(--size-400);
   }
 }

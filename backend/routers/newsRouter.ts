@@ -116,7 +116,7 @@ newsRouter.get('/', async (req: AuthRequest, res: Response) => {
       .limit(pageSize)
 
     res.status(200).json({
-      newsList,
+      articles: newsList,
       total,
     })
   } catch (error) {

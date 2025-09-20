@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./AllBlogs_AllNews.scss";
+import "./AllArticles.scss";
 import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -65,17 +65,17 @@ const MyBlogs = () => {
   }, [currentPage]);
 
   return (
-    <div className="Blogs-container">
+    <div className="Articles-container">
       <ul className="blogs">
         {blogs.map((blog) => (
           <li key={blog._id}>
             <h5>
-              <Link to={`/blogs/${blog._id}`} target="_blank">
+              <Link to={`/articles/${blog._id}`} target="_blank">
                 {blog.title}
               </Link>
             </h5>
             
-            <Link to={`/blogs/update/${blog._id}`}>编辑</Link>
+            <Link to={`/articles/update/${blog._id}`}>编辑</Link>
             <button
               className="delete"
               onClick={() => {
@@ -89,7 +89,7 @@ const MyBlogs = () => {
         ))}
         {authenticated && user?.role === "Administrator" ? (
           <li className="add-blog">
-            <Link to="/blogs/new">
+            <Link to="/articles/new">
               <button>新建博客</button>
             </Link>
           </li>
