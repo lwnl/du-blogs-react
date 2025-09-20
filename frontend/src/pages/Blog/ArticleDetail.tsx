@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import type { IArticle } from "./MyBlogs";
 import { useAuthCheck } from "../../hooks/useAuthCheck";
-import "./Blog_News.scss";
+import "./ArticleDetail.scss";
 import Swal from "sweetalert2";
 import TextareaAutosize from "react-textarea-autosize";
 
@@ -238,7 +238,7 @@ const ArticleDetail = ({ commentType, path }: ArticleProps) => {
   if (!article) return null;
 
   return (
-    <div className="Blog">
+    <div className="ArticleDetail">
       <div className="title-container">
         <h3 className="title">{article.title}</h3>
         <div>
