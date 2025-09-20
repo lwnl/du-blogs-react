@@ -2,24 +2,29 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import type { IArticle } from "./MyBlogs";
 import { useAuthCheck } from "../../hooks/useAuthCheck";
-import "../Blog/Blog_News.scss";
+import "./Blog_News.scss";
 import Swal from "sweetalert2";
 import TextareaAutosize from "react-textarea-autosize";
-import type { IComment } from "../Blog/BolgDetail";
 
-export interface INews {
+export interface IComment {
   _id: string;
-  title: string;
+  subjectId: string;
   content: string;
-  author: string;
+  user: string;
   createdAt: string;
   updatedAt: string;
 }
 
-const NewsDetail = () => {
+type ArticleProps = {
+  commentType: "blog" | "news";
+  path: "articles" | "news-list";
+};
+
+const ArticleDetail = ({ commentType, path }: ArticleProps) => {
   const { id } = useParams<{ id: string }>();
-  const [news, setNews] = useState<INews | null>(null);
+  const [article, setArticle] = useState<IArticle | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
@@ -87,15 +92,15 @@ const NewsDetail = () => {
 
   // 发表评论子程序
   const postComment = async () => {
-    if (!news?._id || !newComment.trim()) return;
+    if (!article?._id || !newComment.trim()) return;
 
     try {
       const res = await axios.post(
         `${HOST}/api/comments/new`,
         {
-          subjectId: news._id,
+          subjectId: article._id,
           content: newComment,
-          type: 'news'
+          type: commentType,
         },
         { withCredentials: true }
       );
@@ -193,9 +198,9 @@ const NewsDetail = () => {
     setLoading(true);
 
     axios
-      .get(`${HOST}/api/news-list/${id}`)
+      .get(`${HOST}/api/${path}/${id}`)
       .then((res) => {
-        setNews(res.data.article);
+        setArticle(res.data.article);
         setComments(res.data.comments);
         setError(null);
       })
@@ -208,34 +213,44 @@ const NewsDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!loading && !news) {
+    if (!loading && !article) {
       Swal.fire({
         title: "",
-        text: "该新闻不存在！",
+        text: "该文章不存在！",
         icon: "error",
         timer: 1500, // 1.5秒后自动关闭
         showConfirmButton: false,
-      }).then(() => navigate("/news-list"));
+      }).then(() => {
+        if (path === "articles") {
+          if (user?.role === "Registered User") {
+            navigate("/blogs/mine");
+          } else {
+            navigate("/blogs");
+          }
+        } else {
+          navigate("/news-list");
+        }
+      });
     }
-  }, [loading, news, user, navigate]);
+  }, [loading, article, user, navigate]);
 
   if (loading) return <div>加载中...</div>;
-  if (!news) return null;
+  if (!article) return null;
 
   return (
     <div className="Blog">
       <div className="title-container">
-        <h3 className="title">{news.title}</h3>
+        <h3 className="title">{article.title}</h3>
         <div>
-          <span className="author">用户： {news.author}</span>
-          <span>更新： {news.updatedAt}</span>
+          <span className="author">用户： {article.author}</span>
+          <span>更新： {article.updatedAt}</span>
         </div>
       </div>
 
-      {/* 将 blog.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
+      {/* 将 article.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
       <article
         className="article-content"
-        dangerouslySetInnerHTML={{ __html: news.content }}
+        dangerouslySetInnerHTML={{ __html: article.content }}
       ></article>
 
       {/* 评论留言 */}
@@ -316,12 +331,24 @@ const NewsDetail = () => {
       </div>
 
       <div className="back-to">
-        <p>
-          <Link to="/news-list">返回</Link>
-        </p>
+        {path === "articles" ? (
+          user?.role === "Registered User" ? (
+            <p>
+              <Link to="/blogs/mine">返回我的博客</Link>
+            </p>
+          ) : (
+            <p>
+              <Link to="/blogs">返回博客园地</Link>
+            </p>
+          )
+        ) : (
+          <p>
+            <Link to="/news-list">返回</Link>
+          </p>
+        )}
       </div>
     </div>
   );
 };
 
-export default NewsDetail;
+export default ArticleDetail;
