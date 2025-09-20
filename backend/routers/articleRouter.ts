@@ -90,7 +90,7 @@ articleRouter.post("/upload-blog", authAdmin, async (req: AuthRequest, res: Resp
     // 5. 清理 temp 文件夹（可选）
     await deleteFolder(tempPrefix);
 
-    res.status(201).json({ message: "Blog created successfully", newBlog });
+    res.status(201).json({ message: "成功添加新文章", newBlog });
   } catch (err) {
     console.error("Finalize blog error:", (err as Error).message);
 
@@ -166,11 +166,11 @@ articleRouter.get('/:id', async (req: Request, res: Response) => {
       blog.comments.map((commentId) => Comment.findById(commentId))
     )
     res.status(200).json({
-      blog,
+      article: blog,
       comments
     })
   } catch (error) {
-    console.error('error fetching blog:', (error as Error).message)
+    console.error('获取文章失败:', (error as Error).message)
     res.status(500).json({
       error: '获取文章失败'
     })

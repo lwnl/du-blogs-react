@@ -4,7 +4,6 @@ import MyBlogs from "./pages/Blog/MyBlogs";
 import Register from "./pages/LoginRegiser/Register";
 import Login from "./pages/LoginRegiser/Login";
 import NewBlog from "./pages/Blog/NewBlog";
-import UpdateBlog from "./pages/Blog/UpdateBlog";
 import AllBlogs from "./pages/Blog/AllBlogs";
 import BannedBooks from "./pages/Book/BannedBooks";
 import NotFound from "./pages/NotFound";
@@ -13,6 +12,8 @@ import AllNews from "./pages/News/AllNews";
 import AddNews from "./pages/News/AddNews";
 import BolgDetail from "./pages/Blog/BolgDetail";
 import NewsDetail from "./pages/News/NewsDetail";
+import UpdateBlog from "./pages/Blog/UpdateBlog";
+import UpdateNews from "./pages/News/UpdateNews";
 
 export default function App() {
   return (
@@ -34,12 +35,11 @@ export default function App() {
         <Route path="/news-list" element={<AllNews />} />
         <Route path="/news-list/:id" element={<NewsDetail />} />
         <Route path="/news-list/new" element={<AddNews />} />
-        <Route path="/blogs/update/:id" element={<UpdateBlog />} />
+        <Route path="/news-list/update/:id" element={<UpdateNews />} />
 
         {/* 禁书 */}
         <Route path="/banned-books" element={<BannedBooks />} />
         <Route path="/banned-books/:id" element={<BookDetail />} />
-        {/* <Route path="/bannedBooks/:id" element={<BannedBook/>} /> */}
 
         {/* 404 页面通配符路由 */}
         <Route path="*" element={<NotFound />} />

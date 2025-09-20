@@ -3,7 +3,7 @@ import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { EditorContent } from "@tiptap/react";
 import EditorToolbar from "../../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
-import "../Blog/AddArticle.scss";
+import "../Blog/Add_Update_Article.scss";
 import { useArticleEditor } from "../../hooks/useArticleEditor";
 
 const AddNews = () => {

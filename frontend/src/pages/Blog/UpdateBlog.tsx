@@ -3,7 +3,7 @@ import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { EditorContent } from "@tiptap/react";
 import EditorToolbar from "../../components/EditorToolbar";
 import "prosemirror-view/style/prosemirror.css";
-import "./AddArticle.scss";
+import "./Add_Update_Article.scss";
 import { useArticleEditor } from "../../hooks/useArticleEditor";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
@@ -23,7 +23,7 @@ const UpdateBlog = () => {
     addImage,
     isSubmitting,
     handleSubmit,
-    noExistingBlog,
+    noExistingArticle,
   } = useArticleEditor({
     id,
     HOST,
@@ -33,7 +33,7 @@ const UpdateBlog = () => {
   });
 
   useEffect(() => {
-    if (noExistingBlog) {
+    if (noExistingArticle) {
       Swal.fire({
         title: "",
         text: "该文章不存在！",
@@ -48,7 +48,7 @@ const UpdateBlog = () => {
         }
       });
     }
-  }, [noExistingBlog, user, navigate]);
+  }, [noExistingArticle, user, navigate]);
 
   if (authLoading || editorLoading) return <p>检测权限...</p>;
   if (!authenticated) {
@@ -57,11 +57,11 @@ const UpdateBlog = () => {
   }
 
   // 渲染前就 return null，避免访问不存在的数据
-  if (noExistingBlog) return null;
+  if (noExistingArticle) return null;
 
   return (
     <form className="NewArticle" onSubmit={handleSubmit}>
-      <h4>更新博客</h4>
+      <h4>更新文章</h4>
       <input
         type="text"
         placeholder="标题"

@@ -195,7 +195,7 @@ const BolgDetail = () => {
     axios
       .get(`${HOST}/api/articles/${id}`)
       .then((res) => {
-        setBlog(res.data.blog);
+        setBlog(res.data.article);
         setComments(res.data.comments);
         setError(null);
       })

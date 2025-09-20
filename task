@@ -48,12 +48,14 @@ newsRouter ok
 将评论分类，分为新闻评论，博客评论，书评 ok
 添加新闻列表页面 ok
 添加具体新闻页面 ok
-新闻列表区分用户级别 
-实现添加更新删除新闻功能
+新闻列表区分用户级别 ok
+实现添加删除新闻功能 ok
+实现更新新闻功能 ok
 
 包括视频音频
 消息系统
 用户profile定义
+网站流量统计
 
 
 上传文章区分博客，新闻
@@ -68,7 +70,7 @@ react query特点 bili
 总结：为何用api，host cors用法
 总结  return null 的作用
 useEffect(() => {
-    if (noExistingBlog) {
+    if (noExistingArticle) {
       Swal.fire({
         title: "",
         text: "该文章不存在！",
@@ -83,7 +85,7 @@ useEffect(() => {
         }
       });
     }
-  }, [noExistingBlog, user, navigate]);
+  }, [noExistingArticle, user, navigate]);
 
   if (authLoading || editorLoading) return <p>检测权限...</p>;
   if (!authenticated) {
@@ -92,7 +94,7 @@ useEffect(() => {
   }
 
   // 渲染前就 return null，避免访问不存在的数据
-  if (noExistingBlog) return null;
+  if (noExistingArticle) return null;
 总结分页系统
     {/* 分页组件 */}
       {blogs.length > pageSize && (

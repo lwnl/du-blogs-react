@@ -195,7 +195,7 @@ const NewsDetail = () => {
     axios
       .get(`${HOST}/api/news-list/${id}`)
       .then((res) => {
-        setNews(res.data.news);
+        setNews(res.data.article);
         setComments(res.data.comments);
         setError(null);
       })

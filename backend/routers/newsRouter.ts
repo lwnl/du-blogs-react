@@ -91,7 +91,7 @@ newsRouter.post('/upload-news', authAdmin, async (req: AuthRequest, res: Respons
     // 5. 清理 temp 文件夹（可选）
     await deleteFolder(tempPrefix);
 
-    res.status(201).json({ message: "Blog created successfully", news });
+    res.status(201).json({ message: "成功添加新文章", news });
   } catch (err) {
     console.error("Finalize blog error:", (err as Error).message);
 
@@ -165,13 +165,13 @@ newsRouter.get('/:id', async (req: Request, res: Response) => {
       news.comments.map((commentId) => Comment.findById(commentId))
     )
     res.status(200).json({
-      news,
+      article: news,
       comments
     })
   } catch (error) {
-    console.error('error fetching news:', (error as Error).message)
+    console.error('获取文章失败:', (error as Error).message)
     res.status(500).json({
-      error: '获取新闻失败'
+      error: '获取文章失败'
     })
   }
 })
