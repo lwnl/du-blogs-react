@@ -90,7 +90,7 @@ const AllArticles = ({ path }: AllArticlesProps) => {
               ) : (
                 <div>
                   <span>{article.author}</span>
-                  <span>{article.updatedAt}</span>
+                  <span>{article.createdAt}</span>
                 </div>
               )}
             </div>
