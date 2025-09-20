@@ -35,6 +35,8 @@ const ArticleDetail = ({ commentType, path }: ArticleProps) => {
 
   const { HOST, user, authenticated, refetchAuth } = useAuthCheck();
 
+  console.log("user:", user);
+
   const submitComment = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -332,19 +334,24 @@ const ArticleDetail = ({ commentType, path }: ArticleProps) => {
 
       <div className="back-to">
         {path === "articles" ? (
-          user?.role === "Registered User" ? (
-            <p>
-              <Link to="/articles/mine">返回我的博客</Link>
-            </p>
+          user?.role === "Administrator" ? (
+            <>
+              <span>
+                <Link to="/articles/mine">返回我的博客</Link>
+              </span>
+              <span>
+                <Link to="/articles">返回博客园地</Link>
+              </span>
+            </>
           ) : (
-            <p>
+            <span>
               <Link to="/articles">返回博客园地</Link>
-            </p>
+            </span>
           )
         ) : (
-          <p>
+          <span>
             <Link to="/news-list">返回</Link>
-          </p>
+          </span>
         )}
       </div>
     </div>

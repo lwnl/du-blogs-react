@@ -15,10 +15,10 @@ export interface IArticle extends Document {
 }
 
 type AllArticlesProps = {
-  path: 'articles' | 'news-list'
-}
+  path: "articles" | "news-list";
+};
 
-const AllArticles = ({path}: AllArticlesProps) => {
+const AllArticles = ({ path }: AllArticlesProps) => {
   const { HOST, user, authenticated, refetchAuth } = useAuthCheck();
 
   const [articles, setArticles] = useState<IArticle[]>([]);
@@ -35,9 +35,7 @@ const AllArticles = ({path}: AllArticlesProps) => {
 
   useEffect(() => {
     axios
-      .get(
-        `${HOST}/api/${path}?pageNumber=${currentPage}&pageSize=${pageSize}`
-      )
+      .get(`${HOST}/api/${path}?pageNumber=${currentPage}&pageSize=${pageSize}`)
       .then((res) => {
         setArticles(res.data.articles);
         setTotalPages(Math.ceil(res.data.total / pageSize) || 1);
@@ -51,18 +49,22 @@ const AllArticles = ({path}: AllArticlesProps) => {
           console.error("请求错误:", error.message);
         }
       });
-  }, [currentPage]);
+  }, [currentPage, path]);
 
   return (
     <div className="Articles-container">
-      <ul className="articles" >
+      <ul className="articles">
         {articles.map((article) => (
           <li key={article._id}>
             <h5>
-              <Link to={`/${path}/${article._id}`} target="_blank">{article.title}</Link>
+              <Link to={`/${path}/${article._id}`} target="_blank">
+                {article.title}
+              </Link>
             </h5>
-            <span>用户：{article.author}</span>
-            <span>更新： {article.updatedAt}</span>
+            <div>
+              <span>用户：{article.author}</span>
+              <span>更新： {article.updatedAt}</span>
+            </div>
           </li>
         ))}
         {authenticated && user?.role === "Administrator" ? (
