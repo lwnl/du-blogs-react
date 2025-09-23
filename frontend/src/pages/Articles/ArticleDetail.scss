@@ -27,7 +27,7 @@ $breakpoint-sm: 599px;
     &:focus {
       outline: none;
       border-color: var(--color-primary);
-      box-shadow: var(--focus-shadow); 
+      box-shadow: var(--focus-shadow);
     }
 
     &:read-only {
@@ -61,9 +61,13 @@ $breakpoint-sm: 599px;
 
     img {
       width: 50%;
-      margin: var(--size-300) auto var(--size-200);
+      margin: var(--size-300) auto ;
       border-radius: var(--size-100);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+      &:first-of-type {
+        width: 100%;
+      }
     }
 
     h5 {
@@ -78,6 +82,11 @@ $breakpoint-sm: 599px;
       color: var(--color-text-light);
       font-style: italic;
       text-align: left;
+
+      &:first-of-type {
+        width: 100%;
+        margin: -10px 0 20px 0;
+      }
     }
   }
 
