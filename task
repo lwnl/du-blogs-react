@@ -145,3 +145,4 @@ user增加管理员身份
 	•	自动生成：用 js2flowchart 生成初版流程图（SVG/Mermaid）。
 	•	手动修改：在 Mermaid Live Editor 或 Draw.io 打开 → 自己调整样式和逻辑。
 
+test
