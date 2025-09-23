@@ -243,10 +243,6 @@ const ArticleDetail = ({ commentType, path }: ArticleProps) => {
     <div className="ArticleDetail">
       <div className="title-container">
         <h3 className="title">{article.title}</h3>
-        <div>
-          <span className="author">{article.author}</span>
-          <span>{article.updatedAt}</span>
-        </div>
       </div>
 
       {/* 将 article.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
