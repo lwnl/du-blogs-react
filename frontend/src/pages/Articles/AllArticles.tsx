@@ -90,6 +90,7 @@ const AllArticles = ({ path }: AllArticlesProps) => {
                 </div>
               ) : (
                 <div>
+                  {path === "articles" && <span>博主：{article.author}</span>}
                   <span>{article.createdAt}</span>
                 </div>
               )}
