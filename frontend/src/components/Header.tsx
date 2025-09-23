@@ -72,7 +72,7 @@ export default function Header() {
 
         <nav className="nav-links">
           <NavLink to="/news-list" end>
-            世界看中国
+            今日要闻
           </NavLink>
           <NavLink to="/articles/mine" end>
             我的博客
@@ -96,7 +96,7 @@ export default function Header() {
 
           <nav className="sidenav-links">
             <NavLink to="/news-list" onClick={toggleSidebar}>
-              世界看中国
+              今日要闻
             </NavLink>
             <NavLink to="/articles" onClick={toggleSidebar}>
               博客园地

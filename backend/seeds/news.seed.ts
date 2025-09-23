@@ -20,16 +20,16 @@ export async function seedNews() {
     console.log("✅ 所有相关图片已清空！");
 
     // 生成 100 条随机新闻
-    const newsList = Array.from({ length: 100 }).map(() => ({
-      title: faker.lorem.sentence(),
-      content: faker.lorem.paragraphs({ min: 2, max: 5 }),
-      author: faker.person.fullName(),
-      source: faker.company.name(),
-    }));
+    // const newsList = Array.from({ length: 100 }).map(() => ({
+    //   title: faker.lorem.sentence(),
+    //   content: faker.lorem.paragraphs({ min: 2, max: 5 }),
+    //   author: faker.person.fullName(),
+    //   source: faker.company.name(),
+    // }));
 
-    // 插入数据库
-    await News.insertMany(newsList);
-    console.log('🎉 已成功插入 100 条新闻');
+    // // 插入数据库
+    // await News.insertMany(newsList);
+    // console.log('🎉 已成功插入 100 条新闻');
   } catch (err) {
     console.error('❌ 出错了:', err);
   }

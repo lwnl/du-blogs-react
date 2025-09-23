@@ -141,3 +141,7 @@ user增加管理员身份
 密码恢复功能
 博客园地添加作者
 评论组件react-quill
+推荐组合（免费 + 可改）
+	•	自动生成：用 js2flowchart 生成初版流程图（SVG/Mermaid）。
+	•	手动修改：在 Mermaid Live Editor 或 Draw.io 打开 → 自己调整样式和逻辑。
+

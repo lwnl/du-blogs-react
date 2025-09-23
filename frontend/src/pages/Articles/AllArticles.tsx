@@ -86,10 +86,10 @@ const AllArticles = ({ path }: AllArticlesProps) => {
                   >
                     删除
                   </button>
+                  <span>{article.createdAt}</span>
                 </div>
               ) : (
                 <div>
-                  <span>{article.author}</span>
                   <span>{article.createdAt}</span>
                 </div>
               )}
