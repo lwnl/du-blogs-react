@@ -68,7 +68,7 @@ const UpdateArticle = ({ path }: UpdateArticleProps) => {
   if (noExistingArticle) return null;
 
   return (
-    <form className="NewArticle" onSubmit={handleSubmit}>
+    <form className="UpdateArticle" onSubmit={handleSubmit}>
       <h4>更新文章</h4>
       <input
         type="text"
