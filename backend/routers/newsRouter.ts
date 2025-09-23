@@ -1,16 +1,15 @@
 import express from 'express'
 import type { Request, Response } from 'express'
 import { type AuthRequest } from '../utils/auth'
-import multer from 'multer'
 import News from '../models/News'
 import Comment from '../models/Comment'
 import { bucket, deleteFolder, moveFolder, uploadFileToGCS } from '../utils/gcsOperating'
 import { authAdmin } from '../utils/authAdmin'
 import type mongoose from 'mongoose'
+import { upload } from './articleRouter'
 
 const newsRouter = express.Router()
 
-const upload = multer({ storage: multer.memoryStorage() });
 
 //上传图片至GCS
 newsRouter.post("/image/upload/temp", authAdmin, upload.single("image"), async (req: AuthRequest, res: Response) => {

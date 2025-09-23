@@ -10,7 +10,14 @@ import type mongoose from 'mongoose'
 
 const articleRouter = express.Router()
 
-const upload = multer({ storage: multer.memoryStorage() });
+export const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    // 把 multer 解析成 latin1 的字符串转回 utf8
+    file.originalname = Buffer.from(file.originalname, "latin1").toString("utf8");
+    cb(null, true);
+  }
+});
 
 //上传图片至GCS
 articleRouter.post("/image/upload/temp", authAdmin, upload.single("image"), async (req: AuthRequest, res: Response) => {
