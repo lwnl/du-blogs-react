@@ -336,12 +336,12 @@ const ArticleDetail = ({ commentType, path }: ArticleProps) => {
                 <Link to="/articles/mine">返回我的博客</Link>
               </span>
               <span>
-                <Link to="/articles">返回博客园地</Link>
+                <Link to="/articles">返回博客</Link>
               </span>
             </>
           ) : (
             <span>
-              <Link to="/articles">返回博客园地</Link>
+              <Link to="/articles">返回博客</Link>
             </span>
           )
         ) : (

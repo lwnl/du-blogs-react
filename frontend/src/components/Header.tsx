@@ -72,15 +72,17 @@ export default function Header() {
 
         <nav className="nav-links">
           <NavLink to="/news-list" end>
-            今日要闻
+            要闻
           </NavLink>
-          <NavLink to="/articles/mine" end>
-            我的博客
-          </NavLink>
+          {user?.role === "Administrator" && (
+            <NavLink to="/articles/mine" end>
+              我的博客
+            </NavLink>
+          )}
           <NavLink to="/articles" end>
-            博客园地
+            博客
           </NavLink>
-          <NavLink to="/banned-books">禁书下载</NavLink>
+          <NavLink to="/banned-books">禁书</NavLink>
         </nav>
       </div>
 
@@ -96,13 +98,13 @@ export default function Header() {
 
           <nav className="sidenav-links">
             <NavLink to="/news-list" onClick={toggleSidebar}>
-              今日要闻
+              要闻
             </NavLink>
             <NavLink to="/articles" onClick={toggleSidebar}>
-              博客园地
+              博客
             </NavLink>
             <NavLink to="/banned-books" onClick={toggleSidebar}>
-              禁书下载
+              禁书
             </NavLink>
           </nav>
 
