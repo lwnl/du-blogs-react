@@ -32,7 +32,15 @@ const bannedBooks = [
     summary: '《墓碑：一九五八至一九六二年中国大饥荒纪实》，新华社退休高级记者杨继绳著，内容主要涉及中华人民共和国的三年大饥荒。2008年12月由香港天地图书出版，此后多次再版，持续热销。2012年英、法、德、日文译本发行。杨继绳因《墓碑》而获得多项荣誉。<br/><br/>2012年6月，本书德文版面世，德国之声中文网引述德国公共广播联盟报导：“杨继绳在《墓碑》一书中，详细记录了饥荒之惨烈与人祸之无情。为编撰此书，杨继绳花了多年时间检索资料。作为退休的新华社高级记者，杨继绳以调查农村经济发展为借口，查阅了各省的机关档案，与大量证人进行了对话。……中国政府这两年对待历史，已经持‘谨慎的开放态度’。杨继绳的这本书四年前虽然只能在香港出版，但他个人至今没有受到过多的政治压力。”<br/><br/>杨继绳在书中得出的结论是，从1958年到1962年，共有3600万中国人死于饥荒，还有4000万人应出生而没有出生，这意味着“大饥荒使中国人口损失大约7600万”。',
     coverLink:'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/%E5%A2%93%E7%A2%91%E5%B0%81%E9%9D%A2.jpg',
     downloadLink:'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/books/%E6%9D%A8%E7%BB%A7%E7%BB%B3%EF%BC%9A%E5%A2%93%E7%A2%91%E2%80%94%E2%80%94%E4%B8%AD%E5%9B%BD%E5%85%AD%E5%8D%81%E5%B9%B4%E4%BB%A3%E5%A4%A7%E9%A5%A5%E8%8D%92%E7%BA%AA%E5%AE%9E.pdf'
-  }
+  },
+  {
+    bookName: '雪白雪红',
+    format:'PDF',
+    review: '',
+    summary: '《雪白血红》是中国大陆报告文学作家张正隆的代表作，描述了第二次国共内战期间林彪率领中共军队在中国东北战场与中华民国国军作战的事迹。<br/><br/>作者采访了上百个林彪有工作关系的人整理而成，写得相当纪实，其中加入了大量林彪与以毛泽东为主席的中共中央互通的电报内容，书中涉及强制动员参军、长春围困战中长春围城饿死大量平民等敏感内容，出版后引起轰动，在被禁前在中国已经卖出超过十万本。',
+    coverLink:'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/%E9%9B%AA%E7%BA%A2%E9%9B%AA%E7%99%BD.jpg',
+    downloadLink:'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/books/%E9%9B%AA%E7%99%BD%E3%80%81%E8%A1%80%E7%BA%A2%EF%BC%9A%E5%9B%BD%E5%85%B1%E4%B8%9C%E5%8C%97%E5%A4%A7%E5%86%B3%E6%88%98%E5%8E%86%E5%8F%B2%E7%9C%9F%E7%9B%B8.pdf'
+  },
 ]
 
 export async function seedBannedBook() {
