@@ -1,0 +1,69 @@
+.AddBannedBook {
+  flex:1;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  h3 {
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 1rem;
+
+    input,
+    textarea {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      // font-weight: bold;
+
+      &.summary {
+        flex-grow: 1;
+
+        textarea {
+          flex: 1; /* 在父容器中自由伸展 */
+          resize: none; /* 禁止用户手动拉伸（可选） */
+          min-height: 120px; /* 给个最小高度 */
+          max-height: 400px; /* 限制最大高度 */
+          padding: 8px;
+          font-size: 14px;
+          line-height: 1.5;
+          margin-bottom: 1rem;
+        }
+      }
+    }
+
+    .error {
+      color: red;
+    }
+
+    button {
+      align-self: flex-start;
+      padding: 0.5rem 1rem;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      user-select: none;
+
+      &:hover {
+        background-color: #244b80;
+      }
+
+      &:disabled {
+        background: #aaa;
+      }
+    }
+  }
+}

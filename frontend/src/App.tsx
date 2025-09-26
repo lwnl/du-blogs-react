@@ -10,6 +10,7 @@ import UpdateArticle from "./pages/Articles/UpdateArticle";
 import AddNew from "./pages/Articles/AddNew";
 import ArticleDetail from "./pages/Articles/ArticleDetail";
 import AllArticles from "./pages/Articles/AllArticles";
+import AddBannedBook from "./pages/Book/AddBannedBook";
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
         {/* 禁书 */}
         <Route path="/banned-books" element={<BannedBooks />} />
         <Route path="/banned-books/:id" element={<BookDetail />} />
+        <Route path="/banned-books/add" element={<AddBannedBook />} />
 
         {/* 404 页面通配符路由 */}
         <Route path="*" element={<NotFound />} />

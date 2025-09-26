@@ -12,7 +12,6 @@ export interface IBannedBook extends Document {
   coverLink: string,
   downloadLink: string,
   format: string,
-  review: string,
   summary: string,
   comments: IComment[],
   ratingResult: number,
@@ -43,9 +42,6 @@ const BookSchema: Schema<IBannedBook> = new Schema({
   format: {
     type: String,
     required: true,
-  },
-  review: {
-    type: String,
   },
   summary: {
     type: String,

@@ -4,6 +4,7 @@ import axios from "axios";
 import { useAuthCheck } from "../../hooks/useAuthCheck";
 import { Link } from "react-router-dom";
 import { starHalf, starNull, starOne } from "../../components/UserRating";
+import { useNavigate } from "react-router-dom";
 
 export interface IBannedBook {
   _id: string;
@@ -26,7 +27,8 @@ const BannedBooks = () => {
   const [bannedBooks, setBannedBooks] = useState<IBannedBook[] | null>(null);
   const [currentBookId, setCurrentBookId] = useState<string | null>(null);
   const [overflowMap, setOverflowMap] = useState<Record<string, boolean>>({});
-
+  const navigate = useNavigate();
+  
   // 检查文本是否溢出
   const checkOverflow = (id: string) => {
     const el = document.getElementById(`summary-${id}`);
@@ -159,6 +161,12 @@ const BannedBooks = () => {
           );
         })}
       </ul>
+      {/* 添加新书按钮 */}
+      <div className="add-book-btn">
+        <button onClick={() => navigate("/banned-books/add")}>
+          ➕ 添加
+        </button>
+      </div>
     </div>
   );
 };

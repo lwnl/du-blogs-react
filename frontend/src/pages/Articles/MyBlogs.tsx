@@ -90,7 +90,7 @@ const MyBlogs = () => {
         {authenticated && user?.role === "Administrator" ? (
           <li className="add-new">
             <Link to="/articles/new">
-              <button>新建</button>
+              <button>➕ 添加</button>
             </Link>
           </li>
         ) : (

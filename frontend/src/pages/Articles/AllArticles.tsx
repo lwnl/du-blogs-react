@@ -100,7 +100,7 @@ const AllArticles = ({ path }: AllArticlesProps) => {
         {authenticated && user?.role === "Administrator" ? (
           <li className="add-new">
             <Link to={`/${path}/new`}>
-              <button>新建</button>
+              <button>➕ 添加</button>
             </Link>
           </li>
         ) : (

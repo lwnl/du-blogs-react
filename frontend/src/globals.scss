@@ -14,7 +14,7 @@
   flex-direction: column;
   gap: 50px;
 
-  &:has(.UpdateArticle), &:has(.NewArticle) {
+  &:has(.UpdateArticle), &:has(.NewArticle), &:has(.AddBannedBook) {
     height: 100svh;
     gap: 5px;
   }
