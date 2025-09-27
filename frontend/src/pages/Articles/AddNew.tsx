@@ -21,6 +21,7 @@ const AddNew = ({path}: AddNewProps) => {
     editor,
     setLink,
     addImage,
+    addVideo,
     handleSubmit,
     isSubmitting,
   } = useArticleEditor({
@@ -53,7 +54,7 @@ const AddNew = ({path}: AddNewProps) => {
       />
 
       <div className="editor">
-        <EditorToolbar editor={editor} setLink={setLink} addImage={addImage} />
+        <EditorToolbar editor={editor} setLink={setLink} addImage={addImage} addVideo={addVideo}/>
         <EditorContent className="content-container" editor={editor} />
         {isSubmitting && <div className="editor-overlay">提交中...</div>}
       </div>

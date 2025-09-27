@@ -10,10 +10,11 @@ import { TextSelection } from "prosemirror-state";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Iframe from "../extensions/Iframe";
 
 interface useArticleEditorOptions {
   id?: string;
-  onDeleted?: (id: string) => void; 
+  onDeleted?: (id: string) => void;
   HOST: string;
   type: "new" | "update";
   path: 'articles' | 'news-list';
@@ -62,6 +63,7 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
       Link.configure({ openOnClick: true }),
       Image,
       Heading.configure({ levels: [3, 4, 5] }),
+      Iframe, // ✅ 自定义的 iframe 扩展
     ],
     content: localStorage.getItem(contentKey) || "<p></p>",
     editorProps: {
@@ -106,6 +108,24 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
         .setLink({ href: url })
         .run();
     }
+  }, [editor]);
+
+  // 新增 addVideo
+  const addVideo = useCallback(async () => {
+    const { value: url } = await Swal.fire({
+      title: "插入视频",
+      input: "url",
+      inputLabel: "请输入视频链接",
+      inputPlaceholder: "https://",
+      showCancelButton: true,
+      confirmButtonText: "插入",
+      cancelButtonText: "取消",
+    });
+
+    if (!url) return;
+
+    // 直接插入 GCS 视频链接
+    editor?.chain().focus().setIframe({ src: url }).run();
   }, [editor]);
 
   // 添加图片
@@ -292,38 +312,38 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
   ]);
 
   // 删除文章
-const handleDelete = useCallback(
-  (id: string) => {
-    Swal.fire({
-      title: "确定删除吗？",
-      text: "此操作不可撤销！",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios
-          .delete(`${HOST}/api/${path}/delete/${id}`, {
-            withCredentials: true,
-          })
-          .then(() => {
-            console.log("删除成功");
-            clearDraft();
-            // ✅ 执行外部传入的回调
-            onDeleted?.(id);
+  const handleDelete = useCallback(
+    (id: string) => {
+      Swal.fire({
+        title: "确定删除吗？",
+        text: "此操作不可撤销！",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios
+            .delete(`${HOST}/api/${path}/delete/${id}`, {
+              withCredentials: true,
+            })
+            .then(() => {
+              console.log("删除成功");
+              clearDraft();
+              // ✅ 执行外部传入的回调
+              onDeleted?.(id);
 
-            Swal.fire("已删除!", "文章已成功删除。", "success");
-          })
-          .catch((error) => {
-            console.error("删除失败:", error);
-            Swal.fire("删除失败", "请稍后重试。", "error");
-          });
-      }
-    });
-  },
-  [HOST, path, clearDraft, onDeleted]
-);
+              Swal.fire("已删除!", "文章已成功删除。", "success");
+            })
+            .catch((error) => {
+              console.error("删除失败:", error);
+              Swal.fire("删除失败", "请稍后重试。", "error");
+            });
+        }
+      });
+    },
+    [HOST, path, clearDraft, onDeleted]
+  );
 
   // 实时保存标题
   useEffect(() => {
@@ -393,6 +413,7 @@ const handleDelete = useCallback(
     isLoading,
     setLink,
     addImage,
+    addVideo,
     isSubmitting,
     handleSubmit,
     clearDraft,

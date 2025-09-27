@@ -6,6 +6,7 @@ import {
   faImage,
   faCommentDots,
   faHeading,
+  faVideo,
 } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "@mui/material/Tooltip";
 
@@ -13,12 +14,14 @@ interface EditorToolbarProps {
   editor: any;
   setLink: () => void;
   addImage: () => void;
+  addVideo: () => void;
 }
 
 const EditorToolbar: React.FC<EditorToolbarProps> = ({
   editor,
   setLink,
   addImage,
+  addVideo,
 }) => {
   return (
     <div className="editor-toolbar">
@@ -64,6 +67,10 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
               .run();
           }}
         />
+      </Tooltip>
+
+      <Tooltip title="视频">
+        <FontAwesomeIcon icon={faVideo} onClick={addVideo} />
       </Tooltip>
     </div>
   );

@@ -25,6 +25,7 @@ const UpdateArticle = ({ path }: UpdateArticleProps) => {
     isLoading: editorLoading,
     setLink,
     addImage,
+    addVideo,
     isSubmitting,
     handleSubmit,
     noExistingArticle,
@@ -79,7 +80,7 @@ const UpdateArticle = ({ path }: UpdateArticleProps) => {
       />
 
       <div className="editor">
-        <EditorToolbar editor={editor} setLink={setLink} addImage={addImage} />
+        <EditorToolbar editor={editor} setLink={setLink} addImage={addImage} addVideo={addVideo}/>
         <EditorContent className="content-container" editor={editor} />
         {isSubmitting && <div className="editor-overlay">提交中...</div>}
       </div>

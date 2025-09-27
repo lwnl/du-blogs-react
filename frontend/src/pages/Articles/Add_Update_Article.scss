@@ -52,7 +52,8 @@
       flex-grow: 1; // 占据剩余空间
       min-height: 0; // ❗ 避免被撑爆
       overflow-y: auto;
-      img {
+      img, iframe {
+        display: block;
         width: 50%;
         margin: 0 auto;
       }

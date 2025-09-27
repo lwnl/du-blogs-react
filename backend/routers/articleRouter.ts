@@ -258,7 +258,7 @@ articleRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Res
       )
     }
 
-    // 删除文章中的所有保存在gcs中的图片
+    // 删除文章中的所有保存在gcs中的文件
     await deleteFolder(folder);
 
     res.status(200).json({

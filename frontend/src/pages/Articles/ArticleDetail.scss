@@ -59,15 +59,18 @@ $breakpoint-sm: 599px;
       font-style: italic;
     }
 
-    img {
+    img,
+    iframe {
       width: 50%;
-      margin: var(--size-300) auto ;
+      display: block;
+      margin: var(--size-300) auto;
       border-radius: var(--size-100);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-      &:first-of-type {
-        width: 100%;
-      }
+    // 只针对第一个 img
+    img:first-of-type {
+      width: 100%;
     }
 
     a {
