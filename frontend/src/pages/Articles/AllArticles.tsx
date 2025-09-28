@@ -6,6 +6,8 @@ import axios from "axios";
 import Pagination from "../../components/Pagination";
 import { useArticleEditor } from "../../hooks/useArticleEditor";
 import Calendar from "react-calendar"; // 引入日历组件
+import "react-calendar/dist/Calendar.css";
+import "dayjs/locale/zh-cn";
 
 export interface IArticle extends Document {
   _id: string;
@@ -121,6 +123,8 @@ const AllArticles = ({ path }: AllArticlesProps) => {
           <Calendar
             onChange={(date) => setSelectedDate(date as Date)}
             value={selectedDate}
+            locale="zh-CN"
+            formatDay={(locale, date) => date.getDate().toString()}
           />
         </div>
       </div>
