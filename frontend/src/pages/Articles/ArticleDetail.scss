@@ -1,7 +1,6 @@
-// 变量定义
-$breakpoint-sm: 599px;
-
 .ArticleDetail {
+  // 变量定义
+  $breakpoint-sm: 599px;
   display: flex;
   flex-direction: column;
   gap: 50px;

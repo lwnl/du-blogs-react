@@ -1,4 +1,6 @@
 .Articles-container {
+  $breakpoint-sm: 599px;
+
   a {
     text-decoration: none;
   }
@@ -21,7 +23,102 @@
     }
   }
 
+  .article-and-calendar {
+    display: flex;
+  }
+
+  .calendar-container {
+    width: 16rem;
+    margin-left: var(--size-600);
+
+    .change-date {
+      background: var(--color-bg-lighter);
+      border-radius: var(--size-100);
+      text-align: center;
+      padding-block: var(--size-100);
+      margin-bottom: var(--size-400);
+    }
+
+    .react-calendar {
+      width: 100%;
+      border: none;
+      border-radius: var(--size-300);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background: #fff;
+      font-family: inherit;
+      background: var(--color-bg-light);
+
+      &__navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        button {
+          color: #333;
+          font-size: 1rem;
+          font-weight: 600;
+          padding: 0.25rem 0.5rem;
+          border-radius: 8px;
+          transition: background 0.2s;
+
+          &:hover {
+            background: #f0f0f0;
+          }
+
+          &:disabled {
+            color: #ccc;
+            background: transparent;
+          }
+        }
+      }
+
+      &__month-view {
+        &__weekdays {
+          text-align: center;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #666;
+          abbr {
+            text-decoration: none;
+          }
+        }
+      }
+
+      &__navigation__arrow,
+      &__navigation__label,
+      &__tile {
+        background: transparent;
+      }
+
+      &__tile {
+        border-radius: 8px;
+        padding: 0.5rem 0;
+        text-align: center;
+        font-size: 0.9rem;
+        transition: background 0.2s, color 0.2s;
+
+        &--now {
+          background: rgba(0, 123, 255, 0.1);
+          font-weight: 600;
+          color: #007bff;
+        }
+
+        &--active {
+          background: #007bff;
+          color: #fff;
+          font-weight: 600;
+
+          &:hover {
+            background: #0056b3;
+          }
+        }
+      }
+    }
+  }
+
   ul.articles {
+    flex: 1;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -34,9 +131,11 @@
       flex-wrap: wrap;
 
       div {
-        margin-left:auto;
-        span, a, button {
-          padding-left: var(--size-400)
+        margin-left: auto;
+        span,
+        a,
+        button {
+          padding-left: var(--size-400);
         }
       }
 
@@ -48,5 +147,15 @@
 
   .add-new {
     margin-top: var(--size-400);
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    .article-and-calendar {
+      flex-direction: column-reverse;
+    }
+
+    .calendar-container {
+      margin: 0 auto var(--size-700);
+    }
   }
 }

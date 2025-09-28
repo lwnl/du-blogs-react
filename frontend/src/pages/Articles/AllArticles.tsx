@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Pagination from "../../components/Pagination";
 import { useArticleEditor } from "../../hooks/useArticleEditor";
+import Calendar from "react-calendar"; // 引入日历组件
 
 export interface IArticle extends Document {
   _id: string;
@@ -25,6 +26,7 @@ const AllArticles = ({ path }: AllArticlesProps) => {
   const [articles, setArticles] = useState<IArticle[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const pageSize = 10; // 每页显示条数，可改成参数或配置
 
@@ -45,8 +47,13 @@ const AllArticles = ({ path }: AllArticlesProps) => {
   });
 
   useEffect(() => {
+    let url = `${HOST}/api/${path}?pageNumber=${currentPage}&pageSize=${pageSize}`;
+    if (selectedDate) {
+      const dateStr = selectedDate.toISOString().split("T")[0]; // "YYYY-MM-DD"
+      url += `&date=${dateStr}`;
+    }
     axios
-      .get(`${HOST}/api/${path}?pageNumber=${currentPage}&pageSize=${pageSize}`)
+      .get(url)
       .then((res) => {
         setArticles(res.data.articles);
         setTotalPages(Math.ceil(res.data.total / pageSize) || 1);
@@ -60,54 +67,63 @@ const AllArticles = ({ path }: AllArticlesProps) => {
           console.error("请求错误:", error.message);
         }
       });
-  }, [currentPage, path]);
+  }, [currentPage, path, selectedDate]);
 
   return (
     <div className="Articles-container">
-      <ul className="articles">
-        {articles.map((article) => (
-          <li key={article._id}>
-            <h5>
-              <Link to={`/${path}/${article._id}`} target="_blank">
-                {article.title}
+      <div className="article-and-calendar">
+        <ul className="articles">
+          {articles.map((article) => (
+            <li key={article._id}>
+              <h5>
+                <Link to={`/${path}/${article._id}`} target="_blank">
+                  {article.title}
+                </Link>
+              </h5>
+              <div>
+                {article.author === user?.userName ? (
+                  <div>
+                    <Link to={`/${path}/update/${article._id}`}>
+                      <span>更新</span>
+                    </Link>
+                    <button
+                      className="delete"
+                      onClick={() => {
+                        handleDelete(article._id);
+                      }}
+                    >
+                      删除
+                    </button>
+                    <span>{article.createdAt}</span>
+                  </div>
+                ) : (
+                  <div>
+                    {path === "articles" && <span>博主：{article.author}</span>}
+                    <span>{article.createdAt}</span>
+                  </div>
+                )}
+              </div>
+            </li>
+          ))}
+          {authenticated && user?.role === "Administrator" ? (
+            <li className="add-new">
+              <Link to={`/${path}/new`}>
+                <button>➕ 添加</button>
               </Link>
-            </h5>
-            <div>
-              {article.author === user?.userName ? (
-                <div>
-                  <Link to={`/${path}/update/${article._id}`}>
-                    <span>更新</span>
-                  </Link>
-                  <button
-                    className="delete"
-                    onClick={() => {
-                      handleDelete(article._id);
-                    }}
-                  >
-                    删除
-                  </button>
-                  <span>{article.createdAt}</span>
-                </div>
-              ) : (
-                <div>
-                  {path === "articles" && <span>博主：{article.author}</span>}
-                  <span>{article.createdAt}</span>
-                </div>
-              )}
-            </div>
-          </li>
-        ))}
-        {authenticated && user?.role === "Administrator" ? (
-          <li className="add-new">
-            <Link to={`/${path}/new`}>
-              <button>➕ 添加</button>
-            </Link>
-          </li>
-        ) : (
-          ""
-        )}
-      </ul>
-
+            </li>
+          ) : (
+            ""
+          )}
+        </ul>
+        {/* 日历筛选 */}
+        <div className="calendar-container">
+          <h5 className="change-date">按日期浏览</h5>
+          <Calendar
+            onChange={(date) => setSelectedDate(date as Date)}
+            value={selectedDate}
+          />
+        </div>
+      </div>
       {/* 分页组件 */}
       <Pagination
         currentPage={currentPage}
