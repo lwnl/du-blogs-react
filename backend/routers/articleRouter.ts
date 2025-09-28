@@ -112,8 +112,26 @@ articleRouter.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber as string) || 1
     const pageSize = parseInt(req.query.pageSize as string) || 9
-    const total = await Article.countDocuments()
-    const blogs = await Article.find()
+    const dateStr = req.query.date as string | undefined
+
+    let filter = {} // 默认不筛选
+    if (dateStr) {
+      const start = new Date(dateStr)
+      start.setHours(0,0,0,0)
+
+      const end = new Date(dateStr)
+      end.setHours(23,59,59,999)
+
+      filter = {
+        createdAt: {
+          $gte: start,
+          $lte: end
+        }
+      }
+    }
+
+    const total = await Article.countDocuments(filter)
+    const blogs = await Article.find(filter)
       .sort({
         createdAt: -1
       })

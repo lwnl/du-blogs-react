@@ -51,7 +51,10 @@ const AllArticles = ({ path }: AllArticlesProps) => {
   useEffect(() => {
     let url = `${HOST}/api/${path}?pageNumber=${currentPage}&pageSize=${pageSize}`;
     if (selectedDate) {
-      const dateStr = selectedDate.toISOString().split("T")[0]; // "YYYY-MM-DD"
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+      const day = String(selectedDate.getDate()).padStart(2, "0");
+      const dateStr = `${year}-${month}-${day}`;
       url += `&date=${dateStr}`;
     }
     axios

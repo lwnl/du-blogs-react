@@ -105,9 +105,27 @@ newsRouter.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber as string) || 1
     const pageSize = parseInt(req.query.pageSize as string) || 9
-    const total = await News.countDocuments()
+    const dateStr = req.query.date as string | undefined
 
-    const newsList = await News.find()
+    let filter = {} // 默认不筛选
+    if (dateStr) {
+      const start = new Date(dateStr)
+      start.setHours(0, 0, 0, 0)
+
+      const end = new Date(dateStr)
+      end.setHours(23, 59, 59, 999)
+
+      filter = {
+        createdAt: {
+          $gte: start,
+          $lte: end
+        }
+      }
+    }
+
+    const total = await News.countDocuments(filter)
+
+    const newsList = await News.find(filter)
       .sort({
         createdAt: -1
       })
