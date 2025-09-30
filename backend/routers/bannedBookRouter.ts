@@ -7,6 +7,7 @@ import { auth, type AuthRequest } from '../utils/auth'
 import { authOptional } from '../utils/authOptional'
 import type { IComment } from '../models/BannedBook'
 import type { IBannedBook } from '../models/BannedBook'
+import { authAdmin } from '../utils/authAdmin';
 
 const bannedBookRouter = express.Router()
 
@@ -29,7 +30,7 @@ const caculateRating = (currentBook: IBannedBook) => {
 //获取所有禁书
 bannedBookRouter.get('/', async (req: Request, res: Response) => {
   try {
-    const bannedBooks = await BannedBook.find()
+    const bannedBooks = await BannedBook.find().sort({ order: -1 })
     if (!bannedBooks) {
       return res.status(404).json({
         error: '数据不存在！'
@@ -44,6 +45,23 @@ bannedBookRouter.get('/', async (req: Request, res: Response) => {
     res.status(500).json({
       error: '获取禁书失败'
     })
+  }
+})
+
+//添加新书
+bannedBookRouter.post('/add', authAdmin, async (req: AuthRequest, res: Response) => {
+  const newBook = req.body
+  if (!newBook) {
+    return res.status(400).json({ error: '数据错误' })
+  }
+  try {
+    const count = await BannedBook.countDocuments()
+    newBook.order = count + 1
+    await BannedBook.create(newBook)
+    res.status(201).json({ message: '添加新书成功' })
+  } catch (error) {
+    console.error('添加新书错误：', (error as Error).message)
+    res.status(500).json({ error: '添加新书错误' })
   }
 })
 

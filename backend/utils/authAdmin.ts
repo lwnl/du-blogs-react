@@ -15,7 +15,7 @@ export const authAdmin = (req: AuthRequest, res: Response, next: NextFunction) =
   if (!token) {
     return res.status(401).json({
       authenticated: false,
-      message: 'No token provided'
+      message: '没有token'
     })
   }
 

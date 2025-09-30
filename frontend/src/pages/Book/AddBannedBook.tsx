@@ -3,12 +3,14 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuthCheck } from "../../hooks/useAuthCheck";
 import "./AddBannedBook.scss";
+import Swal from "sweetalert2";
 
 const AddBannedBook = () => {
   const { HOST } = useAuthCheck();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    order: null,
     bookName: "",
     coverLink: "",
     format: "",
@@ -31,9 +33,18 @@ const AddBannedBook = () => {
     setError(null);
 
     try {
-      await axios.post(`${HOST}/api/banned-books`, formData);
-      alert("✅ 新书添加成功！");
-      navigate("/banned-books"); // 添加成功后返回列表
+      await axios.post(`${HOST}/api/banned-books/add`, formData, {
+        withCredentials: true,
+      });
+      // 使用 Swal 弹窗代替 alert
+      Swal.fire({
+        icon: "success",
+        title: "添加成功",
+        text: "✅ 新书添加成功！",
+        confirmButtonText: "确定",
+      }).then(() => {
+        navigate("/banned-books"); // 点击确认后返回列表
+      });
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || "❌ 添加新书失败";
       setError(errorMsg);

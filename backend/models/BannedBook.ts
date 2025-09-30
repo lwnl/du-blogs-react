@@ -8,6 +8,7 @@ export interface IComment extends Document {
 }
 
 export interface IBannedBook extends Document {
+  order: number | null,
   bookName: string,
   coverLink: string,
   downloadLink: string,
@@ -27,6 +28,10 @@ const CommentSchema = new Schema<IComment>({
 });
 
 const BookSchema: Schema<IBannedBook> = new Schema({
+  order: {
+    type: Number,
+    required: true,
+  },
   bookName: {
     type: String,
     required: true,
