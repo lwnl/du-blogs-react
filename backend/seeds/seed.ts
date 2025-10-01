@@ -19,34 +19,34 @@ async function seed() {
   try {
     await dbConnection()
     rl.question(
-      "请选择初始化数据内容:\n1. 初始化用户数据\n2. 初始化评论数据\n3. 初始化文章数据\n4. 初始化禁书数据\n5. 初始化书评数据\n6. 初始化新闻数据\n7. 授权管理员\n8. 取消管理员\n9. 初始化所有数据\n请输入编号: ",
+      "请选择初始化数据内容:\n7. 授权管理员\n8. 取消管理员\n请输入编号: ",
       async (choice) => {
         try {
           switch (choice.trim()) {
-            case '1':
-              await seedUsers()
-              await disconnection();
-              break
-            case "2":
-              await seedComments();
-              await disconnection();
-              break;
-            case "3":
-              await seedArticles();
-              await disconnection();
-              break;
-            case "4":
-              await seedBannedBook()
-              await disconnection();
-              break;
-            case "5":
-              await seedBannedBookComments()
-              await disconnection();
-              break;
-            case "6":
-              await seedNews() 
-              await disconnection();
-              break;
+            // case '1':
+            //   await seedUsers()
+            //   await disconnection();
+            //   break
+            // case "2":
+            //   await seedComments();
+            //   await disconnection();
+            //   break;
+            // case "3":
+            //   await seedArticles();
+            //   await disconnection();
+            //   break;
+            // case "4":
+            //   await seedBannedBook()
+            //   await disconnection();
+            //   break;
+            // case "5":
+            //   await seedBannedBookComments()
+            //   await disconnection();
+              // break;
+            // case "6":
+            //   await seedNews() 
+            //   await disconnection();
+            //   break;
             case "7":
               rl.question("请输入要授权为管理员的用户名: ", (username) => {
                 authAdmin(username.trim())
@@ -62,13 +62,13 @@ async function seed() {
                   .finally(() => disconnection());
               });
               return;
-            case "9":
-              await seedUsers();
-              await seedArticles();
-              await seedBannedBook()
-              await seedComments()
-              await disconnection();
-              break;
+            // case "9":
+            //   await seedUsers();
+            //   await seedArticles();
+            //   await seedBannedBook()
+            //   await seedComments()
+            //   await disconnection();
+            //   break;
             default:
               console.log("❌ 输入无效，请输入数字1-8");
               await disconnection();

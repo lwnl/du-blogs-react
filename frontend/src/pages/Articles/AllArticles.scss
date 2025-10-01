@@ -27,16 +27,60 @@
     display: flex;
   }
 
-  .calendar-container {
+  ul.articles {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    li {
+      display: flex;
+      gap: var(--size-400);
+      align-items: center;
+      flex-wrap: wrap;
+
+      div {
+        margin-left: auto;
+        span,
+        a,
+        button {
+          padding-left: var(--size-400);
+        }
+      }
+
+      h5 {
+        margin-right: auto;
+      }
+    }
+  }
+
+  .add-new {
+    margin-top: var(--size-400);
+  }
+
+  .right-bar {
     width: 18rem;
     margin-left: var(--size-600);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-400);
 
     .change-date {
       background: var(--color-bg-lighter);
       border-radius: var(--size-100);
       text-align: center;
       padding-block: var(--size-100);
-      margin-bottom: var(--size-400);
+    }
+
+    button.show-all {
+      background-color: transparent;
+      text-align: left;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+        text-underline-offset: var(--size-100);
+      }
     }
 
     .react-calendar {
@@ -117,44 +161,12 @@
     }
   }
 
-  ul.articles {
-    flex: 1;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    li {
-      display: flex;
-      gap: var(--size-400);
-      align-items: center;
-      flex-wrap: wrap;
-
-      div {
-        margin-left: auto;
-        span,
-        a,
-        button {
-          padding-left: var(--size-400);
-        }
-      }
-
-      h5 {
-        margin-right: auto;
-      }
-    }
-  }
-
-  .add-new {
-    margin-top: var(--size-400);
-  }
-
   @media (max-width: $breakpoint-sm) {
     .article-and-calendar {
       flex-direction: column-reverse;
     }
 
-    .calendar-container {
+    .right-bar {
       margin: 0 auto var(--size-700);
     }
   }

@@ -121,7 +121,7 @@ const AllArticles = ({ path }: AllArticlesProps) => {
           )}
         </ul>
         {/* 日历筛选 */}
-        <div className="calendar-container">
+        <div className="right-bar">
           <h5 className="change-date">按日期浏览</h5>
           <Calendar
             onChange={(date) => setSelectedDate(date as Date)}
@@ -129,6 +129,9 @@ const AllArticles = ({ path }: AllArticlesProps) => {
             locale="zh-CN"
             formatDay={(locale, date) => date.getDate().toString()}
           />
+          <button className="show-all" onClick={() => {
+            setSelectedDate(null)
+          }}>查看全部</button>
         </div>
       </div>
       {/* 分页组件 */}
