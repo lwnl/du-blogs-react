@@ -205,7 +205,7 @@ articleRouter.get('/:id', async (req: Request, res: Response) => {
 
 // 作者本人更新文章
 articleRouter.patch('/update/:id', authAdmin, async (req: AuthRequest, res: Response) => {
-  const { title, content } = req.body; // tempFiles 是前端传来的文件名数组
+  const { title, content, keyWordsArray:keyWords } = req.body; // tempFiles 是前端传来的文件名数组
   const { id } = req.params;
   const userId = req.user.id.toString();
 
@@ -237,6 +237,7 @@ articleRouter.patch('/update/:id', authAdmin, async (req: AuthRequest, res: Resp
     // 4. 更新文章数据
     blog.title = title;
     blog.content = updatedContent;
+    blog.keyWords = keyWords;
     const updatedBlog = await blog.save();
 
     res.status(200).json({ message: '文章更新成功！', blog: updatedBlog });
