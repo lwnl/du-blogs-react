@@ -247,7 +247,7 @@
 
   @media (max-width: $breakpoint-sm) {
     .article-content {
-      img {
+      img, iframe {
         width: 80%;
       }
       p.image-caption {

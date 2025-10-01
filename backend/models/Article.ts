@@ -9,6 +9,7 @@ export interface IArticle extends Document {
   comments: string[];
   createdAt: Date;
   updatedAt: Date;
+  keyWords: string[];
 }
 
 const ArticleSchema: Schema<IArticle> = new Schema({
@@ -26,7 +27,10 @@ const ArticleSchema: Schema<IArticle> = new Schema({
   },
   comments: {
     type: [String], default: []
-  }
+  },
+  keyWords: {
+    type: [String], default: []
+  },
 }, {
   timestamps: {
     createdAt: true,

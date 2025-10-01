@@ -7,6 +7,7 @@ export interface INews extends Document {
   author: string,
   source: string,
   comments: string[],
+  keyWords: string[],
   createdAt: Date,
   updatedAt: Date
 }
@@ -30,10 +31,13 @@ const NewsSchema: Schema<INews> = new Schema({
   comments: {
     type: [String], default: []
   },
+  keyWords: {
+    type: [String], default: []
+  },
 }, {
   timestamps: {
     createdAt: true,
-    updateAt:true
+    updateAt: true
   }
 })
 

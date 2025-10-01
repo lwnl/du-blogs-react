@@ -20,6 +20,8 @@ const UpdateArticle = ({ path }: UpdateArticleProps) => {
   const {
     title,
     setTitle,
+    keyWords,
+    setKeyWords,
     feedback,
     editor,
     isLoading: editorLoading,
@@ -80,7 +82,12 @@ const UpdateArticle = ({ path }: UpdateArticleProps) => {
       />
 
       <div className="editor">
-        <EditorToolbar editor={editor} setLink={setLink} addImage={addImage} addVideo={addVideo}/>
+        <EditorToolbar
+          editor={editor}
+          setLink={setLink}
+          addImage={addImage}
+          addVideo={addVideo}
+        />
         <EditorContent className="content-container" editor={editor} />
         {isSubmitting && <div className="editor-overlay">提交中...</div>}
       </div>
@@ -97,7 +104,16 @@ const UpdateArticle = ({ path }: UpdateArticleProps) => {
       )}
 
       {/* [更改] 添加了按钮容器和加载状态样式 */}
-      <div className="actions">
+      <div className="keyWords-and-submit">
+        <div className="keyWords">
+          关键词：
+          <input
+            type="text"
+            value={keyWords}
+            onChange={(e) => setKeyWords(e.target.value)}
+            style={{ width: `${keyWords.length + 1}ch` }}
+          />
+        </div>
         <button
           type="submit"
           disabled={isSubmitting}

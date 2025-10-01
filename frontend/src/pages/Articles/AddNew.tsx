@@ -7,16 +7,18 @@ import "./Add_Update_Article.scss";
 import { useArticleEditor } from "../../hooks/useArticleEditor";
 
 type AddNewProps = {
-  path: 'news-list' | 'articles'
-}
+  path: "news-list" | "articles";
+};
 
-const AddNew = ({path}: AddNewProps) => {
+const AddNew = ({ path }: AddNewProps) => {
   const { authenticated, isLoading: authLoading, HOST, user } = useAuthCheck();
   const navigate = useNavigate();
 
   const {
     title,
     setTitle,
+    keyWords,
+    setKeyWords,
     feedback,
     editor,
     setLink,
@@ -32,18 +34,14 @@ const AddNew = ({path}: AddNewProps) => {
   });
 
   if (authLoading) return <div className="loading">检测权限...</div>;
-  if (!authenticated || authenticated && user?.role !== "Administrator") {
+  if (!authenticated || (authenticated && user?.role !== "Administrator")) {
     navigate("/users/login");
     return null;
   }
 
   return (
     <form className="NewArticle" onSubmit={handleSubmit}>
-      {
-        path === 'articles' 
-        ? <h4>创建新博客</h4>
-        : <h4>添加新闻</h4>
-      }
+      {path === "articles" ? <h4>创建新博客</h4> : <h4>添加新闻</h4>}
       <input
         type="text"
         placeholder="标题"
@@ -54,7 +52,12 @@ const AddNew = ({path}: AddNewProps) => {
       />
 
       <div className="editor">
-        <EditorToolbar editor={editor} setLink={setLink} addImage={addImage} addVideo={addVideo}/>
+        <EditorToolbar
+          editor={editor}
+          setLink={setLink}
+          addImage={addImage}
+          addVideo={addVideo}
+        />
         <EditorContent className="content-container" editor={editor} />
         {isSubmitting && <div className="editor-overlay">提交中...</div>}
       </div>
@@ -71,7 +74,15 @@ const AddNew = ({path}: AddNewProps) => {
       )}
 
       {/* [更改] 添加了按钮容器和加载状态样式 */}
-      <div className="actions">
+      <div className="keyWords-and-submit">
+        <div className="keyWords">
+          关键词：
+          <input
+            type="text"
+            value={keyWords}
+            onChange={(e) => setKeyWords(e.target.value)}
+          />
+        </div>
         <button
           type="submit"
           disabled={isSubmitting}

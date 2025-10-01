@@ -44,16 +44,24 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
   // 根据类型确定localStorage的键名
   const prefix = type === "update" && id ? `draft_${id}_` : "draft_";
   const titleKey = `${prefix}title`;
+  const keyWordsKey = `${prefix}keyWords`;
   const contentKey = `${prefix}content`;
   const imagesKey = `Images${id ? `_${id}` : ""}`;
 
   const [title, setTitle] = useState<string>(
     localStorage.getItem(titleKey) || ""
   );
+
+  const [keyWords, setKeyWords] = useState<string>(
+    localStorage.getItem(keyWordsKey) || ""
+  );
+
   const [feedback, setFeedback] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(type === "update");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [noExistingArticle, setnoExistingArticle] = useState<boolean>(false);
+
+  const decodeUrl = (url: string) => url.replace(/&amp;/g, "&");
 
   // 配置编辑器
   const editor = useEditor({
@@ -218,9 +226,10 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
   const clearDraft = useCallback(() => {
     editor?.off("update");
     localStorage.removeItem(titleKey);
+    localStorage.removeItem(keyWordsKey);
     localStorage.removeItem(contentKey);
     localStorage.removeItem(imagesKey);
-  }, [contentKey, imagesKey, titleKey, editor]);
+  }, [contentKey, imagesKey, titleKey, keyWordsKey, editor]);
 
 
   // 提取当前编辑器中的图片
@@ -245,6 +254,7 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
       e.preventDefault();
       return;
     }
+
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -254,28 +264,32 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
       return;
     }
 
-
-
     try {
       // 清理未使用的图片
       const currentImages = getCurrentImages();
       await removeUnusedImages(currentImages);
+
+      //格式化关键字
+      //1.	正则 [\s\u3000]+ 会匹配 连续的空白字符（包括半角空格、Tab、换行、中文全角空格）。
+      //2.	split 会把这些匹配的部分 当作分隔符丢掉。
+      const keyWordsArray = keyWords.split(/[\s\u3000]+/);
+
       // 根据类型执行不同的请求
       if (type === "update" && id) {
-        // 更新博客
+        // 更新文章
         await axios.patch(
           `${HOST}/api/${path}/update/${id}`,
-          { title, content: editor.getHTML() },
+          { title, content: editor.getHTML(), keyWordsArray },
           { withCredentials: true }
         );
       } else {
-        // 创建新博客
+        // 创建新文章
         const postPath = path === 'articles'
           ? `${HOST}/api/${path}/upload-blog`
           : `${HOST}/api/${path}/upload-news`
         await axios.post(
           postPath,
-          { title, content: editor.getHTML() },
+          { title, content: editor.getHTML(), keyWordsArray },
           { withCredentials: true }
         );
       }
@@ -345,69 +359,65 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
     [HOST, path, clearDraft, onDeleted]
   );
 
-  // 实时保存标题
   useEffect(() => {
-    if (title.trim()) {
-      localStorage.setItem(titleKey, title);
-    } else {
-      localStorage.removeItem(titleKey);
-    }
-  }, [title, titleKey]);
-
-  // 实时保存内容
-  useEffect(() => {
-    if (!editor) return;
-
-    const updateHandler = () => {
-      const html = editor.getHTML();
-      localStorage.setItem(contentKey, html);
-    };
-
-    editor.on("update", updateHandler);
-    return () => {
-      editor.off("update", updateHandler);
-    };
-  }, [editor, contentKey]);
-
-  const decodeUrl = (url: string) => url.replace(/&amp;/g, "&");
-
-  // 初始化数据（仅用于更新）
-  useEffect(() => {
+    // 初始化文章（仅 update 且有 id 且 editor 已准备好）
     if (type === "update" && id && editor) {
       const hasLocalDraft =
-        localStorage.getItem(titleKey) || localStorage.getItem(contentKey);
+        localStorage.getItem(titleKey) || localStorage.getItem(contentKey) || localStorage.getItem(keyWordsKey);
 
       if (!hasLocalDraft) {
-        axios
-          .get(`${HOST}/api/${path}/${id}`)
-          .then((res) => {
+        axios.get(`${HOST}/api/${path}/${id}`)
+          .then(res => {
             const { article } = res.data;
+            const kwStr = (article.keyWords || []).join(" ");
+
             setTitle(article.title);
-            editor?.commands.setContent(article.content);
+            setKeyWords(kwStr);
+            editor.commands.setContent(article.content);
+
             localStorage.setItem(titleKey, article.title);
+            localStorage.setItem(keyWordsKey, kwStr);
             localStorage.setItem(contentKey, article.content);
 
-            //初始化格式化数据
             const imgUrls = Array.from(article.content.matchAll(/<img[^>]+src="([^">]+)"/g))
               .map((m: any) => decodeUrl(m[1]));
             localStorage.setItem(imagesKey, JSON.stringify(imgUrls));
           })
-          .catch((error) => {
-            console.error("获取文章失败", (error as Error).message);
-            if (axios.isAxiosError(error) && error.response?.status === 404) {
-              setnoExistingArticle(true); // ✅ 捕获 404 时设置
+          .catch(err => {
+            if (axios.isAxiosError(err) && err.response?.status === 404) {
+              setnoExistingArticle(true);
             }
-          })
-          .finally(() => setIsLoading(false));
+          }).finally(() => setIsLoading(false));
       } else {
-        setIsLoading(false);
+        setIsLoading(false); // ✅ 本地有草稿也要结束 loading
       }
     }
-  }, [HOST, editor, id, type, contentKey, imagesKey, titleKey]);
+
+    // 实时同步标题和关键字
+    if (title.trim()) localStorage.setItem(titleKey, title);
+    else localStorage.removeItem(titleKey);
+
+    if (keyWords.trim()) localStorage.setItem(keyWordsKey, keyWords);
+    else localStorage.removeItem(keyWordsKey);
+
+    // 实时同步内容
+    if (editor) {
+      const updateHandler = () => {
+        const html = editor.getHTML();
+        localStorage.setItem(contentKey, html);
+      };
+      editor.on("update", updateHandler);
+      return () => {
+        editor.off("update", updateHandler);
+      };
+    }
+  }, [HOST, editor, id, type, titleKey, keyWordsKey, contentKey, imagesKey, path]);
 
   return {
     title,
     setTitle,
+    keyWords,
+    setKeyWords,
     feedback,
     editor,
     isLoading,
@@ -420,4 +430,4 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
     handleDelete,
     noExistingArticle
   };
-};
+};  

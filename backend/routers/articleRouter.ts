@@ -60,7 +60,7 @@ articleRouter.post("/image/delete", authAdmin, async (req: AuthRequest, res: Res
 
 // 上传博客文章
 articleRouter.post("/upload-blog", authAdmin, async (req: AuthRequest, res: Response) => {
-  const { title, content } = req.body;
+  const { title, content, keyWordsArray:keyWords } = req.body;
   const userId = req.user?.id.toString();
 
   try {
@@ -68,6 +68,7 @@ articleRouter.post("/upload-blog", authAdmin, async (req: AuthRequest, res: Resp
     const newBlog = await Article.create({
       title,
       content,
+      keyWords,
       author: req.user?.userName || "unknown",
     });
 
