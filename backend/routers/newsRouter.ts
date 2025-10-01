@@ -53,7 +53,7 @@ newsRouter.post("/image/delete", authAdmin, async (req: AuthRequest, res: Respon
 
 // 上传新闻文章
 newsRouter.post('/upload-news', authAdmin, async (req: AuthRequest, res: Response) => {
-  const { title, content, source } = req.body;
+  const { title, content, keyWordsArray:keyWords  } = req.body;
   const userId = req.user?.id.toString();
 
   try {
@@ -61,6 +61,7 @@ newsRouter.post('/upload-news', authAdmin, async (req: AuthRequest, res: Respons
     const news = await News.create({
       title,
       content,
+      keyWords,
       author: req.user?.userName || "unknown",
     });
 
@@ -195,7 +196,7 @@ newsRouter.get('/:id', async (req: Request, res: Response) => {
 
 // 作者本人更新新闻
 newsRouter.patch('/update/:id', authAdmin, async (req: AuthRequest, res: Response) => {
-  const { title, content, source } = req.body;
+  const { title, content, keyWordsArray:keyWords } = req.body;
   const { id } = req.params;
   const userId = req.user.id.toString();
 
@@ -227,6 +228,7 @@ newsRouter.patch('/update/:id', authAdmin, async (req: AuthRequest, res: Respons
     // 4. 更新文章数据
     news.title = title;
     news.content = updatedContent;
+    news.keyWords = keyWords;
     const updatedNews = await news.save();
 
     res.status(200).json({ message: '文章更新成功！', updatedNews });

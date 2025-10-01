@@ -97,7 +97,7 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
   });
 
   // 设置链接
-  const setLink = useCallback(async () => {
+  const setLink = async () => {
     const { value: url } = await Swal.fire({
       title: "插入链接",
       input: "url",
@@ -116,10 +116,10 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
         .setLink({ href: url })
         .run();
     }
-  }, [editor]);
+  }
 
   // 新增 addVideo
-  const addVideo = useCallback(async () => {
+  const addVideo = async () => {
     const { value: url } = await Swal.fire({
       title: "插入视频",
       input: "url",
@@ -134,10 +134,10 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
 
     // 直接插入 GCS 视频链接
     editor?.chain().focus().setIframe({ src: url }).run();
-  }, [editor]);
+  }
 
   // 添加图片
-  const addImage = useCallback(async () => {
+  const addImage = async () => {
     const { value: imageUrl, isDismissed } = await Swal.fire({
       title: "添加图片",
       input: "url",
@@ -195,45 +195,42 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
       }
     };
     input.click();
-  }, [HOST, editor, imagesKey]);
+  }
 
   // 清理未使用的图片
-  const removeUnusedImages = useCallback(
-    async (currentImages: string[]) => {
-      const storedImages: string[] = JSON.parse(localStorage.getItem(imagesKey) || "[]");
-      const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/";
+  const removeUnusedImages = async (currentImages: string[]) => {
+    const storedImages: string[] = JSON.parse(localStorage.getItem(imagesKey) || "[]");
+    const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/";
 
-      const removedImages = storedImages.filter(
-        (url) => url.startsWith(gcsPrefix) && !currentImages.includes(url)
+    const removedImages = storedImages.filter(
+      (url) => url.startsWith(gcsPrefix) && !currentImages.includes(url)
+    );
+
+    console.log('被删除的图片为：', removedImages)
+
+    if (removedImages.length > 0) {
+      await Promise.all(
+        removedImages.map((url) =>
+          axios
+            .post(`${HOST}/api/${path}/image/delete`, { url }, { withCredentials: true })
+            .catch((err) => console.error("图片删除失败:", url, err))
+        )
       );
-
-      console.log('被删除的图片为：', removedImages)
-
-      if (removedImages.length > 0) {
-        await Promise.all(
-          removedImages.map((url) =>
-            axios
-              .post(`${HOST}/api/${path}/image/delete`, { url }, { withCredentials: true })
-              .catch((err) => console.error("图片删除失败:", url, err))
-          )
-        );
-      }
-    },
-    [HOST, imagesKey]
-  );
+    }
+  }
 
   // 清理草稿
-  const clearDraft = useCallback(() => {
+  const clearDraft = () => {
     editor?.off("update");
     localStorage.removeItem(titleKey);
     localStorage.removeItem(keyWordsKey);
     localStorage.removeItem(contentKey);
     localStorage.removeItem(imagesKey);
-  }, [contentKey, imagesKey, titleKey, keyWordsKey, editor]);
+  };
 
 
   // 提取当前编辑器中的图片
-  const getCurrentImages = useCallback((): string[] => {
+  const getCurrentImages = (): string[] => {
     const html = editor?.getHTML() || "";
     const imageRegex = /<img[^>]+src="([^">]+)"/g;
     const images: string[] = [];
@@ -246,10 +243,10 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
     }
 
     return images;
-  }, [editor]);
+  };
 
   // 处理表单提交
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     if (isSubmitting) {
       e.preventDefault();
       return;
@@ -272,7 +269,10 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
       //格式化关键字
       //1.	正则 [\s\u3000]+ 会匹配 连续的空白字符（包括半角空格、Tab、换行、中文全角空格）。
       //2.	split 会把这些匹配的部分 当作分隔符丢掉。
-      const keyWordsArray = keyWords.split(/[\s\u3000]+/);
+      const keyWordsArray = keyWords
+        .trim()
+        .split(/[\s\u3000]+/)
+        .filter(Boolean);
 
       // 根据类型执行不同的请求
       if (type === "update" && id) {
@@ -311,107 +311,110 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
       setFeedback(type === "update" ? "❌ 更新失败" : "❌ 创建失败");
       setIsSubmitting(false);
     }
-  }, [
-    title,
-    editor,
-    type,
-    id,
-    HOST,
-    getCurrentImages,
-    removeUnusedImages,
-    clearDraft,
-    navigate,
-    isSubmitting,
-    imagesKey
-  ]);
+  };
 
   // 删除文章
-  const handleDelete = useCallback(
-    (id: string) => {
-      Swal.fire({
-        title: "确定删除吗？",
-        text: "此操作不可撤销！",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios
-            .delete(`${HOST}/api/${path}/delete/${id}`, {
-              withCredentials: true,
-            })
-            .then(() => {
-              console.log("删除成功");
-              clearDraft();
-              // ✅ 执行外部传入的回调
-              onDeleted?.(id);
+  const handleDelete = (id: string) => {
+    Swal.fire({
+      title: "确定删除吗？",
+      text: "此操作不可撤销！",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`${HOST}/api/${path}/delete/${id}`, {
+            withCredentials: true,
+          })
+          .then(() => {
+            console.log("删除成功");
+            clearDraft();
+            // ✅ 执行外部传入的回调
+            onDeleted?.(id);
 
-              Swal.fire("已删除!", "文章已成功删除。", "success");
-            })
-            .catch((error) => {
-              console.error("删除失败:", error);
-              Swal.fire("删除失败", "请稍后重试。", "error");
-            });
-        }
-      });
-    },
-    [HOST, path, clearDraft, onDeleted]
-  );
+            Swal.fire("已删除!", "文章已成功删除。", "success");
+          })
+          .catch((error) => {
+            console.error("删除失败:", error);
+            Swal.fire("删除失败", "请稍后重试。", "error");
+          });
+      }
+    });
+  }
 
+  // 实时保存标题
   useEffect(() => {
-    // 初始化文章（仅 update 且有 id 且 editor 已准备好）
+    if (title.trim()) {
+      localStorage.setItem(titleKey, title);
+    } else {
+      localStorage.removeItem(titleKey);
+    }
+  }, [title, titleKey]);
+
+  // 实时保存关键字
+  useEffect(() => {
+    if (keyWords.trim()) {
+      localStorage.setItem(keyWordsKey, keyWords);
+    } else {
+      localStorage.removeItem(keyWordsKey);
+    }
+  }, [keyWords, keyWordsKey]);
+
+  // 实时保存内容
+  useEffect(() => {
+    if (!editor) return;
+
+    const updateHandler = () => {
+      const html = editor.getHTML();
+      localStorage.setItem(contentKey, html);
+    };
+
+    editor.on("update", updateHandler);
+    return () => {
+      editor.off("update", updateHandler);
+    };
+  }, [editor, contentKey]);
+
+  // 初始化数据（仅用于更新）
+  useEffect(() => {
     if (type === "update" && id && editor) {
       const hasLocalDraft =
         localStorage.getItem(titleKey) || localStorage.getItem(contentKey) || localStorage.getItem(keyWordsKey);
 
       if (!hasLocalDraft) {
-        axios.get(`${HOST}/api/${path}/${id}`)
-          .then(res => {
+        axios
+          .get(`${HOST}/api/${path}/${id}`)
+          .then((res) => {
             const { article } = res.data;
             const kwStr = (article.keyWords || []).join(" ");
 
             setTitle(article.title);
             setKeyWords(kwStr);
-            editor.commands.setContent(article.content);
+            editor?.commands.setContent(article.content);
 
             localStorage.setItem(titleKey, article.title);
             localStorage.setItem(keyWordsKey, kwStr);
             localStorage.setItem(contentKey, article.content);
 
+            //初始化格式化数据
             const imgUrls = Array.from(article.content.matchAll(/<img[^>]+src="([^">]+)"/g))
               .map((m: any) => decodeUrl(m[1]));
             localStorage.setItem(imagesKey, JSON.stringify(imgUrls));
           })
-          .catch(err => {
-            if (axios.isAxiosError(err) && err.response?.status === 404) {
-              setnoExistingArticle(true);
+          .catch((error) => {
+            console.error("获取文章失败", (error as Error).message);
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
+              setnoExistingArticle(true); // ✅ 捕获 404 时设置
             }
-          }).finally(() => setIsLoading(false));
+          })
+          .finally(() => setIsLoading(false));
       } else {
-        setIsLoading(false); // ✅ 本地有草稿也要结束 loading
+        setIsLoading(false);
       }
     }
-
-    // 实时同步标题和关键字
-    if (title.trim()) localStorage.setItem(titleKey, title);
-    else localStorage.removeItem(titleKey);
-
-    if (keyWords.trim()) localStorage.setItem(keyWordsKey, keyWords);
-    else localStorage.removeItem(keyWordsKey);
-
-    // 实时同步内容
-    if (editor) {
-      const updateHandler = () => {
-        const html = editor.getHTML();
-        localStorage.setItem(contentKey, html);
-      };
-      editor.on("update", updateHandler);
-      return () => {
-        editor.off("update", updateHandler);
-      };
-    }
-  }, [HOST, editor, id, type, titleKey, keyWordsKey, contentKey, imagesKey, path]);
+  }, [HOST, editor, id, type, contentKey, imagesKey, titleKey, keyWordsKey]);
 
   return {
     title,

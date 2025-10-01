@@ -5,7 +5,6 @@ export interface INews extends Document {
   title: string,
   content: string,
   author: string,
-  source: string,
   comments: string[],
   keyWords: string[],
   createdAt: Date,
@@ -24,9 +23,6 @@ const NewsSchema: Schema<INews> = new Schema({
   author: {
     type: String,
     required: true
-  },
-  source: {
-    type: String,
   },
   comments: {
     type: [String], default: []

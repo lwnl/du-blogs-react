@@ -87,8 +87,6 @@ bannedBookRouter.get('/:id', authOptional, async (req: AuthRequest, res: Respons
         currentRating = userComment.rating
       }
     }
-    console.log('当前用户为：', user)
-    console.log('currentRating is', currentRating)
     res.status(200).json({
       message: '成功获取数据！',
       book,

@@ -111,7 +111,6 @@ const UpdateArticle = ({ path }: UpdateArticleProps) => {
             type="text"
             value={keyWords}
             onChange={(e) => setKeyWords(e.target.value)}
-            style={{ width: `${keyWords.length + 1}ch` }}
           />
         </div>
         <button
