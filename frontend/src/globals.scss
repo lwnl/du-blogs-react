@@ -14,7 +14,9 @@
   flex-direction: column;
   gap: 50px;
 
-  &:has(.UpdateArticle), &:has(.NewArticle), &:has(.AddBannedBook) {
+  &:has(.UpdateArticle),
+  &:has(.NewArticle),
+  &:has(.AddBannedBook) {
     height: 100svh;
     gap: 5px;
   }
@@ -29,4 +31,8 @@
 
 button {
   user-select: none;
+}
+
+a {
+  text-underline-offset: var(--size-100);
 }

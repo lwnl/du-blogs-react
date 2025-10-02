@@ -10,6 +10,7 @@ export interface IArticle {
   _id: string;
   title: string;
   content: string;
+  keyWords: string[];
   author: string;
   createdAt: string;
   updatedAt: string;

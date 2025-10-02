@@ -1,0 +1,28 @@
+.search-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-500);
+
+  h4 {
+    text-align: center;
+
+    span {
+      color:red;
+    }
+  }
+
+  .search-result-type h5 {
+    margin-bottom: var(--size-200);
+  }
+
+  li {
+    display: flex;
+    a {
+      text-decoration: none;
+    }
+
+    span {
+      margin-left: auto;
+    }
+  }
+}

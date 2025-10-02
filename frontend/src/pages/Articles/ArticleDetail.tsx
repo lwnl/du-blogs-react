@@ -245,6 +245,17 @@ const ArticleDetail = ({ commentType, path }: ArticleProps) => {
         <h3 className="title">{article.title}</h3>
       </div>
 
+      {article.keyWords.length > 0 && (
+        <div className="keyWords">
+          关键字：
+          {article.keyWords.map((keyword, index) => (
+            <Link key={index} to={`/search/tag/${keyword}`}>
+              <span>{keyword}#</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* 将 article.content 里的 HTML 字符串直接渲染成真正的 HTML 结构 */}
       <article
         className="article-content"

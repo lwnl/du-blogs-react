@@ -4,6 +4,7 @@ import { jsonDateTransform } from '../utils/formatDate'
 export interface IVideo extends Document {
   title: string;
   comments: string[];
+  keyWords: string[];
   category: string;
   url: string;
   createdAt: Date;
@@ -16,6 +17,9 @@ const VideoSchema: Schema<IVideo> = new Schema({
     required: true
   },
   comments: {
+    type: [String], default: []
+  },
+  keyWords: {
     type: [String], default: []
   },
   category: {

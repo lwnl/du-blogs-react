@@ -5,7 +5,7 @@ $line-number: 9;
 
 .BannedBooks {
   a {
-    text-underline-offset: var(--size-100);
+   text-decoration: none;
   }
 
   li {

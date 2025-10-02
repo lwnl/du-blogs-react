@@ -11,6 +11,7 @@ import AddNew from "./pages/Articles/AddNew";
 import ArticleDetail from "./pages/Articles/ArticleDetail";
 import AllArticles from "./pages/Articles/AllArticles";
 import AddBannedBook from "./pages/Book/AddBannedBook";
+import SearchPage from "./pages/SearchPage";
 
 export default function App() {
   return (
@@ -20,6 +21,9 @@ export default function App() {
         {/* 默认首页 */}
         <Route path="/users/register" element={<Register />} />
         <Route path="/users/login" element={<Login />} />
+
+        {/* 搜索结果页面 */}
+        <Route path="/search/:type?/:keyword" element={<SearchPage />} />
 
         {/* 博客 */}
         <Route path="/articles" element={<AllArticles path='articles'/>} />

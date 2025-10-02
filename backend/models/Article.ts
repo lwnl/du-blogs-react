@@ -7,9 +7,9 @@ export interface IArticle extends Document {
   content: string;
   author: string;
   comments: string[];
+  keyWords: string[];
   createdAt: Date;
   updatedAt: Date;
-  keyWords: string[];
 }
 
 const ArticleSchema: Schema<IArticle> = new Schema({
