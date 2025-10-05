@@ -42,28 +42,15 @@ const SearchPage = () => {
     },
   });
 
-  const pageSize = 4;
+  const pageSize = 2;
 
   // 处理翻页
-  const newsHandlePageChange = (pageNumber: number) => {
-    if (pageNumber < 1 || pageNumber > totalPages.news) return;
-    setCurrentPage((prev) => {
-      return { ...prev, news: pageNumber };
-    });
-  };
-
-  const blogHandlePageChange = (pageNumber: number) => {
-    if (pageNumber < 1 || pageNumber > totalPages.blog) return;
-    setCurrentPage((prev) => {
-      return { ...prev, blog: pageNumber };
-    });
-  };
-
-  const videoHandlePageChange = (pageNumber: number) => {
-    if (pageNumber < 1 || pageNumber > totalPages.video) return;
-    setCurrentPage((prev) => {
-      return { ...prev, video: pageNumber };
-    });
+  const handlePageChange = (type: keyof IPage, pageNumber: number) => {
+    if (pageNumber < 1 || pageNumber > totalPages[type]) return;
+    setCurrentPage((prev) => ({
+      ...prev,
+      [type]: pageNumber,
+    }));
   };
 
   useEffect(() => {
@@ -84,7 +71,9 @@ const SearchPage = () => {
 
   return (
     <section className="search-page">
-      <h4>关键词<span> “{keyword}” </span>搜索结果</h4>
+      <h4>
+        关键词<span> “{keyword}” </span>搜索结果
+      </h4>
       {searchResult.news.length > 0 && (
         <div className="search-result-type">
           <h5>要闻</h5>
@@ -99,7 +88,7 @@ const SearchPage = () => {
           <Pagination
             currentPage={currentPage.news}
             totalPages={totalPages.news}
-            onPageChange={newsHandlePageChange}
+            onPageChange={(page) => handlePageChange("news", page)}
           />
         </div>
       )}
@@ -118,7 +107,7 @@ const SearchPage = () => {
           <Pagination
             currentPage={currentPage.blog}
             totalPages={totalPages.blog}
-            onPageChange={blogHandlePageChange}
+            onPageChange={(page) => handlePageChange("blog", page)}
           />
         </div>
       )}
@@ -137,7 +126,7 @@ const SearchPage = () => {
           <Pagination
             currentPage={currentPage.video}
             totalPages={totalPages.video}
-            onPageChange={videoHandlePageChange}
+            onPageChange={(page) => handlePageChange("video", page)}
           />
         </div>
       )}
