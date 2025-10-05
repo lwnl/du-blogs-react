@@ -5,7 +5,7 @@ export interface IComment extends Document {
   subjectId: string,
   content: string,
   user: string,
-  type: "news" | "blog",
+  type: "news" | "blog" | "video",
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,7 +29,7 @@ const CommentSchema: Schema<IComment> = new Schema({
   type: {
     type: String,
     required: true,
-    enum: ['news', 'blog']
+    enum: ['news', 'blog', 'video']
   }
 }, {
   timestamps: {

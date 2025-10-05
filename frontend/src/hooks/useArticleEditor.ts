@@ -16,8 +16,8 @@ interface useArticleEditorOptions {
   id?: string;
   onDeleted?: (id: string) => void;
   HOST: string;
-  type: "new" | "update";
-  path: 'articles' | 'news-list';
+  type?: "new" | "update";
+  path: 'articles' | 'news-list' | 'videos';
   navigate: ReturnType<typeof useNavigate>;
 }
 

@@ -10,11 +10,13 @@ const storage = new Storage({
 const bucketName = 'daniel-jansen7879-bucket-1';
 const bucket = storage.bucket(bucketName);
 
+//上传文件
 const uploadFileToGCS = async (file: Express.Multer.File, folder: string) => {
+  const filePath = `projects/free-talk/images/${folder}/${Date.now()}-${file.originalname}`;
+  const blob = bucket.file(filePath);
+
   return new Promise<string>(async (resolve, reject) => {
     try {
-      const filePath = `projects/free-talk/images/${folder}/${Date.now()}-${file.originalname}`;
-      const blob = bucket.file(filePath);
 
       const blobStream = blob.createWriteStream({
         resumable: false,
@@ -38,7 +40,7 @@ const uploadFileToGCS = async (file: Express.Multer.File, folder: string) => {
   });
 };
 
-
+// 在不同文件夹之间移动文件
 const moveFolder = async (srcPrefix: string, destPrefix: string) => {
   const [files] = await bucket.getFiles({ prefix: srcPrefix });
 
@@ -53,6 +55,7 @@ const moveFolder = async (srcPrefix: string, destPrefix: string) => {
   );
 };
 
+// 删除文件夹
 const deleteFolder = async (prefix: string) => {
   const [files] = await bucket.getFiles({ prefix });
 
@@ -60,9 +63,29 @@ const deleteFolder = async (prefix: string) => {
     console.log(`文件夹为空: ${prefix}`);
     return;
   }
-  if (files.length > 0) {
-    await Promise.all(files.map((file) => file.delete()));
-  }
+
+  await Promise.all(files.map((file) => file.delete()));
 };
 
-export { bucket, uploadFileToGCS, moveFolder, deleteFolder }
+// 根据公共 URL 删除文件
+const deleteFileByUrl = async (publicUrl: string) => {
+// 公共 URL 格式: https://storage.googleapis.com/<bucket>/<filePath>
+  const url = new URL(publicUrl);
+  const pathname = url.pathname; // /<bucket>/<filePath>
+  const parts = pathname.split('/').filter(Boolean);
+
+  if (parts.length < 2) {
+    throw new Error('URL 格式不正确');
+  }
+
+  const bucketFromUrl = parts[0];
+  const filePath = parts.slice(1).join('/');
+
+  if (bucketFromUrl !== bucket.name) {
+    throw new Error('URL 对应的 bucket 不匹配');
+  }
+
+  await bucket.file(filePath).delete();
+};
+
+export { bucket, uploadFileToGCS, moveFolder, deleteFolder, deleteFileByUrl }

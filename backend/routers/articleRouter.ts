@@ -266,7 +266,7 @@ articleRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Res
   const folder = `projects/free-talk/images/in-blogs/${id}`;
 
   try {
-    const deletedBlog = await Article.findOneAndDelete({ _id: id, author: req.user.userName }) //只有作者本人可以删除自己的文章
+    const deletedBlog = await Article.findOneAndDelete({ _id: id }) 
     if (!deletedBlog) {
       return res.status(404).json({ error: '文章不存在或无权限删除' });
     }

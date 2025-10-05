@@ -9,23 +9,24 @@ import Calendar from "react-calendar"; // 引入日历组件
 import "react-calendar/dist/Calendar.css";
 import "dayjs/locale/zh-cn";
 
-export interface IArticle extends Document {
+import '../Articles/AllArticles.scss'
+
+export interface IVideo extends Document {
   _id: string;
   title: string;
   content: string;
   category: string;
   createdAt: string;
+  imgUrl: string;
+  videoUrl: string;
   updatedAt: string;
 }
 
-type AllArticlesProps = {
-  path: "articles" | "news-list";
-};
 
-const AllArticles = ({ path }: AllArticlesProps) => {
+const AllVideos = () => {
   const { HOST, user, authenticated, refetchAuth } = useAuthCheck();
 
-  const [articles, setArticles] = useState<IArticle[]>([]);
+  const [videos, setVideos] = useState<IVideo[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -38,18 +39,17 @@ const AllArticles = ({ path }: AllArticlesProps) => {
     setCurrentPage(pageNumber);
   };
 
-  // 删除文章
+  // 删除视频
   const { handleDelete } = useArticleEditor({
     HOST,
-    type: "update",
-    path,
+    path:'videos',
     onDeleted: (id) =>
-      setArticles((prev) => prev.filter((article) => article._id !== id)),
+      setVideos((prev) => prev.filter((video) => video._id !== id)),
     navigate: () => {},
   });
 
   useEffect(() => {
-    let url = `${HOST}/api/${path}?pageNumber=${currentPage}&pageSize=${pageSize}`;
+    let url = `${HOST}/api/videos?pageNumber=${currentPage}&pageSize=${pageSize}`;
     if (selectedDate) {
       const year = selectedDate.getFullYear();
       const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
@@ -60,7 +60,7 @@ const AllArticles = ({ path }: AllArticlesProps) => {
     axios
       .get(url)
       .then((res) => {
-        setArticles(res.data.articles);
+        setVideos(res.data.videos);
         setTotalPages(Math.ceil(res.data.total / pageSize) || 1);
       })
       .catch((error: any) => {
@@ -72,52 +72,42 @@ const AllArticles = ({ path }: AllArticlesProps) => {
           console.error("请求错误:", error.message);
         }
       });
-  }, [currentPage, path, selectedDate]);
+  }, [currentPage, selectedDate]);
 
   return (
     <div className="Articles-container">
       <div className="article-and-calendar">
         <ul className="articles">
-          {articles.map((article) => (
-            <li key={article._id}>
+          {videos.map((video) => (
+            <li key={video._id}>
               <h5>
-                <Link to={`/${path}/${article._id}`} target="_blank">
-                  {article.title}
+                <Link to={`/videos/${video._id}`} target="_blank">
+                  {video.title}
                 </Link>
               </h5>
               <div>
-                {article.author === user?.userName ? (
+                {authenticated && user?.role === "Administrator" && (
                   <div>
-                    <Link to={`/${path}/update/${article._id}`}>
-                      <span>更新</span>
-                    </Link>
                     <button
                       className="delete"
                       onClick={() => {
-                        handleDelete(article._id);
+                        handleDelete(video._id);
                       }}
                     >
                       删除
                     </button>
-                    <span>{article.createdAt}</span>
-                  </div>
-                ) : (
-                  <div>
-                    {path === "articles" && <span>博主：{article.author}</span>}
-                    <span>{article.createdAt}</span>
+                    <span>{video.createdAt}</span>
                   </div>
                 )}
               </div>
             </li>
           ))}
-          {authenticated && user?.role === "Administrator" ? (
+          {authenticated && user?.role === "Administrator" && (
             <li className="add-new">
-              <Link to={`/${path}/new`}>
+              <Link to={`/videos/new`}>
                 <button>➕ 添加</button>
               </Link>
             </li>
-          ) : (
-            ""
           )}
         </ul>
         {/* 日历筛选 */}
@@ -129,9 +119,14 @@ const AllArticles = ({ path }: AllArticlesProps) => {
             locale="zh-CN"
             formatDay={(locale, date) => date.getDate().toString()}
           />
-          <button className="show-all" onClick={() => {
-            setSelectedDate(null)
-          }}>查看全部</button>
+          <button
+            className="show-all"
+            onClick={() => {
+              setSelectedDate(null);
+            }}
+          >
+            查看全部
+          </button>
         </div>
       </div>
       {/* 分页组件 */}
@@ -144,4 +139,4 @@ const AllArticles = ({ path }: AllArticlesProps) => {
   );
 };
 
-export default AllArticles;
+export default AllVideos;

@@ -11,6 +11,7 @@ import commentRouter from './routers/commentRouter';
 import bannedBookRouter from './routers/bannedBookRouter';
 import newsRouter from './routers/newsRouter';
 import searchRouter from './routers/searchRouter';
+import videoRouter from './routers/videoRouter';
 
 dotenv.config();
 dbConnection();
@@ -30,6 +31,7 @@ app.use('/api/users', userRouter);
 app.use('/api/comments', commentRouter);
 app.use('/api/banned-books', bannedBookRouter);
 app.use('/api/articles', articleRouter);
+app.use('/api/videos', videoRouter);
 app.use('/api/news-list', newsRouter);
 app.use('/api/search', searchRouter);
 

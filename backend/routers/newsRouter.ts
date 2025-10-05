@@ -255,11 +255,8 @@ newsRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Respon
     })
   }
 
-  const folder = `projects/free-talk/images/in-news/${id}`;
-
-
   try {
-    const deletedNews = await News.findOneAndDelete({ _id: id, author: req.user.userName }) //只有作者本人可以删除自己的文章
+    const deletedNews = await News.findOneAndDelete({ _id: id}) 
     if (!deletedNews) {
       return res.status(404).json({ error: '新闻不存在或无权限删除' });
     }
@@ -272,6 +269,7 @@ newsRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Respon
     }
 
     // 删除文章中的所有保存在gcs中的文件
+    const folder = `projects/free-talk/images/in-news/${id}`;
     await deleteFolder(folder);
 
     res.status(200).json({
