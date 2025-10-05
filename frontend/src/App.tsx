@@ -53,24 +53,24 @@ export default function App() {
 
         {/* 视频 */}
         <Route path="/videos" element={<AllVideos />} />
-        <Route
+        {/* <Route
           path="/videos/:id"
           element={<ArticleDetail commentType="news" path="videos" />}
-        />
+        /> */}
         <Route path="/videos/new" element={<AddVideoOrBook path="videos"/>} />
-        <Route
+        {/* <Route
           path="/videos/update/:id"
           element={<UpdateVideoOrBook path="videos" />}
-        />
+        /> */}
 
         {/* 禁书 */}
         <Route path="/banned-books" element={<BannedBooks />} />
         <Route path="/banned-books/:id" element={<BookDetail />} />
         <Route path="/banned-books/add" element={<AddBannedBook />} />
-        <Route
+        {/* <Route
           path="/banned-books/update/:id"
           element={<UpdateVideoOrBook path="books" />}
-        />
+        /> */}
 
         {/* 404 页面通配符路由 */}
         <Route path="*" element={<NotFound />} />
