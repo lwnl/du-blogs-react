@@ -6,7 +6,8 @@ export interface IVideo extends Document {
   comments: string[];
   keyWords: string[];
   category: string;
-  url: string;
+  imgUrl: string;
+  videoUrl: string;
   createdAt: Date;
   updateAt: Date;
 }
@@ -25,10 +26,13 @@ const VideoSchema: Schema<IVideo> = new Schema({
   category: {
     type: String,
   },
-  url: {
+  imgUrl: {
+    type: String,
+  },
+  videoUrl: {
     type: String,
     required: true
-  }
+  },
 }, {
   timestamps: {
     createdAt: true,
