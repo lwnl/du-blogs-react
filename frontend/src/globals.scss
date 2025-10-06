@@ -16,7 +16,7 @@
 
   &:has(.UpdateArticle),
   &:has(.NewArticle),
-  &:has(.AddBannedBook) {
+  &:has(.AddBookOrVideo) {
     height: 100svh;
     gap: 5px;
   }

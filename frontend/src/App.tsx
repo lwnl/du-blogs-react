@@ -10,9 +10,9 @@ import UpdateArticle from "./pages/Articles/UpdateArticle";
 import AddNew from "./pages/Articles/AddNew";
 import ArticleDetail from "./pages/Articles/ArticleDetail";
 import AllArticles from "./pages/Articles/AllArticles";
-import AddBannedBook from "./pages/Book/AddBannedBook";
 import SearchPage from "./pages/SearchPage";
 import AllVideos from "./pages/Videos/AllVideos";
+import AddBookOrVideo from "./pages/Book/AddBookOrVideo";
 
 export default function App() {
   return (
@@ -57,7 +57,7 @@ export default function App() {
           path="/videos/:id"
           element={<ArticleDetail commentType="news" path="videos" />}
         /> */}
-        <Route path="/videos/new" element={<AddVideoOrBook path="videos"/>} />
+        <Route path="/videos/add" element={<AddBookOrVideo path="videos"/>} />
         {/* <Route
           path="/videos/update/:id"
           element={<UpdateVideoOrBook path="videos" />}
@@ -66,7 +66,7 @@ export default function App() {
         {/* 禁书 */}
         <Route path="/banned-books" element={<BannedBooks />} />
         <Route path="/banned-books/:id" element={<BookDetail />} />
-        <Route path="/banned-books/add" element={<AddBannedBook />} />
+        <Route path="/banned-books/add" element={<AddBookOrVideo path="banned-books"/>} />
         {/* <Route
           path="/banned-books/update/:id"
           element={<UpdateVideoOrBook path="books" />}

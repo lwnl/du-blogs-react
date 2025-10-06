@@ -78,8 +78,8 @@ videoRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Respo
     }
 
     // 删除存储在gcs中的图片和视频
-    await deleteFileByUrl(deletedItem.videoUrl)
-    if (deletedItem.imgUrl) await deleteFileByUrl(deletedItem.videoUrl)
+    await deleteFileByUrl(deletedItem.downloadLink)
+    if (deletedItem.coverLink) await deleteFileByUrl(deletedItem.downloadLink)
       
     res.status(200).json({
       message: '成功删除！'
