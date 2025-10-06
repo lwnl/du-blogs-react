@@ -86,8 +86,8 @@ const AddBookOrVideo = ({ path }: AddBookOrVideoProps) => {
           标题 / 书名：
           <input
             type="text"
-            name="bookName"
-            value={formData.bookName}
+            name={path === "banned-books" ? "bookName" : "title"}
+            value={path === "banned-books" ? formData.bookName : formData.title}
             onChange={handleChange}
             required
           />
@@ -152,21 +152,24 @@ const AddBookOrVideo = ({ path }: AddBookOrVideoProps) => {
           </label>
         )}
 
-        {path === "banned-books" && (
-          <label className="summary">
-            简介：
-            <textarea
-              name="summary"
-              rows={6}
-              value={formData.summary}
-              onChange={handleChange}
-              required
-            ></textarea>
-            <button type="submit" disabled={loading}>
-              {loading ? "提交中..." : "提交"}
-            </button>
-          </label>
-        )}
+        <label className="summary">
+          {path === "banned-books" && (
+            <>
+              简介：
+              <textarea
+                name="summary"
+                rows={6}
+                value={formData.summary}
+                onChange={handleChange}
+                required
+              ></textarea>
+            </>
+          )}
+
+          <button type="submit" disabled={loading}>
+            {loading ? "提交中..." : "提交"}
+          </button>
+        </label>
 
         {error && <p className="error">{error}</p>}
       </form>

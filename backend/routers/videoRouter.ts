@@ -51,6 +51,25 @@ videoRouter.get('/', async (req: AuthRequest, res: Response) => {
   }
 })
 
+// 添加新条目
+videoRouter.post('/add', authAdmin, async (req: AuthRequest, res: Response) => {
+  const newVideo = req.body
+  if (!newVideo) {
+    return res.status(400).json({
+      error:'数据错误'
+    })
+  }
+  try {
+    await Video.create(newVideo)
+    res.status(201).json({
+      message: '成功添加新视频'
+    })
+  } catch (error) {
+    console.error('添加视频错误：', (error as Error).message)
+    res.status(500).json({ error: '添加视频出错' })
+  }
+})
+
 // 删除视频，评论，缩略图
 videoRouter.delete('/delete/:id', authAdmin, async (req: AuthRequest, res: Response) => {
   const id = req.params.id
