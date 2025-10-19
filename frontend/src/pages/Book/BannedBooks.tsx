@@ -162,11 +162,12 @@ const BannedBooks = () => {
         })}
       </ul>
       {/* 添加新书按钮 */}
-      <div className="add-book-btn">
+      {user?.role === 'Administrator' &&   <div className="add-book-btn">
         <button onClick={() => navigate("/banned-books/add")}>
           ➕ 添加
         </button>
-      </div>
+      </div>}
+    
     </div>
   );
 };
