@@ -7,7 +7,11 @@ const storage = new Storage({
   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // 从 .env 读取
 });
 
-const bucketName = 'daniel-jansen7879-bucket-1';
+const bucketName = process.env.GCS_BUCKET_NAME;
+if (!bucketName) {
+  throw new Error('GCS_BUCKET_NAME is not defined');
+}
+
 const bucket = storage.bucket(bucketName);
 
 //上传文件
@@ -69,7 +73,7 @@ const deleteFolder = async (prefix: string) => {
 
 // 根据公共 URL 删除文件
 const deleteFileByUrl = async (publicUrl: string) => {
-// 公共 URL 格式: https://storage.googleapis.com/<bucket>/<filePath>
+  // 公共 URL 格式: https://storage.googleapis.com/<bucket>/<filePath>
   const url = new URL(publicUrl);
   const pathname = url.pathname; // /<bucket>/<filePath>
   const parts = pathname.split('/').filter(Boolean);

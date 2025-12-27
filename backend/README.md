@@ -1,15 +1,3 @@
-# backend
-
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.19. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+变换网址需更改：
+1 mongodb 目录 （backend env）
+2 Google drive 文件目录： gcsOperating.ts

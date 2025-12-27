@@ -103,7 +103,7 @@ const Register = () => {
           {userExists ? (
             <span className="error">'该用户名已存在！'</span>
           ) : (
-            <span>✅ 改用户名可用！</span>
+            <span>✅ 该用户名可用！</span>
           )}
         </p>
       )}

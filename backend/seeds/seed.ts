@@ -19,7 +19,7 @@ async function seed() {
   try {
     await dbConnection()
     rl.question(
-      "请选择初始化数据内容:\n7. 授权管理员\n8. 取消管理员\n请输入编号: ",
+      "请选择初始化数据内容:\n4. 初始化禁书数据\n7. 授权管理员\n8. 取消管理员\n请输入编号: ",
       async (choice) => {
         try {
           switch (choice.trim()) {
@@ -35,14 +35,14 @@ async function seed() {
             //   await seedArticles();
             //   await disconnection();
             //   break;
-            // case "4":
-            //   await seedBannedBook()
-            //   await disconnection();
-            //   break;
+            case "4":
+              await seedBannedBook()
+              await disconnection();
+              break;
             // case "5":
             //   await seedBannedBookComments()
             //   await disconnection();
-              // break;
+            //   break;
             // case "6":
             //   await seedNews() 
             //   await disconnection();
