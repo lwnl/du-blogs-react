@@ -12,6 +12,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Iframe from "../extensions/Iframe";
 
+const bucketName = import.meta.env.VITE_GCS_BUCKET_NAME;
+
 interface useArticleEditorOptions {
   id?: string;
   onDeleted?: (id: string) => void;
@@ -183,7 +185,7 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
           editor?.chain().focus().setImage({ src: res.data.url }).run();
 
           // ✅ 只保存 GCS 上传的图片
-          const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/";
+          const gcsPrefix = `https://storage.googleapis.com/${bucketName}/projects/free-talk/images/`;
           if (res.data.url.startsWith(gcsPrefix)) {
             const storedImages = JSON.parse(localStorage.getItem(imagesKey) || "[]");
             storedImages.push(res.data.url);
@@ -200,7 +202,7 @@ export const useArticleEditor = ({ id, HOST, type, navigate, path, onDeleted }: 
   // 清理未使用的图片
   const removeUnusedImages = async (currentImages: string[]) => {
     const storedImages: string[] = JSON.parse(localStorage.getItem(imagesKey) || "[]");
-    const gcsPrefix = "https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/free-talk/images/";
+    const gcsPrefix = `https://storage.googleapis.com/${bucketName}/projects/free-talk/images/`;
 
     const removedImages = storedImages.filter(
       (url) => url.startsWith(gcsPrefix) && !currentImages.includes(url)

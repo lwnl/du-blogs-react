@@ -19,7 +19,7 @@ async function seed() {
   try {
     await dbConnection()
     rl.question(
-      "请选择初始化数据内容:\n4. 初始化禁书数据\n7. 授权管理员\n8. 取消管理员\n请输入编号: ",
+      "请选择初始化数据内容:\n3. 初始化博客数据\n4. 初始化禁书数据\n6. 初始化新闻数据\n7. 授权管理员\n8. 取消管理员\n请输入编号: ",
       async (choice) => {
         try {
           switch (choice.trim()) {
@@ -31,10 +31,10 @@ async function seed() {
             //   await seedComments();
             //   await disconnection();
             //   break;
-            // case "3":
-            //   await seedArticles();
-            //   await disconnection();
-            //   break;
+            case "3":
+              await seedArticles();
+              await disconnection();
+              break;
             case "4":
               await seedBannedBook()
               await disconnection();
@@ -43,10 +43,10 @@ async function seed() {
             //   await seedBannedBookComments()
             //   await disconnection();
             //   break;
-            // case "6":
-            //   await seedNews() 
-            //   await disconnection();
-            //   break;
+            case "6":
+              await seedNews() 
+              await disconnection();
+              break;
             case "7":
               rl.question("请输入要授权为管理员的用户名: ", (username) => {
                 authAdmin(username.trim())
