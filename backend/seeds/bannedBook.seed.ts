@@ -41,6 +41,30 @@ const bannedBooks = [
     coverLink: 'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/Mao_Ze_Dong_Xian_Wei_Ren_Zhi_De_Gu_Shi.jpg',
     downloadLink: 'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/books/%E6%AF%9B%E6%B3%BD%E4%B8%9C%EF%BC%9A%E9%B2%9C%E4%B8%BA%E4%BA%BA%E7%9F%A5%E7%9A%84%E6%95%85%E4%BA%8B.pdf',
   },
+  {
+    order: 6,
+    bookName: '九评共产党',
+    format: 'PDF',
+    summary: '《九评共产党》简称《九评》，是《大纪元时报》于2004年11月19日发表的系列评论性文章，主要是对共产主义和共产党（尤其是中国共产党）的政治观及宇宙观的评价。《九评共产党》获得2005年美国亚裔记者协会颁发网络报导类最佳奖之一。<br/><br/>美国国会参众两院支持中国人退党运动的决议及部分境外媒体均认为此书引发退出中国共产党相关组织的三退运动。该书已经被翻译为27种语言。外媒《言者》（The Speaker）指出，《九评》是对中国共产党的历史、意识形态、做法，以及诸此对中国文化、价值观及一般中国人产生的影响所做的系列回顾、剖析及批评；对“大量”中国人来说，《九评》是唯一独立于中共以外的，对中国的重大历史事件包括大跃进、文化大革命等做出的回顾和解读。大纪元总编辑郭军在自由亚洲电台专访中表示，《九评》最大特点，就是在中国共产党“党文化”的语言系统之外来看待中国共产党和中国发生的事情。',
+    coverLink: 'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/%E4%B9%9D%E8%AF%84%E5%85%B1%E4%BA%A7%E5%85%9A%E5%B0%81%E9%9D%A2.jpg',
+    downloadLink: 'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/books/9pinggb_A4.pdf',
+  },
+  {
+    order: 7,
+    bookName: '共产主义终极目的',
+    format: 'PDF',
+    summary: '从第一个共产政权苏俄出现到今天，整整一百年过去了。在短短一个世纪的时间里，共产主义造成了上亿人的死亡。共产党从一开始就亮出了与神争夺人类的旗帜，喊出〝从来就没有什么救世主〞，要把〝旧世界打个落花流水〞。<br/><br/>共产主义来自何处？为什么宇宙中会冒出个共产党？共产主义的本质究竟是什么？结局又会怎样？对这些根本问题的答案，人们众说纷纭，现在是揭开谜底的时候了。',
+    coverLink: 'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/%E5%85%B1%E4%BA%A7%E4%B8%BB%E4%B9%89%E7%9A%84%E7%BB%88%E6%9E%81%E7%9B%AE%E7%9A%84-%E5%B0%81%E9%9D%A2.jpg',
+    downloadLink: 'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/books/%E5%85%B1%E4%BA%A7%E4%B8%BB%E4%B9%89%E7%BB%88%E6%9E%81%E7%9B%AE%E7%9A%84.pdf',
+  },
+  {
+    order: 8,
+    bookName: '魔鬼在统治着我们的世界',
+    format: 'PDF',
+    summary: '《九评》编辑部新书《魔鬼在统治着我们的世界》在台湾出版发行，书店及网路书店均可购买。该书分为上、下册，上册404页、下册432页。<br/><br/>《魔鬼在统治着我们的世界》是《九评》编辑部继《共产主义的终极目的》之后的又一巨著。全名为《魔鬼在统治着我们的世界——共产党的幽灵并没有随着东欧共产党的解体而消失》。',
+    coverLink: 'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/images/in-books/%E9%AD%94%E9%AC%BC%E5%9C%A8%E7%BB%9F%E6%B2%BB%E7%9D%80%E6%88%91%E4%BB%AC%E7%9A%84%E4%B8%96%E7%95%8C-%E5%B0%81%E9%9D%A2.jpeg',
+    downloadLink: 'https://storage.googleapis.com/daniel-jansen7879-bucket-1/projects/my-blog/books/%E9%AD%94%E9%AC%BC%E5%9C%A8%E7%BB%9F%E6%B2%BB%E7%9D%80%E6%88%91%E4%BB%AC%E7%9A%84%E4%B8%96%E7%95%8C.pdf',
+  },
 ]
 
 export async function seedBannedBook() {
